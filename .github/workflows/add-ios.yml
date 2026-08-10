@@ -1,0 +1,57 @@
+name: Add Capacitor iOS (with CocoaPods)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  add-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Add iOS platform
+        run: |
+          npm install @capacitor/ios
+          if [ ! -d "ios" ]; then
+            npx cap add ios
+          fi
+          npx cap sync ios
+
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      - name: Run pod install
+        run: |
+          echo "Searching for Podfile..."
+          PODFILE_PATH=$(find ios -name Podfile | head -n 1)
+          echo "Podfile found at: $PODFILE_PATH"
+          cd "$(dirname "$PODFILE_PATH")"
+          pod install --repo-update
+
+      - name: Verify workspace exists
+        run: |
+            find ios -name "*.xcworkspace"
+
+      - name: Commit generated iOS project
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add ios package-lock.json
+          git commit -m "Add iOS platform + CocoaPods workspace" || echo "No changes"
+          git push

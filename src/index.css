@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 220 20% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
+
+    /* Sanam brand — sampled from full logo: orange #EE8820, green #8CC040 */
+    --primary: 30 86% 53%;
+    --primary-foreground: 0 0% 100%;
+
+    --primary-dark: 30 86% 42%;
+    --primary-light: 30 90% 62%;
+    --primary-pale: 30 85% 92%;
+
+    --secondary: 84 40% 95%;
+    --secondary-foreground: 84 45% 28%;
+
+    --muted: 30 20% 96%;
+    --muted-foreground: 220 10% 45%;
+
+    --accent: 84 45% 94%;
+    --accent-foreground: 84 50% 32%;
+
+    --brand-green: 84 50% 50%;
+    --brand-green-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 15% 90%;
+    --input: 30 15% 90%;
+    --ring: 30 86% 53%;
+
+    --radius: 0.75rem;
+
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --info: 217 91% 60%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 20% 5%;
+    --foreground: 0 0% 95%;
+    --card: 220 20% 8%;
+    --card-foreground: 0 0% 95%;
+    --popover: 220 20% 8%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 30 90% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 12%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 220 15% 12%;
+    --muted-foreground: 220 10% 60%;
+    --accent: 84 30% 18%;
+    --accent-foreground: 84 50% 70%;
+    --brand-green: 84 50% 48%;
+    --brand-green-foreground: 0 0% 100%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 220 15% 15%;
+    --input: 220 15% 15%;
+    --ring: 30 90% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+/* Always paint the iOS status bar / overscroll area with the app background
+   so it does not change color while scrolling. */
+html {
+  background-color: hsl(var(--background));
+  overscroll-behavior-y: none;
+}
+
+/* iOS safe-area handling for Capacitor native app */
+@supports (padding: env(safe-area-inset-top)) {
+  html, body {
+    background-color: hsl(var(--background));
+  }
+
+  /* Native iOS: StatusBar overlays the WebView, so this fixed fill is the
+     actual color seen behind the clock/battery area after the splash hides. */
+  html.capacitor-ios body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top);
+    background-color: var(--status-bar-bg, hsl(var(--background)));
+    z-index: 60;
+    pointer-events: none;
+  }
+
+  /* Push sticky header below iPhone status bar (clock / signal area).
+     Use a ::before pseudo so the status-bar band always matches the header bg,
+     even when the page rubber-bands on scroll. */
+  header.sticky {
+    padding-top: env(safe-area-inset-top);
+  }
+  header.sticky::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top);
+    background-color: var(--status-bar-bg, hsl(var(--background)));
+    z-index: 60;
+    pointer-events: none;
+  }
+  /* Keep bottom nav above iPhone home indicator */
+  nav.fixed.bottom-0 {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Hide bottom nav while the on-screen keyboard is visible (iOS / Android Capacitor) */
+body.keyboard-open nav.fixed.bottom-0 {
+  display: none !important;
+}
+body.keyboard-open .h-16.md\:hidden {
+  height: 0 !important;
+}
+
+/* Prevent iOS auto-zoom on input focus (which causes the whole layout to shift left/right).
+   iOS only zooms when input font-size is < 16px. */
+@media (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+/* Indeterminate loading bar for search */
+@keyframes loading {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(150%); }
+  100% { transform: translateX(400%); }
+}
