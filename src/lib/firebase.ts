@@ -3,12 +3,12 @@ import { getAnalytics, isSupported, type Analytics } from "firebase/analytics";
 
 /**
  * Firebase web config for project sanamapp (sanamapp-4cfc0).
- * App ID: 1:680062692468:web:0b998dea6b507ea4feb521
- *
- * apiKey must come from Firebase Console → Project settings → Your apps → Config.
+ * Client apiKey is safe in the browser when domain-restricted in Google Cloud.
  */
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string | undefined,
+  apiKey:
+    (import.meta.env.VITE_FIREBASE_API_KEY as string | undefined) ||
+    "AIzaSyDyvySk039DX_JvpIs7r7zDkP1IjYJo_0M",
   authDomain:
     (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string | undefined) ||
     "sanamapp-4cfc0.firebaseapp.com",
