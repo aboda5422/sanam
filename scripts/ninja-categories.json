@@ -1,0 +1,911 @@
+[
+  {
+    "slug": "weekly-offers",
+    "name": "العروض الأسبوعية",
+    "name_en": "Weekly Offers",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/681846ae-7a26-4f8f-b722-9db8ddc9b59c_SA-CornerFocusGroceryW5RamadanthemeAR(3).jpg?w=400&q=75",
+    "section": "offers",
+    "sort_order": 1,
+    "is_active": true
+  },
+  {
+    "slug": "healthy-choices",
+    "name": "خياراتك الصحية",
+    "name_en": "Healthy Choices",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/771b3c51-8902-48f0-bffd-0601a7f3ceb1_3.CornerAR.jpg?w=400&q=75",
+    "section": "offers",
+    "sort_order": 2,
+    "is_active": true
+  },
+  {
+    "slug": "easy-meals",
+    "name": "وجبات سهلة ولذيذة",
+    "name_en": "Easy Meal Fix",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/68bee92f-717e-4426-818c-3d2582e0aba7_1213980050299411.B5j49fHdmRv5QjZWhoNW_height640.png?w=400&q=75",
+    "section": "offers",
+    "sort_order": 3,
+    "is_active": true
+  },
+  {
+    "slug": "refreshing-drinks",
+    "name": "مشروبات منعشة",
+    "name_en": "Sip & Refresh",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/477c3d54-adfa-4288-8222-e0e55b25ae92_1213966827332346.GNGdynR8JKRnEddaRpbX_height640.png?w=400&q=75",
+    "section": "offers",
+    "sort_order": 4,
+    "is_active": true
+  },
+  {
+    "slug": "dried-fruits-nuts",
+    "name": "الفواكه المجففة والمكسرات",
+    "name_en": "Dried Fruits & Nuts",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/3d9c95c8-3aac-4ee2-94fd-01badc45a284_1213966827332344.covsJd3Uk9AKBRofqr98_height640.png?w=400&q=75",
+    "section": "offers",
+    "sort_order": 5,
+    "is_active": true
+  },
+  {
+    "slug": "coffee-time",
+    "name": "وقت القهوة",
+    "name_en": "Coffee Fix",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/40ffa44d-b827-4daf-b952-56255aa1f483_1213966827332342.q1afbBrUkKWtABTQO8uQ_height640.png?w=400&q=75",
+    "section": "offers",
+    "sort_order": 6,
+    "is_active": true
+  },
+  {
+    "slug": "coffee-now",
+    "name": "قهوة Now",
+    "name_en": "Coffee Now",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/de026900-332f-4491-9a1b-75150eda7140_1x1-Now-Coffee-Apr-Ar-AM.png?w=400&q=75",
+    "section": "daily",
+    "sort_order": 7,
+    "is_active": true
+  },
+  {
+    "slug": "vegetables",
+    "name": "الخضار والفواكه",
+    "name_en": "Fruits & Vegetables",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/5e8acb97-45c8-4cd3-aeed-92c766c0ff2f_Fruits-Ar1.png?w=400&q=75",
+    "section": "daily",
+    "sort_order": 8,
+    "is_active": true
+  },
+  {
+    "slug": "sweets",
+    "name": "حلى",
+    "name_en": "Sweets",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/8e5b2d95-818a-4f97-b670-5c053580937a_%D8%AA%D8%B5%D9%85%D9%8A%D9%85%D8%A8%D8%AF%D9%88%D9%86%D8%B9%D9%86%D9%88%D8%A7%D9%86-3.png?w=400&q=75",
+    "section": "daily",
+    "sort_order": 9,
+    "is_active": true
+  },
+  {
+    "slug": "dairy",
+    "name": "الألبان والبيض",
+    "name_en": "Dairy & Eggs",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/b1ba9c84-8f44-436a-a75c-d5c2c018f54d_3def7b74-0c4f-432a-944d-7b8f5df0fb57_Ninja-Banners-Dairy-Egg-Ar.png?w=400&q=75",
+    "section": "daily",
+    "sort_order": 10,
+    "is_active": true
+  },
+  {
+    "slug": "cheese",
+    "name": "الأجبان",
+    "name_en": "Cheese",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/9da469ec-83b5-460e-9306-9e71713f1e01_2.jpg?w=400&q=75",
+    "section": "daily",
+    "sort_order": 11,
+    "is_active": true
+  },
+  {
+    "slug": "milk",
+    "name": "الحليب",
+    "name_en": "Milk",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/7fb223f3-3c9d-4644-ad4a-77fb1664d4d1_4.jpg?w=400&q=75",
+    "section": "daily",
+    "sort_order": 12,
+    "is_active": true
+  },
+  {
+    "slug": "bakery",
+    "name": "الخبز والمخبوزات",
+    "name_en": "Bread & Bakery",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/9532ad87-bf7a-47a0-a6fd-8861c2f1765d_10.png?w=400&q=75",
+    "section": "daily",
+    "sort_order": 13,
+    "is_active": true
+  },
+  {
+    "slug": "meat",
+    "name": "الدجاج واللحوم الطازجة",
+    "name_en": "Fresh Poultry & Meat",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/02cfd749-5c2b-479c-b4ef-8d7ea1699475_Ar.jpeg?w=400&q=75",
+    "section": "daily",
+    "sort_order": 14,
+    "is_active": true
+  },
+  {
+    "slug": "ready-meals",
+    "name": "وجبات جاهزة",
+    "name_en": "Ready to Eat",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/5c008e55-d3d9-4b35-9cde-be3eb46c71fb_12.png?w=400&q=75",
+    "section": "daily",
+    "sort_order": 15,
+    "is_active": true
+  },
+  {
+    "slug": "deli",
+    "name": "جزيرة الأجبان",
+    "name_en": "Deli",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/fc0bfa24-ddc8-4a66-8df9-a59523818dc2_CheeseIslandAR.png?w=400&q=75",
+    "section": "daily",
+    "sort_order": 16,
+    "is_active": true
+  },
+  {
+    "slug": "fresh-juices",
+    "name": "عصائر طازجة",
+    "name_en": "Fresh Juices",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/1216f5ba-6c1b-41d2-9173-a6a9229e1549_6.png?w=400&q=75",
+    "section": "daily",
+    "sort_order": 17,
+    "is_active": true
+  },
+  {
+    "slug": "dates",
+    "name": "التمور",
+    "name_en": "Dates",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/162c6419-baaa-49cd-9c8b-b6f3159572a3_14.png?w=400&q=75",
+    "section": "daily",
+    "sort_order": 18,
+    "is_active": true
+  },
+  {
+    "slug": "rice-pasta",
+    "name": "الرز والمكرونة والحبوب",
+    "name_en": "Pasta, Rice & Grains",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/c33c4523-0166-4934-95b1-4e1499c11366_1-Pasta,Rice-AR(2).jpg?w=400&q=75",
+    "section": "pantry",
+    "sort_order": 19,
+    "is_active": true
+  },
+  {
+    "slug": "cooking-needs",
+    "name": "مستلزمات الطبخ",
+    "name_en": "Oil, Flour & Cooking Needs",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/ef189fc5-fb1f-4a00-8b1a-f3901a84f27e_2-CookingNeeds-AR(2).jpg?w=400&q=75",
+    "section": "pantry",
+    "sort_order": 20,
+    "is_active": true
+  },
+  {
+    "slug": "cooking-sauces",
+    "name": "صلصات الطبخ",
+    "name_en": "Cooking Sauces",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/cb60b0e4-ef54-4894-b1c8-2d6473b8cae2_3-CookingSauces-AR(2).jpg?w=400&q=75",
+    "section": "pantry",
+    "sort_order": 21,
+    "is_active": true
+  },
+  {
+    "slug": "canned-food",
+    "name": "المعلبات",
+    "name_en": "Canned Food",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/db12f8d8-a49b-4d1b-89a4-b9afc1679108_4-CannedFood-AR(1).jpg?w=400&q=75",
+    "section": "pantry",
+    "sort_order": 22,
+    "is_active": true
+  },
+  {
+    "slug": "spices",
+    "name": "البهارات والتوابل",
+    "name_en": "Spices & Seasoning",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/2c6bf22a-22e0-4881-b384-fd671128da02_5-Spices-Seasoning-AR(1).jpg?w=400&q=75",
+    "section": "pantry",
+    "sort_order": 23,
+    "is_active": true
+  },
+  {
+    "slug": "frozen",
+    "name": "الأطعمة المجمدة",
+    "name_en": "Frozen Food",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/eaff4fa4-84e0-41fb-b313-d4e734709a41_FROZENAR.jpg?w=400&q=75",
+    "section": "pantry",
+    "sort_order": 24,
+    "is_active": true
+  },
+  {
+    "slug": "breakfast",
+    "name": "منتجات الإفطار",
+    "name_en": "Breakfast",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/ee12680d-7190-45c0-b9e8-c822a5fe949d_10.jpg?w=400&q=75",
+    "section": "pantry",
+    "sort_order": 25,
+    "is_active": true
+  },
+  {
+    "slug": "spreads",
+    "name": "منتجات قابلة للدهن والعسل",
+    "name_en": "Spreads, Honey & Cereals",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/b5527955-267f-4732-8675-991ca341092e_222ecovered-Recovered.png?w=400&q=75",
+    "section": "pantry",
+    "sort_order": 26,
+    "is_active": true
+  },
+  {
+    "slug": "noodles",
+    "name": "النودلز والمأكولات الآسيوية",
+    "name_en": "Noodles & Asian Corner",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/71f1d3bd-1551-4961-a4ce-122e7cb5b3db_AsianCornerFinalAR.jpg?w=400&q=75",
+    "section": "pantry",
+    "sort_order": 27,
+    "is_active": true
+  },
+  {
+    "slug": "family-packs",
+    "name": "أحجام عائلية",
+    "name_en": "Family Sized Packs",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/805e2b79-8e4c-4f06-8147-c6b97e8852d8_FAMILYENAR.jpg?w=400&q=75",
+    "section": "pantry",
+    "sort_order": 28,
+    "is_active": true
+  },
+  {
+    "slug": "organic",
+    "name": "طعام عضوي وصحي",
+    "name_en": "Organic & Healthy Food",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/8ade42f2-a8a2-4c77-8b54-3af4c6922c93_CategoryCaptionAR.png?w=400&q=75",
+    "section": "pantry",
+    "sort_order": 29,
+    "is_active": true
+  },
+  {
+    "slug": "water",
+    "name": "مياه وثلج",
+    "name_en": "Water & Ice",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/15148e27-5efe-4eb0-99b1-1e14303e8093_WaterARjp.jpg?w=400&q=75",
+    "section": "drinks",
+    "sort_order": 30,
+    "is_active": true
+  },
+  {
+    "slug": "soft-drinks",
+    "name": "مشروبات غازية",
+    "name_en": "Soft & Energy Drinks",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/a3aac811-db28-4d6b-8f04-2e7da5f671e9_SoftDrinksNEWAR.jpg?w=400&q=75",
+    "section": "drinks",
+    "sort_order": 31,
+    "is_active": true
+  },
+  {
+    "slug": "energy-drinks",
+    "name": "مشروبات الطاقة والشعير",
+    "name_en": "Energy Drinks & Malt",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/c58bcb00-c877-4865-9c9c-f5c148a024ab_RedBullARFinal.jpg?w=400&q=75",
+    "section": "drinks",
+    "sort_order": 32,
+    "is_active": true
+  },
+  {
+    "slug": "tea",
+    "name": "الشاي",
+    "name_en": "Tea",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/aa7e1aaa-c232-47e4-9e5a-c6206d88f54a_213213red.png?w=400&q=75",
+    "section": "drinks",
+    "sort_order": 33,
+    "is_active": true
+  },
+  {
+    "slug": "coffee",
+    "name": "القهوة",
+    "name_en": "Coffee",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/67c8984c-37ce-4403-9114-d12070c28290_COFFEENEWAR.jpg?w=400&q=75",
+    "section": "drinks",
+    "sort_order": 34,
+    "is_active": true
+  },
+  {
+    "slug": "specialty-coffee",
+    "name": "قهوة مختصة",
+    "name_en": "Specialty Coffee",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/bd8da63e-70b9-44a9-b768-aa79750cbc3a_1.png?w=400&q=75",
+    "section": "drinks",
+    "sort_order": 35,
+    "is_active": true
+  },
+  {
+    "slug": "juices",
+    "name": "عصيرات",
+    "name_en": "Juices",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/43ea62bd-1e9d-4d93-8aea-ca313c7ef99d_JuicesARFinal.jpg?w=400&q=75",
+    "section": "drinks",
+    "sort_order": 36,
+    "is_active": true
+  },
+  {
+    "slug": "healthy-drinks",
+    "name": "مشروبات صحية",
+    "name_en": "Healthy Drinks",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/91056299-990d-40aa-9b89-0a0f41f199d5_WhatsAppImage2025-02-03at10.14.01_9280c39f.jpg?w=400&q=75",
+    "section": "drinks",
+    "sort_order": 37,
+    "is_active": true
+  },
+  {
+    "slug": "chocolate",
+    "name": "شوكولاتة",
+    "name_en": "Chocolate & Cakes",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/ae24267e-e9f0-4f17-8ac5-02ba0590b439_ChocAr.png?w=400&q=75",
+    "section": "snacks",
+    "sort_order": 38,
+    "is_active": true
+  },
+  {
+    "slug": "biscuits",
+    "name": "بسكويت وكوكيز",
+    "name_en": "Biscuits & Cookies",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/a37c1f7a-60b2-4564-a930-f0298076a51b_BiscuitsAr.jpg?w=400&q=75",
+    "section": "snacks",
+    "sort_order": 39,
+    "is_active": true
+  },
+  {
+    "slug": "cake",
+    "name": "كيك",
+    "name_en": "Cake & Biscuits",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/51b46e6b-d88d-4d6f-839e-795b1ac3238e_CakeAr.jpg?w=400&q=75",
+    "section": "snacks",
+    "sort_order": 40,
+    "is_active": true
+  },
+  {
+    "slug": "wafer",
+    "name": "ويفر",
+    "name_en": "Wafer & Waffel",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/8f619d15-9370-49bc-8571-2a0a9d44ef02_Untitled.jpg?w=400&q=75",
+    "section": "snacks",
+    "sort_order": 41,
+    "is_active": true
+  },
+  {
+    "slug": "candy",
+    "name": "كاندي وعلك",
+    "name_en": "Candies & Gums",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/c5b2545e-e5cc-498b-a045-064ffafaa761_Candiesa.jpg?w=400&q=75",
+    "section": "snacks",
+    "sort_order": 42,
+    "is_active": true
+  },
+  {
+    "slug": "healthy-snacks",
+    "name": "سناكات صحية",
+    "name_en": "Healthy Snacks",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/49596443-b566-4866-91a0-08f65d57ce62_WhatsAppImage2025-02-03at10.14.02_16a833bb.jpg?w=400&q=75",
+    "section": "snacks",
+    "sort_order": 43,
+    "is_active": true
+  },
+  {
+    "slug": "ice-cream",
+    "name": "الأيس كريم",
+    "name_en": "Ice Cream",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/3b6c747b-d03a-417d-89c5-43034d6361b5_828fa751-a849-428b-a9d1-3960e1ea2ddf_NEWAR(1).jpg?w=400&q=75",
+    "section": "snacks",
+    "sort_order": 44,
+    "is_active": true
+  },
+  {
+    "slug": "salty-snacks",
+    "name": "سناكات مالحة",
+    "name_en": "Salty Snacks",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/328ed85a-b8ef-4b6e-a3b1-c38a953a8ec3_SNAAAAAACKSSSSSSAR.jpg?w=400&q=75",
+    "section": "snacks",
+    "sort_order": 45,
+    "is_active": true
+  },
+  {
+    "slug": "nuts",
+    "name": "مكسرات وبذور وفواكه مجففة",
+    "name_en": "Nuts, Seeds & Dried Fruits",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/aa9d0236-83b0-46f5-9d49-e5f50f603ca4_BAJAAR.jpg?w=400&q=75",
+    "section": "snacks",
+    "sort_order": 46,
+    "is_active": true
+  },
+  {
+    "slug": "healthy-snacks-nutrition",
+    "name": "سناكات صحية",
+    "name_en": "Healthy Snacks",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/49596443-b566-4866-91a0-08f65d57ce62_WhatsAppImage2025-02-03at10.14.02_16a833bb.jpg?w=400&q=75",
+    "section": "health",
+    "sort_order": 47,
+    "is_active": true
+  },
+  {
+    "slug": "organic-healthy",
+    "name": "طعام عضوي وصحي",
+    "name_en": "Organic & Healthy Food",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/8ade42f2-a8a2-4c77-8b54-3af4c6922c93_CategoryCaptionAR.png?w=400&q=75",
+    "section": "health",
+    "sort_order": 48,
+    "is_active": true
+  },
+  {
+    "slug": "sport-nutrition",
+    "name": "تغذية رياضية",
+    "name_en": "Sport Nutrition",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/ba3039e5-731d-4a11-9390-f551f3024980_SportAr.jpg?w=400&q=75",
+    "section": "health",
+    "sort_order": 49,
+    "is_active": true
+  },
+  {
+    "slug": "healthy-drinks-section",
+    "name": "مشروبات صحية",
+    "name_en": "Healthy Drinks",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/91056299-990d-40aa-9b89-0a0f41f199d5_WhatsAppImage2025-02-03at10.14.01_9280c39f.jpg?w=400&q=75",
+    "section": "health",
+    "sort_order": 50,
+    "is_active": true
+  },
+  {
+    "slug": "face-makeup",
+    "name": "مكياج الوجه",
+    "name_en": "Face Makeup",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/3e66a876-7738-4d9e-ab01-4277dfa0b67d_21312red.png?w=400&q=75",
+    "section": "makeup",
+    "sort_order": 51,
+    "is_active": true
+  },
+  {
+    "slug": "eye-makeup",
+    "name": "مكياج العيون والحواجب",
+    "name_en": "Brow & Eye Makeup",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/cc92f572-5aa8-4965-8dec-5a02e18b10d2_eed-Recovered.png?w=400&q=75",
+    "section": "makeup",
+    "sort_order": 52,
+    "is_active": true
+  },
+  {
+    "slug": "lip-makeup",
+    "name": "مكياج الشفاه",
+    "name_en": "Lips Makeup",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/a90b1144-62b3-4514-99bb-06132aa58963_14113ecovered.png?w=400&q=75",
+    "section": "makeup",
+    "sort_order": 53,
+    "is_active": true
+  },
+  {
+    "slug": "lashes",
+    "name": "رموش وعدسات",
+    "name_en": "Lashes & Lenses",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/9bb01b7a-a91a-400b-97c9-af0ebb0b165c_213132red-Recovered.png?w=400&q=75",
+    "section": "makeup",
+    "sort_order": 54,
+    "is_active": true
+  },
+  {
+    "slug": "nails",
+    "name": "أظافر",
+    "name_en": "Nails",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/d9a75421-e11c-4d81-aa25-7bcfc959b6fd_NailsAR.png?w=400&q=75",
+    "section": "makeup",
+    "sort_order": 55,
+    "is_active": true
+  },
+  {
+    "slug": "makeup-tools",
+    "name": "أدوات المكياج",
+    "name_en": "Makeup Tools & Accessories",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/c6e6e1a7-b360-4b24-aafc-6aca7b39a1b6_MakeupTools-AccessoriesAR.png?w=400&q=75",
+    "section": "makeup",
+    "sort_order": 56,
+    "is_active": true
+  },
+  {
+    "slug": "women-accessories",
+    "name": "إكسسوارات نسائية",
+    "name_en": "Women Accessories",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/85ab4b06-fcd3-4fb0-b950-845a4d8e8a8f_32131231NonFood3-Recovered.png?w=400&q=75",
+    "section": "makeup",
+    "sort_order": 57,
+    "is_active": true
+  },
+  {
+    "slug": "perfumes",
+    "name": "العطور",
+    "name_en": "Perfumes",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/081ecedb-e2e5-44b0-8c41-9585b705cb2b_Perfumes-AR.png?w=400&q=75",
+    "section": "perfumes",
+    "sort_order": 58,
+    "is_active": true
+  },
+  {
+    "slug": "women-perfumes",
+    "name": "العطور النسائية",
+    "name_en": "Women Perfumes",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/030f81f8-22b4-46a8-8a8d-660150f7cfc1_WOMEN-PERFUMES-AR.png?w=400&q=75",
+    "section": "perfumes",
+    "sort_order": 59,
+    "is_active": true
+  },
+  {
+    "slug": "men-perfumes",
+    "name": "العطور الرجالية",
+    "name_en": "Men Perfumes",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/723fb99d-88f9-4c3d-a3b3-da30c40439df_MEN-PERFUMES-AR.png?w=400&q=75",
+    "section": "perfumes",
+    "sort_order": 60,
+    "is_active": true
+  },
+  {
+    "slug": "moisturizers",
+    "name": "المرطبات",
+    "name_en": "Moisturizers",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/3c4393e7-0097-489c-88c3-1f00b266ce95_MoisturizersTileAR_1.jpg?w=400&q=75",
+    "section": "beauty",
+    "sort_order": 61,
+    "is_active": true
+  },
+  {
+    "slug": "skin-care",
+    "name": "العناية بالبشرة",
+    "name_en": "Skin Care",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/b5032f9d-e864-42bd-b702-7256f35424fd_1x1_SkinCare-03.png?w=400&q=75",
+    "section": "beauty",
+    "sort_order": 62,
+    "is_active": true
+  },
+  {
+    "slug": "hair-care",
+    "name": "العناية بالشعر",
+    "name_en": "Hair Care",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/5cf18660-f72b-4c8f-a453-816ae9dd6378_Ninja-Banners-Hair-Care-ar.png?w=400&q=75",
+    "section": "beauty",
+    "sort_order": 63,
+    "is_active": true
+  },
+  {
+    "slug": "deodorants",
+    "name": "مزيل العرق",
+    "name_en": "Deodorants",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/91a2b8c3-0ac3-4e69-8a5b-66874c56cf95_3213vered.png?w=400&q=75",
+    "section": "beauty",
+    "sort_order": 64,
+    "is_active": true
+  },
+  {
+    "slug": "korean-beauty",
+    "name": "الجمال الكوري",
+    "name_en": "Korean Beauty",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/52851e04-350e-41fb-9b4b-b6aa2f47c54a_KoreanBeautyAR.png?w=400&q=75",
+    "section": "beauty",
+    "sort_order": 65,
+    "is_active": true
+  },
+  {
+    "slug": "bath-shower",
+    "name": "الاستحمام",
+    "name_en": "Bath & Shower",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/ff380c04-df35-42d5-89a5-17a3b0696db8_1231ecovered.png?w=400&q=75",
+    "section": "beauty",
+    "sort_order": 66,
+    "is_active": true
+  },
+  {
+    "slug": "oral-care",
+    "name": "صحة الأسنان",
+    "name_en": "Oral Care",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/a77aaba7-e24c-485d-b8af-d2d64628a657_a013c0b8-5419-448f-a462-3ef312cabebe_33333ecovered-Recovered.png?w=400&q=75",
+    "section": "beauty",
+    "sort_order": 67,
+    "is_active": true
+  },
+  {
+    "slug": "laundry",
+    "name": "العناية بالملابس",
+    "name_en": "Laundry",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/453b5239-eb1c-4acb-ad43-c07a00940836_LAR.jpg?w=400&q=75",
+    "section": "home",
+    "sort_order": 68,
+    "is_active": true
+  },
+  {
+    "slug": "cleaning",
+    "name": "المنظفات",
+    "name_en": "Cleaning Supplies",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/a58696f1-8bb4-49e4-8262-5685a654f7d3_Untitled.jpg?w=400&q=75",
+    "section": "home",
+    "sort_order": 69,
+    "is_active": true
+  },
+  {
+    "slug": "tissues",
+    "name": "المناديل واللفائف",
+    "name_en": "Tissues & Rolls",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/ee3144d8-d60e-473c-9751-f289db4c3216_TiisuesandRolesAR.jpg?w=400&q=75",
+    "section": "home",
+    "sort_order": 70,
+    "is_active": true
+  },
+  {
+    "slug": "disposables",
+    "name": "المنتجات الاستهلاكية",
+    "name_en": "Disposables & Papers",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/2faabdf9-a0f8-4611-877c-4a6f66738556_DisposablesAR.jpg?w=400&q=75",
+    "section": "home",
+    "sort_order": 71,
+    "is_active": true
+  },
+  {
+    "slug": "gathering-essentials",
+    "name": "مستلزمات الضيافة",
+    "name_en": "Gathering Essentials",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/af3f5226-0e2a-49ed-9985-7719c131e8f4_HouseholdGatheringEssentialsAR(1).png?w=400&q=75",
+    "section": "home",
+    "sort_order": 72,
+    "is_active": true
+  },
+  {
+    "slug": "kitchen-tools",
+    "name": "أدوات المطبخ والأجهزة",
+    "name_en": "Appliances & Kitchen Tools",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/a43fff62-dd9e-4285-860b-65dd727080ef_red-Recovered.png?w=400&q=75",
+    "section": "home",
+    "sort_order": 73,
+    "is_active": true
+  },
+  {
+    "slug": "clothing",
+    "name": "ملابس",
+    "name_en": "Clothing",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/cf0bd1df-0a9b-4604-b98c-8b7138416718_23131covered-Recovered.png?w=400&q=75",
+    "section": "home",
+    "sort_order": 74,
+    "is_active": true
+  },
+  {
+    "slug": "electronics",
+    "name": "إلكترونيات",
+    "name_en": "Electronics",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/cb9d668d-88ec-412c-bbde-da6705f68826_23121red-Recovered.png?w=400&q=75",
+    "section": "electronics",
+    "sort_order": 75,
+    "is_active": true
+  },
+  {
+    "slug": "mobile-accessories",
+    "name": "إكسسوارات الجوال",
+    "name_en": "Mobile Accessories",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/27ad7a9e-088f-4b0e-9be0-c571e5c9acc1_3213213d-Recovered.png?w=400&q=75",
+    "section": "electronics",
+    "sort_order": 76,
+    "is_active": true
+  },
+  {
+    "slug": "auto-accessories",
+    "name": "إكسسوارات السيارات",
+    "name_en": "Auto Accessories",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/b690c4c0-828c-4e82-984c-78a7147192cd_14d-Recovered.png?w=400&q=75",
+    "section": "electronics",
+    "sort_order": 77,
+    "is_active": true
+  },
+  {
+    "slug": "video-games",
+    "name": "ألعاب الفيديو",
+    "name_en": "Video Games",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/d1f5f30c-37b0-4151-8ff6-e1ed93a9c1e4_VideogamesAR.jpg?w=400&q=75",
+    "section": "electronics",
+    "sort_order": 78,
+    "is_active": true
+  },
+  {
+    "slug": "baby-milk",
+    "name": "حليب الأطفال",
+    "name_en": "Baby Milk",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/072fc644-eae7-40f6-a0d7-a51144899c24_Baby-Milk-ar.png?w=400&q=75",
+    "section": "baby",
+    "sort_order": 79,
+    "is_active": true
+  },
+  {
+    "slug": "baby-diapers",
+    "name": "حفاضات الأطفال",
+    "name_en": "Baby Diapers & Pants",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/f4dfe70d-901f-4bbb-9c60-135215c97891_Baby-Diapers-ar.png?w=400&q=75",
+    "section": "baby",
+    "sort_order": 80,
+    "is_active": true
+  },
+  {
+    "slug": "baby-care",
+    "name": "مستلزمات الطفل",
+    "name_en": "Baby Toiletries & Accessories",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/b7308f9a-b17f-4591-8d0e-f64da13fbf61_222vered.png?w=400&q=75",
+    "section": "baby",
+    "sort_order": 81,
+    "is_active": true
+  },
+  {
+    "slug": "cats",
+    "name": "القطط",
+    "name_en": "Cats",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/19bf746a-cb20-4c7f-aea2-e2e0cd1b3a97_CATSAR.png.png?w=400&q=75",
+    "section": "pets",
+    "sort_order": 82,
+    "is_active": true
+  },
+  {
+    "slug": "dogs",
+    "name": "الكلاب",
+    "name_en": "Dogs",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/30f94cc4-95eb-4096-b0a2-db77c491adc2_DOGSAR.png.png?w=400&q=75",
+    "section": "pets",
+    "sort_order": 83,
+    "is_active": true
+  },
+  {
+    "slug": "pets-hygiene",
+    "name": "نظافة الحيوانات",
+    "name_en": "Pets Hygiene & Supplements",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/84f94e65-605b-4a48-91eb-028ec058ce57_PetsHygieneAR.png?w=400&q=75",
+    "section": "pets",
+    "sort_order": 84,
+    "is_active": true
+  },
+  {
+    "slug": "other-pets",
+    "name": "حيوانات أخرى",
+    "name_en": "Other Pets",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/0a5d757f-231c-4c06-9270-f4b8f23c303e_OtherPetsAR.png.png?w=400&q=75",
+    "section": "pets",
+    "sort_order": 85,
+    "is_active": true
+  },
+  {
+    "slug": "pets-essentials",
+    "name": "مستلزمات الحيوانات",
+    "name_en": "Pets Essentials",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/f8658664-ad02-4788-912d-734820908e79_PetsEssentialsAR.png?w=400&q=75",
+    "section": "pets",
+    "sort_order": 86,
+    "is_active": true
+  },
+  {
+    "slug": "celebrations",
+    "name": "احتفالات وهدايا",
+    "name_en": "Celebrations & Gifts",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/b0afe43e-c343-49e1-8a5e-fe2cbdcbfa70_12312red-Recovered.png?w=400&q=75",
+    "section": "toys",
+    "sort_order": 87,
+    "is_active": true
+  },
+  {
+    "slug": "puzzles",
+    "name": "تركيبات وبناء",
+    "name_en": "Puzzles & Building",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/941a8268-619f-4be0-9d6c-fac3c2f9d001_WhatsAppImage2026-02-16at11.58.45AM(1).jpeg?w=400&q=75",
+    "section": "toys",
+    "sort_order": 88,
+    "is_active": true
+  },
+  {
+    "slug": "kids-toys",
+    "name": "ألعاب الأطفال",
+    "name_en": "Toddlers & Kids Toys",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/b748961c-ef6d-4f0e-985d-ce5e616a97b9_ToddlersAR.jpg?w=400&q=75",
+    "section": "toys",
+    "sort_order": 89,
+    "is_active": true
+  },
+  {
+    "slug": "girls-world",
+    "name": "عالم البنات",
+    "name_en": "Girls World",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/b9a4dc2c-cefe-465a-b588-52a38528da1d_GirlsAR.jpg?w=400&q=75",
+    "section": "toys",
+    "sort_order": 90,
+    "is_active": true
+  },
+  {
+    "slug": "clay-slime",
+    "name": "صلصال وسلايم",
+    "name_en": "Clay & Slime",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/4d2e5237-e594-43bc-8f94-04528d59c167_ClayAR.jpg?w=400&q=75",
+    "section": "toys",
+    "sort_order": 91,
+    "is_active": true
+  },
+  {
+    "slug": "outdoor-games",
+    "name": "ألعاب خارجية",
+    "name_en": "Outdoor Games",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/6671488d-b827-4e30-aacf-d11c78ec3d1f_CardsAR.jpg?w=400&q=75",
+    "section": "toys",
+    "sort_order": 92,
+    "is_active": true
+  },
+  {
+    "slug": "school-bags",
+    "name": "حقائب مدرسية",
+    "name_en": "School Bags & Lunch Box",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/427bdb1b-3885-4dd4-8cf7-3e4cafabbcd2_WhatsAppImage2025-08-03at11.24.50AM.jpeg?w=400&q=75",
+    "section": "stationery",
+    "sort_order": 93,
+    "is_active": true
+  },
+  {
+    "slug": "notebooks",
+    "name": "دفاتر",
+    "name_en": "Notebooks",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/2becf8cf-5d1c-4778-bf98-1a61cf2dac76_NoteBooksAR.png?w=400&q=75",
+    "section": "stationery",
+    "sort_order": 94,
+    "is_active": true
+  },
+  {
+    "slug": "pens",
+    "name": "أقلام",
+    "name_en": "Pens & Pencils",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/f8ee3cae-d758-4379-b6cd-d19883bc740f_WhatsAppImage2025-08-03at11.25.58AM.jpeg?w=400&q=75",
+    "section": "stationery",
+    "sort_order": 95,
+    "is_active": true
+  },
+  {
+    "slug": "school-supplies",
+    "name": "مستلزمات مدرسية",
+    "name_en": "School Supplies",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/2ee5989f-7590-4b03-92a6-1d76df96a3ff_SchoolSuppliesAR.png?w=400&q=75",
+    "section": "stationery",
+    "sort_order": 96,
+    "is_active": true
+  },
+  {
+    "slug": "drawing",
+    "name": "رسم وتلوين",
+    "name_en": "Drawing & Coloring",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/e7be261c-7606-4fea-91c4-394e40cb3170_WhatsAppImage2025-08-03at11.26.42AM(1).jpeg?w=400&q=75",
+    "section": "stationery",
+    "sort_order": 97,
+    "is_active": true
+  },
+  {
+    "slug": "office-supplies",
+    "name": "مستلزمات مكتبية",
+    "name_en": "Office Supplies",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/be8d8ab9-2be3-4e75-9d83-9ea2ad6127b3_OfficeSuppliesAR.png?w=400&q=75",
+    "section": "stationery",
+    "sort_order": 98,
+    "is_active": true
+  },
+  {
+    "slug": "pharmacy",
+    "name": "الصيدلية",
+    "name_en": "Pharmacy",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/49b10a4d-a79e-41cb-9497-316ac8acd9b3_Pharmacy-Ar.png?w=400&q=75",
+    "section": "pharmacy",
+    "sort_order": 99,
+    "is_active": true
+  },
+  {
+    "slug": "feminine-care",
+    "name": "العناية النسائية",
+    "name_en": "Feminine Care",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/8006502d-d6ba-4f7d-a1b8-b7df07ba85ef_2od3-Recovered.png?w=400&q=75",
+    "section": "pharmacy",
+    "sort_order": 100,
+    "is_active": true
+  },
+  {
+    "slug": "mens-care",
+    "name": "عناية الرجل",
+    "name_en": "Men Care",
+    "image": "https://img.ananinja.com/media/ninja-catalog-42/449aa9e2-ab69-4260-a745-e3c9ee4301ae_MenCare.png?w=400&q=75",
+    "section": "pharmacy",
+    "sort_order": 101,
+    "is_active": true
+  }
+]

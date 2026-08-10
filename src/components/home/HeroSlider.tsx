@@ -1,15 +1,15 @@
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCategories } from "@/hooks/useCategories";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import { categories as staticCategories } from "@/data/store-data";
 
 const HeroSlider = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { data: categories, isLoading } = useCategories();
 
-  const bannerItems = (categories || []).filter(c => c.image).slice(0, 8);
+  // Prefer Ninja "Best Offers" tiles — same look customers liked
+  const bannerItems = staticCategories.filter((c) => c.section === "offers").slice(0, 8);
 
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
@@ -17,7 +17,7 @@ const HeroSlider = () => {
     el.scrollBy({ left: dir === "left" ? -300 : 300, behavior: "smooth" });
   };
 
-  if (isLoading) {
+  if (!bannerItems.length) {
     return (
       <section className="mb-6">
         <div className="flex gap-3 overflow-hidden">
@@ -36,14 +36,22 @@ const HeroSlider = () => {
           {bannerItems.map((item) => (
             <div
               key={item.id}
-              onClick={() => navigate(`/category/${item.slug}`)}
+              onClick={() => navigate(`/category/${item.id}`)}
               className="shrink-0 w-[200px] h-[200px] rounded-2xl overflow-hidden cursor-pointer hover:shadow-md transition-shadow relative"
             >
-              <img src={item.image || "/placeholder.svg"} alt={item.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/placeholder.svg"; }} />
+              <img
+                src={item.image || "/placeholder.svg"}
+                alt={item.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "/placeholder.svg";
+                }}
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
               <div className="absolute bottom-0 inset-x-0 p-3 text-white">
                 <h3 className="font-heading font-bold text-xs">{item.name}</h3>
-                <p className="text-[10px] opacity-90 mt-0.5">{item.name_en}</p>
+                <p className="text-[10px] opacity-90 mt-0.5">{item.nameEn}</p>
               </div>
             </div>
           ))}

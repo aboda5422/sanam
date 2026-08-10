@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { MapPin, Store } from "lucide-react";
 import {
   Dialog,
@@ -10,19 +11,48 @@ import { Button } from "@/components/ui/button";
 import { useBranch } from "@/contexts/BranchContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+function matchesCityFilter(city: string | null | undefined, filter: string) {
+  const c = (city || "").trim();
+  const f = filter.trim();
+  if (!f) return true;
+  if (f.includes("رياض") || f.toLowerCase().includes("riyadh")) {
+    return c.includes("رياض") || c.toLowerCase().includes("riyadh");
+  }
+  if (f.includes("مكة") || f.toLowerCase().includes("makkah") || f.toLowerCase().includes("mecca")) {
+    return c.includes("مكة") || c.toLowerCase().includes("makkah") || c.toLowerCase().includes("mecca");
+  }
+  return c.includes(f) || c.toLowerCase().includes(f.toLowerCase());
+}
+
 /** Forced branch picker — cannot dismiss without choosing (unless URL already set). */
 const BranchPickerDialog = () => {
-  const { branches, loading, pickerOpen, selectBranch, selectedBranch, setPickerOpen } = useBranch();
+  const {
+    branches,
+    loading,
+    pickerOpen,
+    selectBranch,
+    selectedBranch,
+    setPickerOpen,
+    pickerCityFilter,
+  } = useBranch();
   const { t } = useLanguage();
+
+  const filtered = useMemo(() => {
+    if (!pickerCityFilter) return branches;
+    return branches.filter((b) => matchesCityFilter(b.city, pickerCityFilter));
+  }, [branches, pickerCityFilter]);
 
   const mustChoose = !selectedBranch;
   const open = pickerOpen && !loading && branches.length > 0;
+
+  const title = pickerCityFilter
+    ? t(`فروع ${pickerCityFilter}`, `${pickerCityFilter} branches`)
+    : t("اختر فرعك", "Choose your branch");
 
   return (
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        // Allow closing only after a branch is already selected (change-branch flow)
         if (!next && mustChoose) return;
         setPickerOpen(next);
       }}
@@ -41,7 +71,7 @@ const BranchPickerDialog = () => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 justify-center text-xl">
             <Store className="h-5 w-5 text-primary" />
-            {t("اختر فرعك", "Choose your branch")}
+            {title}
           </DialogTitle>
           <DialogDescription className="text-center">
             {t(
@@ -52,22 +82,28 @@ const BranchPickerDialog = () => {
         </DialogHeader>
 
         <div className="grid gap-3 mt-2">
-          {branches.map((branch) => (
-            <Button
-              key={branch.id}
-              variant={selectedBranch?.id === branch.id ? "default" : "outline"}
-              className="h-auto py-3 px-4 justify-start gap-3 text-right"
-              onClick={() => selectBranch(branch)}
-            >
-              <MapPin className="h-5 w-5 text-primary shrink-0" />
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold">{branch.name}</div>
-                <div className="text-xs opacity-70 truncate">
-                  {branch.city || branch.address}
+          {filtered.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              {t("لا توجد فروع في هذه المدينة حالياً", "No branches in this city yet")}
+            </p>
+          ) : (
+            filtered.map((branch) => (
+              <Button
+                key={branch.id}
+                variant={selectedBranch?.id === branch.id ? "default" : "outline"}
+                className="h-auto py-3 px-4 justify-start gap-3 text-right"
+                onClick={() => selectBranch(branch)}
+              >
+                <MapPin className="h-5 w-5 text-primary shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold">{branch.name}</div>
+                  <div className="text-xs opacity-70 truncate">
+                    {branch.city || branch.address}
+                  </div>
                 </div>
-              </div>
-            </Button>
-          ))}
+              </Button>
+            ))
+          )}
         </div>
       </DialogContent>
     </Dialog>

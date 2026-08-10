@@ -24,9 +24,11 @@ type BranchContextValue = {
   needsPicker: boolean;
   selectBranch: (branch: Branch | string, opts?: { persist?: boolean }) => void;
   clearBranch: () => void;
-  openPicker: () => void;
+  /** Open branch picker; optional city filter e.g. "مكة" or "الرياض" */
+  openPicker: (cityFilter?: string | null) => void;
   pickerOpen: boolean;
   setPickerOpen: (open: boolean) => void;
+  pickerCityFilter: string | null;
 };
 
 const BranchContext = createContext<BranchContextValue | null>(null);
@@ -85,7 +87,8 @@ export function BranchProvider({ children }: { children: ReactNode }) {
       return null;
     }
   });
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerOpen, setPickerOpenState] = useState(false);
+  const [pickerCityFilter, setPickerCityFilter] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
 
   const branchesQuery = useQuery({
@@ -125,7 +128,8 @@ export function BranchProvider({ children }: { children: ReactNode }) {
           /* ignore */
         }
       }
-      setPickerOpen(false);
+      setPickerCityFilter(null);
+      setPickerOpenState(false);
       const current = searchParams.get("location");
       if (current !== branch.slug) {
         const next = new URLSearchParams(searchParams);
@@ -145,9 +149,19 @@ export function BranchProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const setPickerOpen = useCallback((open: boolean) => {
+    setPickerOpenState(open);
+    if (!open) setPickerCityFilter(null);
+  }, []);
+
+  const openPicker = useCallback((cityFilter?: string | null) => {
+    setPickerCityFilter(cityFilter?.trim() || null);
+    setPickerOpenState(true);
+  }, []);
+
   useEffect(() => {
     if (staffMode) {
-      setPickerOpen(false);
+      setPickerOpenState(false);
       setReady(true);
       return;
     }
@@ -162,17 +176,18 @@ export function BranchProvider({ children }: { children: ReactNode }) {
         } catch {
           /* ignore */
         }
-        setPickerOpen(false);
+        setPickerOpenState(false);
         setReady(true);
         return;
       }
     }
     if (selectedSlug && branches.some((b) => b.slug === selectedSlug)) {
-      setPickerOpen(false);
+      setPickerOpenState(false);
       setReady(true);
       return;
     }
-    setPickerOpen(true);
+    setPickerCityFilter(null);
+    setPickerOpenState(true);
     setReady(true);
   }, [branches, branchesQuery.isLoading, searchParams, selectedSlug, staffMode]);
 
@@ -189,9 +204,10 @@ export function BranchProvider({ children }: { children: ReactNode }) {
     needsPicker: !staffMode && ready && !selectedBranch,
     selectBranch,
     clearBranch,
-    openPicker: () => setPickerOpen(true),
+    openPicker,
     pickerOpen: staffMode ? false : pickerOpen,
     setPickerOpen,
+    pickerCityFilter,
   };
 
   return <BranchContext.Provider value={value}>{children}</BranchContext.Provider>;

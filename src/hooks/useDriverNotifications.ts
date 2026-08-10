@@ -47,7 +47,7 @@ export function useDriverNotifications(driverId: string | null) {
       if (Notification.permission === "granted") {
         new Notification("طلب جديد! 🛒", {
           body: `طلب #${newData.order_number} - ${Number(newData.total).toFixed(2)} ر.س`,
-          icon: "/favicon.ico",
+          icon: "/sanam-logo.png",
         });
       }
     }

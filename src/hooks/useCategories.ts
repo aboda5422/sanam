@@ -8,7 +8,7 @@ export const useCategories = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("categories")
-        .select("id, name, name_en, image, slug, is_active, sort_order")
+        .select("id, name, name_en, image, slug, section, is_active, sort_order")
         .eq("is_active", true)
         .order("sort_order");
       if (error) throw error;
@@ -23,7 +23,7 @@ export const useAllCategories = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("categories")
-        .select("id, name, name_en, image, slug, is_active, sort_order")
+        .select("id, name, name_en, image, slug, section, is_active, sort_order")
         .order("sort_order");
       if (error) throw error;
       return data || [];

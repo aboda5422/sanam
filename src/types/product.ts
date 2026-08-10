@@ -20,6 +20,7 @@ export interface Category {
   name_en: string | null;
   image: string | null;
   slug: string;
+  section?: string | null;
   is_active: boolean;
   sort_order: number;
 }

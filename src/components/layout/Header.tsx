@@ -189,7 +189,7 @@ const Header = () => {
           </Sheet>
         )}
 
-        {/* Logo: mark on mobile, full lockup on desktop */}
+        {/* Logo: mark (short) on mobile, full lockup on desktop */}
         <Link to="/" className="shrink-0">
           <img
             src={logoMark}
@@ -294,12 +294,12 @@ const Header = () => {
         {/* Cart */}
         <Link
           to="/cart"
-          className="flex items-center gap-1 lg:gap-2 bg-primary text-primary-foreground rounded-full px-3 lg:px-6 py-2 lg:py-3 hover:bg-primary/90 transition-colors text-sm lg:text-base font-semibold whitespace-nowrap"
+          className="flex items-center gap-1 lg:gap-2 bg-primary/10 hover:bg-primary/15 text-primary rounded-full px-3 lg:px-4 py-2 transition-colors text-sm lg:text-base font-semibold whitespace-nowrap"
         >
           <ShoppingCart className="h-5 w-5" />
           <span className="hidden sm:inline">{t("عربتي", "Cart")}</span>
           {uniqueItems > 0 && (
-            <span className="bg-primary-foreground text-primary text-xs lg:text-sm font-bold w-5 lg:w-6 h-5 lg:h-6 rounded-full flex items-center justify-center">
+            <span className="bg-primary text-primary-foreground text-xs lg:text-sm font-bold w-5 lg:w-6 h-5 lg:h-6 rounded-full flex items-center justify-center">
               {uniqueItems}
             </span>
           )}
@@ -319,17 +319,17 @@ const Header = () => {
         {!isMobile && (
           <>
             {user ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => navigate("/profile")}
-                  className="flex items-center gap-2 text-base text-foreground hover:text-primary transition-colors cursor-pointer"
+                  className="flex items-center gap-2 bg-primary/10 hover:bg-primary/15 text-primary rounded-full px-3 py-2 transition-colors cursor-pointer text-sm font-semibold"
                 >
                   <User className="h-5 w-5" />
                   <span className="hidden sm:inline">{user.user_metadata?.full_name || t("حسابي", "Account")}</span>
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-1 text-base text-muted-foreground hover:text-destructive transition-colors"
+                  className="flex items-center gap-1 p-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-muted transition-colors"
                 >
                   <LogOut className="h-5 w-5" />
                 </button>
@@ -337,10 +337,11 @@ const Header = () => {
             ) : (
               <Link
                 to="/auth"
-                className="flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-6 py-3 hover:bg-primary/90 transition-colors text-base font-semibold whitespace-nowrap"
+                className="flex items-center gap-2 bg-primary/10 hover:bg-primary/15 text-primary rounded-full px-3 py-2 transition-colors text-sm font-semibold whitespace-nowrap"
+                aria-label={t("التسجيل", "Sign Up")}
               >
                 <User className="h-5 w-5" />
-                <span>{t("التسجيل", "Sign Up")}</span>
+                <span className="hidden lg:inline">{t("التسجيل", "Sign Up")}</span>
               </Link>
             )}
           </>

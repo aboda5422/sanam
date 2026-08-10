@@ -172,6 +172,7 @@ export type Database = {
           is_active: boolean
           name: string
           name_en: string | null
+          section: string | null
           slug: string
           sort_order: number
           updated_at: string
@@ -183,6 +184,7 @@ export type Database = {
           is_active?: boolean
           name: string
           name_en?: string | null
+          section?: string | null
           slug: string
           sort_order?: number
           updated_at?: string
@@ -194,6 +196,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           name_en?: string | null
+          section?: string | null
           slug?: string
           sort_order?: number
           updated_at?: string

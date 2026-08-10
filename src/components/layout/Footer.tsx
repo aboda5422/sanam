@@ -4,6 +4,7 @@ import { Phone, MapPin, MessageCircle, MessageSquare, Truck, ShieldCheck } from 
 import { categories, categorySections } from "@/data/store-data";
 import logoFull from "@/assets/logo-full.png";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useBranch } from "@/contexts/BranchContext";
 import { BRAND } from "@/lib/brand";
 import {
   Dialog,
@@ -28,7 +29,8 @@ const TiktokIcon = () => (
 );
 
 const Footer = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const { openPicker } = useBranch();
   const navigate = useNavigate();
   const mainSections = categorySections.slice(0, 5);
   const whatsappNumber = BRAND.whatsapp;
@@ -153,7 +155,23 @@ const Footer = () => {
             </Link>
             <div className="flex items-center gap-1.5 text-xs text-background/60">
               <MapPin className="h-3.5 w-3.5 text-primary" />
-              <span>{t(BRAND.locationsAr, BRAND.locationsEn)}</span>
+              <span className="inline-flex items-center gap-1 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => openPicker(lang === "en" ? "Makkah" : "مكة المكرمة")}
+                  className="hover:text-primary underline-offset-2 hover:underline transition-colors"
+                >
+                  {t("مكة المكرمة", "Makkah")}
+                </button>
+                <span aria-hidden="true">{t("و", " & ")}</span>
+                <button
+                  type="button"
+                  onClick={() => openPicker(lang === "en" ? "Riyadh" : "الرياض")}
+                  className="hover:text-primary underline-offset-2 hover:underline transition-colors"
+                >
+                  {t("الرياض", "Riyadh")}
+                </button>
+              </span>
             </div>
           </div>
         </div>
