@@ -5,10 +5,10 @@ import { Capacitor } from "@capacitor/core";
 import { initFirebase } from "@/lib/firebase";
 import { initGoogleAnalytics } from "@/lib/analytics";
 
-// Google Analytics 4 (G-422LMMDEL2)
+// Google Analytics 4 (public measurement id)
 initGoogleAnalytics();
 
-// Firebase — no-op until VITE_FIREBASE_API_KEY is set
+// Firebase config (apiKey) loaded securely from Supabase secrets
 void initFirebase();
 
 // Native-only initialization (status bar, splash hide, keyboard handling)

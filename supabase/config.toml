@@ -29,3 +29,9 @@ verify_jwt = false
 
 [functions.verify-recaptcha]
 verify_jwt = false
+
+[functions.get-firebase-config]
+verify_jwt = false
+
+[functions.get-maps-key]
+verify_jwt = false
