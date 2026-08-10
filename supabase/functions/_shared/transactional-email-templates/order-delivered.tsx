@@ -74,7 +74,7 @@ export const template = {
   previewData: {
     customerName: 'محمد',
     orderNumber: 1024,
-    ratingUrl: 'https://sanam.sa/order/abc-123?rate=1',
+    ratingUrl: 'https://sanam.xbarawa.com/order/abc-123?rate=1',
     driverName: 'أحمد',
   },
 } satisfies TemplateEntry

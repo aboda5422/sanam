@@ -5,10 +5,10 @@ import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
 
 // Configuration baked in at scaffold time — do NOT change these manually.
 const SITE_NAME = "sanam"
-// SENDER_DOMAIN is the verified sender subdomain FQDN (e.g. notify.sanam.sa in Resend).
-const SENDER_DOMAIN = "notify.sanam.sa"
-// FROM_DOMAIN is the domain shown in the From: header.
-const FROM_DOMAIN = "sanam.sa"
+// Verified sender domain in Resend (staging subdomain until client domain is ready).
+const SENDER_DOMAIN = "sanam.xbarawa.com"
+const FROM_DOMAIN = "sanam.xbarawa.com"
+const SITE_URL = "https://sanam.xbarawa.com"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

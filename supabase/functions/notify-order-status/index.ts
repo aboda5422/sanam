@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
       })
     }
 
-    const origin = req.headers.get('origin') || 'https://sanam.sa'
+    const origin = req.headers.get('origin') || 'https://sanam.xbarawa.com'
     const trackingUrl = `${origin}/order/${order.id}`
     const ratingUrl = `${origin}/order/${order.id}?rate=1`
 

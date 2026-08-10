@@ -73,7 +73,7 @@ export const template = {
   previewData: {
     customerName: 'محمد',
     orderNumber: 1024,
-    trackingUrl: 'https://sanam.sa/order/abc-123',
+    trackingUrl: 'https://sanam.xbarawa.com/order/abc-123',
     driverName: 'أحمد',
     estimatedMinutes: 25,
   },
