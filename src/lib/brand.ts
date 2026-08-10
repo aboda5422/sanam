@@ -19,8 +19,8 @@ export const BRAND = {
   locationsEn: "Makkah & Riyadh",
   /** Sampled from official full logo */
   colors: {
-    orange: "#EE8820",
-    green: "#8CC040",
+    orange: "#EC8824",
+    green: "#8CBC44",
   },
   social: {
     instagram: "https://instagram.com/sanamsaudi",

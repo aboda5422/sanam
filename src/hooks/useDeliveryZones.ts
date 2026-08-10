@@ -9,18 +9,24 @@ export type DeliveryZone = {
   is_active: boolean;
   color: string;
   sort_order: number;
+  branch_id?: string | null;
 };
 
 export const OUT_OF_SERVICE_MESSAGE =
-  "عذراً، هذا الموقع خارج نطاق التوصيل الحالي. نوصل حالياً داخل المناطق المفعّلة على الخريطة.";
+  "عذراً، هذا الموقع خارج نطاق التوصيل للفرع المحدد. جرّب فرعاً آخر أو عنواناً أقرب.";
 
-async function fetchDeliveryZones(): Promise<DeliveryZone[]> {
-  const { data, error } = await supabase
+async function fetchDeliveryZones(branchId?: string | null): Promise<DeliveryZone[]> {
+  let query = supabase
     .from("delivery_zones")
-    .select("id, name, polygon, is_active, color, sort_order")
+    .select("id, name, polygon, is_active, color, sort_order, branch_id")
     .order("sort_order", { ascending: true });
 
-  // Fail-open before migration is applied (or on transient errors): do not block checkout.
+  if (branchId) {
+    query = query.eq("branch_id", branchId);
+  }
+
+  const { data, error } = await query;
+
   if (error) {
     console.warn("[delivery-zones] fetch failed (fail-open):", error.message);
     return [];
@@ -33,19 +39,20 @@ async function fetchDeliveryZones(): Promise<DeliveryZone[]> {
     is_active: !!row.is_active,
     color: row.color || "#22c55e",
     sort_order: row.sort_order ?? 0,
+    branch_id: row.branch_id,
   }));
 }
 
-export function useDeliveryZones() {
+export function useDeliveryZones(branchId?: string | null) {
   return useQuery({
-    queryKey: ["delivery-zones"],
-    queryFn: fetchDeliveryZones,
+    queryKey: ["delivery-zones", branchId || "all"],
+    queryFn: () => fetchDeliveryZones(branchId),
     staleTime: 60_000,
   });
 }
 
-export function useActiveDeliveryZones() {
-  const query = useDeliveryZones();
+export function useActiveDeliveryZones(branchId?: string | null) {
+  const query = useDeliveryZones(branchId);
   const active = (query.data || []).filter((z) => z.is_active && z.polygon.length >= 3);
   return { ...query, active };
 }
@@ -60,8 +67,24 @@ export function isLocationCovered(lat: number, lng: number, activeZones: Deliver
   );
 }
 
-/** Optional server-side RPC check (uses same SQL ray-cast as order trigger). */
-export async function checkDeliveryCoverageRpc(lat: number, lng: number): Promise<boolean> {
+export async function checkDeliveryCoverageRpc(
+  lat: number,
+  lng: number,
+  branchId?: string | null
+): Promise<boolean> {
+  if (branchId) {
+    const { data, error } = await supabase.rpc("is_within_branch_zone" as any, {
+      p_lat: lat,
+      p_lng: lng,
+      p_branch_id: branchId,
+    });
+    if (error) {
+      console.warn("[delivery-zone] branch RPC failed, falling back:", error.message);
+      return true;
+    }
+    return !!data;
+  }
+
   const { data, error } = await supabase.rpc("is_within_delivery_zone", {
     p_lat: lat,
     p_lng: lng,
@@ -71,4 +94,21 @@ export async function checkDeliveryCoverageRpc(lat: number, lng: number): Promis
     return true;
   }
   return !!data;
+}
+
+export async function calculateDeliveryFeeRpc(
+  branchId: string,
+  lat: number,
+  lng: number
+): Promise<number | null> {
+  const { data, error } = await supabase.rpc("calculate_branch_delivery_fee" as any, {
+    p_branch_id: branchId,
+    p_lat: lat,
+    p_lng: lng,
+  });
+  if (error) {
+    console.warn("[delivery-fee] RPC failed:", error.message);
+    return null;
+  }
+  return data == null ? null : Number(data);
 }

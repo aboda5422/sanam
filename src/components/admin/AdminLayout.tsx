@@ -1,16 +1,19 @@
 import { ReactNode } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
-import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { AdminAuthProvider, useAdminAuth } from "@/hooks/useAdminAuth";
 import { Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 interface AdminLayoutProps {
   children: ReactNode;
   title?: string;
 }
 
-const AdminLayout = ({ children, title }: AdminLayoutProps) => {
-  const { loading } = useAdminAuth();
+const AdminShell = ({ children, title }: AdminLayoutProps) => {
+  const { loading, isSuperAdmin, branches, filterBranchId, setFilterBranchId, scopedBranchIds } =
+    useAdminAuth();
 
   if (loading) {
     return (
@@ -20,6 +23,12 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
     );
   }
 
+  const branchLabel = (() => {
+    if (isSuperAdmin && !filterBranchId) return "كل الفروع";
+    const id = filterBranchId || scopedBranchIds?.[0];
+    return branches.find((b) => b.id === id)?.name || "فرعي";
+  })();
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full" dir="rtl">
@@ -27,17 +36,44 @@ const AdminLayout = ({ children, title }: AdminLayoutProps) => {
         <div className="flex-1 flex flex-col min-w-0">
           <header className="sticky top-0 z-40 h-14 flex items-center gap-3 border-b bg-background/95 backdrop-blur px-4">
             <SidebarTrigger />
-            {title && (
-              <h1 className="font-heading font-bold text-lg">{title}</h1>
-            )}
+            {title && <h1 className="font-heading font-bold text-lg">{title}</h1>}
+            <div className="mr-auto flex items-center gap-2">
+              {isSuperAdmin ? (
+                <Select
+                  value={filterBranchId || "all"}
+                  onValueChange={(v) => setFilterBranchId(v === "all" ? null : v)}
+                >
+                  <SelectTrigger className="w-[200px] h-9">
+                    <SelectValue placeholder="كل الفروع" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">كل الفروع</SelectItem>
+                    {branches.map((b) => (
+                      <SelectItem key={b.id} value={b.id}>
+                        {b.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Badge variant="secondary">{branchLabel}</Badge>
+              )}
+              <Badge variant={isSuperAdmin ? "default" : "outline"}>
+                {isSuperAdmin ? "أدمن عام" : "مدير فرع"}
+              </Badge>
+            </div>
           </header>
-          <main className="flex-1 p-4 md:p-6 overflow-y-auto">
-            {children}
-          </main>
+          <main className="flex-1 p-4 md:p-6 overflow-y-auto">{children}</main>
         </div>
       </div>
     </SidebarProvider>
   );
 };
+
+const AdminLayout = ({ children, title }: AdminLayoutProps) => (
+  <AdminAuthProvider>
+    <AdminShell title={title}>{children}</AdminShell>
+  </AdminAuthProvider>
+);
 
 export default AdminLayout;

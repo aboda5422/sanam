@@ -4,7 +4,7 @@ import {
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
 
-const SITE_NAME = 'سلة بازار المواسم'
+const SITE_NAME = 'سنام سوبر ماركت'
 const SITE_URL = 'https://sanam.sa'
 
 interface WelcomeProps {
@@ -32,7 +32,7 @@ const WelcomeEmail = ({ customerName }: WelcomeProps) => (
           </Text>
 
           <Hr style={hr} />
-          <Heading style={h3}>لماذا سلة بازار؟</Heading>
+          <Heading style={h3}>لماذا سنام؟</Heading>
 
           <Row style={featureRow}>
             <Column style={featureIcon}>🥬</Column>

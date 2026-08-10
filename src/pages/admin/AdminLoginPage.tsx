@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import logo from "@/assets/logo.png";
+import logoFull from "@/assets/logo-full.png";
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
@@ -48,9 +48,9 @@ const AdminLoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4" dir="rtl">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
+        <CardHeader className="text-center space-y-[1.2rem]">
           <div className="flex justify-center">
-            <img src={logo} alt="سنام" className="h-16 w-auto" />
+            <img src={logoFull} alt="سنام" className="h-11 w-auto max-w-[224px] object-contain" />
           </div>
           <div>
             <CardTitle className="text-xl flex items-center justify-center gap-2">

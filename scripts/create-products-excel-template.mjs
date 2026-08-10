@@ -26,7 +26,7 @@ async function main() {
   const categoryNames = activeCategories.map((c) => c.name);
 
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = "بازار مواسم";
+  workbook.creator = "سنام";
   workbook.created = new Date();
 
   // ===== Sheet 1: المنتجات =====
@@ -239,7 +239,7 @@ async function main() {
   helpSheet.getColumn(1).width = 90;
 
   const instructions = [
-    "نموذج رفع المنتجات — بازار مواسم",
+    "نموذج رفع المنتجات — سنام",
     "",
     "كيف تستخدم الملف:",
     "1) اذهب إلى ورقة «المنتجات» واملأ صفًا لكل منتج.",

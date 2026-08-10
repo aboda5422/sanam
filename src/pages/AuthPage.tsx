@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import { translateError } from "@/lib/error-messages";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
-import { lovable } from "@/integrations/lovable/index";
 import { Capacitor } from "@capacitor/core";
 
 const AuthPage = () => {
@@ -26,34 +25,54 @@ const AuthPage = () => {
   const { toast } = useToast();
   const { verify: verifyRecaptcha } = useRecaptcha();
 
+  // After Google OAuth redirect, session is set then we go home
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    const fromOAuth =
+      params.has("code") ||
+      hash.includes("access_token") ||
+      hash.includes("error");
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === "SIGNED_IN" || fromOAuth)) {
+        toast({ title: "تم تسجيل الدخول بنجاح", description: "مرحباً بك في سنام" });
+        navigate("/", { replace: true });
+      }
+    });
+
+    if (fromOAuth) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          toast({ title: "تم تسجيل الدخول بنجاح", description: "مرحباً بك في سنام" });
+          navigate("/", { replace: true });
+        }
+      });
+    }
+
+    return () => subscription.unsubscribe();
+  }, [navigate, toast]);
+
   const handleGoogle = async () => {
+    const WEB_CLIENT_ID =
+      "166670791802-nlc276b8q8bnk939tl39nos9amcth2al.apps.googleusercontent.com";
+
     // On native (iOS/Android) use the Google Sign-In SDK via Capacitor.
-    // This opens the system account picker / Google app instead of trying
-    // to load Lovable's web OAuth proxy from inside the WebView.
     if (Capacitor.isNativePlatform()) {
       setLoading(true);
       try {
-        const WEB_CLIENT_ID =
-          "148924632918-2vcnigktvm5duqs6jqr84i5uog3nlt1a.apps.googleusercontent.com";
-        const IOS_CLIENT_ID =
-          "148924632918-b0fu5t6nopeilvan8cjqmdr24dp44bep.apps.googleusercontent.com";
         const { SocialLogin } = await import("@capgo/capacitor-social-login");
         try {
           await SocialLogin.initialize({
             google: {
               webClientId: WEB_CLIENT_ID,
-              iOSClientId: IOS_CLIENT_ID,
               iOSServerClientId: WEB_CLIENT_ID,
               mode: "online",
             },
           });
         } catch {}
-        // NOTE: do not pass `scopes` here — on Android the @capgo plugin
-        // throws "You CANNOT use scopes without modifying the main activity".
-        // email/profile are included by default. Also don't pass a `nonce`:
-        // the plugin does not embed it in the returned idToken, which causes
-        // Supabase to throw "Passed nonce and nonce in id_token should either
-        // both exist or not".
         const res: any = await SocialLogin.login({
           provider: "google",
           options: {},
@@ -80,17 +99,20 @@ const AuthPage = () => {
       }
       return;
     }
+
+    // Web: Supabase Google OAuth
     setLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth`,
+        queryParams: { access_type: "online", prompt: "select_account" },
+      },
     });
-    if (result.error) {
-      toast({ title: "خطأ", description: "فشل تسجيل الدخول عبر Google", variant: "destructive" });
+    if (error) {
+      toast({ title: "خطأ", description: error.message || "فشل تسجيل الدخول عبر Google", variant: "destructive" });
       setLoading(false);
-      return;
     }
-    if (result.redirected) return;
-    navigate("/");
   };
 
   const handleApple = async () => {

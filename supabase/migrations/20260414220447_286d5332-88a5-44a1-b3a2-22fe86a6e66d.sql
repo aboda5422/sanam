@@ -4,7 +4,7 @@ CREATE TABLE public.profiles (
   full_name TEXT,
   phone TEXT,
   address TEXT,
-  city TEXT DEFAULT 'خميس مشيط',
+  city TEXT DEFAULT 'مكة المكرمة',
   avatar_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()

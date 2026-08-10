@@ -17,8 +17,8 @@ CREATE POLICY "Admins can manage branches" ON public.branches FOR ALL USING (pub
 CREATE TRIGGER update_branches_updated_at BEFORE UPDATE ON public.branches FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 INSERT INTO public.branches (name, address, lat, lng, phone) VALUES
-  ('المركز الرئيسي - حي الوسام', 'شارع ثعلبة بن أوس، حي الوسام، خميس مشيط', 18.3433, 42.7669, '0530909751'),
-  ('فرع حي شباعة', 'حي شباعة، خميس مشيط', 18.3284, 42.7275, '0530233395');
+  ('فرع مكة الشرايع 7', 'مكة المكرمة - الشرايع', 21.4225, 39.8262, '0502291213'),
+  ('فرع الرياض الرمال', 'الرياض - حي الرمال', 24.7136, 46.6753, '0502291218');
 
 -- 2. CATEGORIES
 CREATE TABLE public.categories (

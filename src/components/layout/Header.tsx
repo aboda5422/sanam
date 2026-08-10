@@ -10,6 +10,7 @@ import logoMark from "@/assets/logo-mark.png";
 import logoFull from "@/assets/logo-full.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BRAND } from "@/lib/brand";
+import { useBranch } from "@/contexts/BranchContext";
 
 const Header = () => {
   const { uniqueItems } = useCart();
@@ -24,6 +25,7 @@ const Header = () => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { lang, toggleLang, t } = useLanguage();
+  const { selectedBranch, openPicker } = useBranch();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -113,10 +115,13 @@ const Header = () => {
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] p-0 overflow-y-auto">
-              <SheetHeader className="p-4 border-b">
-                <SheetTitle className="flex items-center gap-2">
-                  <img src={logoMark} alt={BRAND.fullNameAr} className="h-8 w-auto" />
-                  <span className="font-heading font-bold text-lg">{t(BRAND.nameAr, BRAND.nameEn)}</span>
+              <SheetHeader className="p-4 pr-12 border-b">
+                <SheetTitle className="!mt-0 text-center">
+                  <img
+                    src={logoFull}
+                    alt={BRAND.fullNameAr}
+                    className="h-11 w-auto max-w-full object-contain mx-auto"
+                  />
                 </SheetTitle>
               </SheetHeader>
               <div className="p-4 space-y-4">
@@ -197,6 +202,18 @@ const Header = () => {
             className="hidden md:block h-12 w-auto max-w-[280px] object-contain"
           />
         </Link>
+
+        {/* Selected branch */}
+        <button
+          type="button"
+          onClick={openPicker}
+          className="hidden sm:flex items-center gap-1.5 text-sm bg-primary/10 hover:bg-primary/15 text-primary rounded-full px-3 py-1.5 transition-colors max-w-[180px]"
+        >
+          <MapPin className="h-4 w-4 shrink-0" />
+          <span className="font-semibold truncate">
+            {selectedBranch?.name || t("اختر الفرع", "Choose branch")}
+          </span>
+        </button>
 
         {/* Delivery address - desktop only */}
         <button

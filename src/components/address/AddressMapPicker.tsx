@@ -20,7 +20,7 @@ interface AddressMapPickerProps {
 
 const KHAMIS_LAT = 18.3;
 const KHAMIS_LNG = 42.73;
-const LAST_LOCATION_KEY = "bazaar:last_picked_location";
+const LAST_LOCATION_KEY = "sanam:last_picked_location";
 
 type SavedLoc = { lat: number; lng: number; address?: string; label?: "home" | "work"; ts: number };
 

@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const q = query.trim();
@@ -59,66 +59,91 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Use AI to rank/pick best alternatives, including size variants
+    // Without Gemini key, fall back to first candidates
+    if (!GEMINI_API_KEY) {
+      return new Response(JSON.stringify({ matches: candidates.slice(0, 8) }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Use Gemini to rank/pick best alternatives, including size variants
     const productList = candidates
       .map((p, i) => `${i}: ${p.name}${p.unit ? ` (${p.unit})` : ""} - ${p.price} ر.س`)
       .join("\n");
 
-    const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          {
-            role: "system",
-            content:
-              "أنت مساعد بقالة ذكي. مهمتك ترتيب المنتجات الأقرب لطلب العميل. أعد فقط فهارس المنتجات (أرقام) من الأكثر تطابقاً للأقل. إذا طلب العميل حجماً غير متوفر، اقترح أقرب حجم. أعد حتى 8 نتائج.",
+    const model = "gemini-flash-lite-latest";
+    const aiResp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": GEMINI_API_KEY,
+        },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [
+              {
+                text:
+                  "أنت مساعد بقالة ذكي. مهمتك ترتيب المنتجات الأقرب لطلب العميل. أعد فقط فهارس المنتجات (أرقام) من الأكثر تطابقاً للأقل. إذا طلب العميل حجماً غير متوفر، اقترح أقرب حجم. أعد حتى 8 نتائج.",
+              },
+            ],
           },
-          {
-            role: "user",
-            content: `طلب العميل: "${q}"\n\nالمنتجات المتاحة:\n${productList}`,
-          },
-        ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "rank_products",
-              description: "ترتيب المنتجات حسب الأقرب لطلب العميل",
-              parameters: {
-                type: "object",
-                properties: {
-                  ranked_indexes: {
-                    type: "array",
-                    items: { type: "integer" },
-                    description: "فهارس المنتجات مرتبة من الأفضل تطابقاً للأقل",
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: `طلب العميل: "${q}"\n\nالمنتجات المتاحة:\n${productList}`,
+                },
+              ],
+            },
+          ],
+          tools: [
+            {
+              functionDeclarations: [
+                {
+                  name: "rank_products",
+                  description: "ترتيب المنتجات حسب الأقرب لطلب العميل",
+                  parameters: {
+                    type: "object",
+                    properties: {
+                      ranked_indexes: {
+                        type: "array",
+                        items: { type: "integer" },
+                        description: "فهارس المنتجات مرتبة من الأفضل تطابقاً للأقل",
+                      },
+                    },
+                    required: ["ranked_indexes"],
                   },
                 },
-                required: ["ranked_indexes"],
-              },
+              ],
+            },
+          ],
+          toolConfig: {
+            functionCallingConfig: {
+              mode: "ANY",
+              allowedFunctionNames: ["rank_products"],
             },
           },
-        ],
-        tool_choice: { type: "function", function: { name: "rank_products" } },
-      }),
-    });
+        }),
+      },
+    );
 
     if (!aiResp.ok) {
-      // Fallback: return candidates as-is
+      const errText = await aiResp.text();
+      console.error("Gemini error:", aiResp.status, errText);
       return new Response(JSON.stringify({ matches: candidates.slice(0, 8) }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const aiData = await aiResp.json();
-    const toolCall = aiData?.choices?.[0]?.message?.tool_calls?.[0];
+    const parts = aiData?.candidates?.[0]?.content?.parts ?? [];
+    const fnCall = parts.find((p: { functionCall?: unknown }) => p.functionCall)?.functionCall;
     let ranked: number[] = [];
     try {
-      const args = JSON.parse(toolCall?.function?.arguments || "{}");
+      const args = fnCall?.args ?? {};
       ranked = Array.isArray(args.ranked_indexes) ? args.ranked_indexes : [];
     } catch {
       ranked = [];
@@ -126,7 +151,7 @@ Deno.serve(async (req) => {
 
     const matches =
       ranked.length > 0
-        ? ranked.map((i) => candidates[i]).filter(Boolean).slice(0, 8)
+        ? ranked.map((i: number) => candidates[i]).filter(Boolean).slice(0, 8)
         : candidates.slice(0, 8);
 
     return new Response(JSON.stringify({ matches }), {

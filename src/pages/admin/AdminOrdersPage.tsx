@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Search, Loader2, Eye, XCircle, Undo2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 const statusMap: Record<string, { label: string; color: string }> = {
   pending: { label: "بانتظار", color: "bg-yellow-100 text-yellow-800" },
@@ -29,6 +30,7 @@ const paymentStatusMap: Record<string, { label: string; className: string }> = {
 };
 
 const AdminOrdersPage = () => {
+  const { scopedBranchIds, isSuperAdmin } = useAdminAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -41,12 +43,18 @@ const AdminOrdersPage = () => {
   const [refunding, setRefunding] = useState(false);
 
   const { data: orders, isLoading } = useQuery({
-    queryKey: ["admin-orders"],
+    queryKey: ["admin-orders", scopedBranchIds],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from("orders")
-        .select("*, order_items(*)")
+        .select("*, order_items(*), branches(name, slug)")
         .order("created_at", { ascending: false });
+      if (scopedBranchIds && scopedBranchIds.length > 0) {
+        q = q.in("branch_id", scopedBranchIds);
+      } else if (!isSuperAdmin) {
+        return [];
+      }
+      const { data, error } = await q;
       if (error) throw error;
       return data;
     },

@@ -1,3 +1,15 @@
-# Welcome to your Lovable project
+# سنام سوبر ماركت | Sanam Supermarket
 
-TODO: Document your project here
+متجر إلكتروني لتوصيل البقالة والمنتجات الطازجة — واجهة عميل، لوحة إدارة، وواجهة مندوبين.
+
+## التشغيل المحلي
+
+```bash
+npm install
+npm run dev
+```
+
+## الهوية
+
+- الموقع المرجعي: https://sanam.sa
+- الألوان: برتقالي `#EE8820` · أخضر `#8CC040`

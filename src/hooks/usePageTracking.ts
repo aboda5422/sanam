@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { trackPageView } from "@/lib/analytics";
 
 const SESSION_KEY = "bz_session_id";
 
@@ -25,6 +26,9 @@ export const usePageTracking = () => {
       return;
     }
 
+    const path = location.pathname + location.search;
+    trackPageView(path);
+
     const track = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -40,5 +44,5 @@ export const usePageTracking = () => {
       }
     };
     track();
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 };

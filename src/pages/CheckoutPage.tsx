@@ -5,7 +5,9 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useCart } from "@/contexts/CartContext";
+import { useBranch } from "@/contexts/BranchContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import AddressMapPicker from "@/components/address/AddressMapPicker";
@@ -15,8 +17,15 @@ import {
   useActiveDeliveryZones,
   isLocationCovered,
   checkDeliveryCoverageRpc,
+  calculateDeliveryFeeRpc,
   OUT_OF_SERVICE_MESSAGE,
 } from "@/hooks/useDeliveryZones";
+import {
+  distanceFromBranch,
+  feeForDistance,
+  isValidNationalAddress,
+  normalizeNationalAddress,
+} from "@/lib/branch";
 
 const deliveryTimes = [
   "الآن (في أقرب وقت)",
@@ -30,15 +39,17 @@ const deliveryTimes = [
 
 const CheckoutPage = () => {
   const { items, totalPrice, clearCart, markCheckoutReached, markConverted } = useCart();
+  const { selectedBranch, ratesByBranch, openPicker } = useBranch();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { verify: verifyRecaptcha } = useRecaptcha();
-  const { active: activeZones } = useActiveDeliveryZones();
+  const { active: activeZones } = useActiveDeliveryZones(selectedBranch?.id);
   const [selectedTime, setSelectedTime] = useState("");
   const [phone, setPhone] = useState("");
   const [savedPhone, setSavedPhone] = useState("");
   const [editingPhone, setEditingPhone] = useState(false);
   const [name, setName] = useState("");
+  const [nationalAddress, setNationalAddress] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [showMapPicker, setShowMapPicker] = useState(false);
@@ -46,6 +57,7 @@ const CheckoutPage = () => {
   const [user, setUser] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("cash");
   const [processing, setProcessing] = useState(false);
+  const [deliveryFee, setDeliveryFee] = useState<number>(15);
 
   // Online payment temporarily disabled while licensing is finalized with Moyasar
   const ONLINE_PAYMENT_ENABLED = false;
@@ -91,6 +103,62 @@ const CheckoutPage = () => {
     }
   }, [activeZones]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Recalculate delivery fee from distance tiers / RPC when address or branch changes
+  useEffect(() => {
+    const run = async () => {
+      if (!selectedBranch || !selectedAddress) {
+        setDeliveryFee(15);
+        return;
+      }
+      if (!isLocationCovered(selectedAddress.lat, selectedAddress.lng, activeZones)) {
+        setDeliveryFee(15);
+        return;
+      }
+      const rpcFee = await calculateDeliveryFeeRpc(
+        selectedBranch.id,
+        selectedAddress.lat,
+        selectedAddress.lng
+      );
+      if (rpcFee != null) {
+        setDeliveryFee(rpcFee);
+        return;
+      }
+      const rates = ratesByBranch[selectedBranch.id] || [];
+      const km = distanceFromBranch(selectedBranch, {
+        lat: selectedAddress.lat,
+        lng: selectedAddress.lng,
+      });
+      setDeliveryFee(feeForDistance(rates, km));
+    };
+    run();
+  }, [selectedBranch, selectedAddress, activeZones, ratesByBranch]);
+
+  const distanceKm =
+    selectedBranch && selectedAddress
+      ? distanceFromBranch(selectedBranch, {
+          lat: selectedAddress.lat,
+          lng: selectedAddress.lng,
+        })
+      : null;
+
+  const delivery = totalPrice >= 100 ? 0 : deliveryFee;
+  const total = totalPrice + delivery;
+
+  if (!selectedBranch) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 container py-16 text-center space-y-4">
+          <MapPin className="h-12 w-12 mx-auto text-primary" />
+          <h2 className="font-heading text-xl font-bold">اختر الفرع أولاً</h2>
+          <p className="text-muted-foreground">يجب اختيار فرع قبل إتمام الطلب</p>
+          <Button onClick={openPicker}>اختيار الفرع</Button>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   if (items.length === 0 && !submitted) {
     navigate("/cart");
     return null;
@@ -113,9 +181,6 @@ const CheckoutPage = () => {
       </div>
     );
   }
-
-  const delivery = totalPrice >= 100 ? 0 : 15;
-  const total = totalPrice + delivery;
 
   const handleAddressSelected = async (addr: { label: string; address: string; lat: number; lng: number; id?: string }) => {
     if (!isLocationCovered(addr.lat, addr.lng, activeZones)) {
@@ -147,8 +212,23 @@ const CheckoutPage = () => {
   };
 
   const handleSubmit = async () => {
+    if (!selectedBranch) {
+      toast({ title: "يرجى اختيار الفرع أولاً", variant: "destructive" });
+      openPicker();
+      return;
+    }
+
     if (!name || !phone || !selectedAddress || !selectedTime) {
       toast({ title: "يرجى تعبئة جميع الحقول واختيار العنوان", variant: "destructive" });
+      return;
+    }
+
+    if (!isValidNationalAddress(nationalAddress)) {
+      toast({
+        title: "العنوان الوطني المختصر غير صحيح",
+        description: "مثال: ANCAW32154",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -165,15 +245,17 @@ const CheckoutPage = () => {
 
     setProcessing(true);
 
-    // Double-check on server RPC before insert (same logic as DB trigger)
-    const covered = await checkDeliveryCoverageRpc(selectedAddress.lat, selectedAddress.lng);
+    const covered = await checkDeliveryCoverageRpc(
+      selectedAddress.lat,
+      selectedAddress.lng,
+      selectedBranch.id
+    );
     if (!covered) {
       setProcessing(false);
       toast({ title: "خارج نطاق التوصيل", description: OUT_OF_SERVICE_MESSAGE, variant: "destructive" });
       return;
     }
 
-    // reCAPTCHA v3 — silent bot check before placing order
     const passed = await verifyRecaptcha("order");
     if (!passed) {
       setProcessing(false);
@@ -181,7 +263,6 @@ const CheckoutPage = () => {
       return;
     }
 
-    // Create order in database
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({
@@ -196,8 +277,10 @@ const CheckoutPage = () => {
         total,
         status: "pending",
         payment_method: paymentMethod === "cash" ? "cash" : "online",
-        notes: `وقت التوصيل: ${selectedTime}`,
-      })
+        branch_id: selectedBranch.id,
+        national_address: normalizeNationalAddress(nationalAddress),
+        notes: `وقت التوصيل: ${selectedTime} | الفرع: ${selectedBranch.name}`,
+      } as any)
       .select()
       .single();
 
@@ -309,6 +392,35 @@ const CheckoutPage = () => {
                     </div>
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* Branch + national address */}
+            <div className="bg-card rounded-xl border p-6 space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">الفرع</p>
+                  <p className="font-semibold">{selectedBranch.name}</p>
+                  <p className="text-xs text-muted-foreground">{selectedBranch.city}</p>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={openPicker}>
+                  تغيير الفرع
+                </Button>
+              </div>
+              <div>
+                <Label htmlFor="national-address">العنوان الوطني المختصر</Label>
+                <Input
+                  id="national-address"
+                  value={nationalAddress}
+                  onChange={(e) => setNationalAddress(e.target.value.toUpperCase())}
+                  placeholder="ANCAW32154"
+                  dir="ltr"
+                  className="mt-1.5 font-mono tracking-wider"
+                  maxLength={12}
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  الرمز المختصر من العنوان الوطني السعودي (مثال: ANCAW32154)
+                </p>
               </div>
             </div>
 
@@ -433,7 +545,12 @@ const CheckoutPage = () => {
             </div>
             <div className="border-t pt-3 space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">التوصيل</span>
+                <span className="text-muted-foreground">
+                  التوصيل
+                  {distanceKm != null && delivery > 0 ? (
+                    <span className="text-[11px] text-muted-foreground/80 block">~{distanceKm.toFixed(1)} كم من الفرع</span>
+                  ) : null}
+                </span>
                 <span className={delivery === 0 ? "text-green-500" : ""}>{delivery === 0 ? "مجاني" : `${delivery} ر.س`}</span>
               </div>
               <div className="flex justify-between font-heading font-bold text-lg pt-2 border-t">

@@ -13,24 +13,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 15%;
 
-    /* Sanam brand — sampled from full logo: orange #EE8820, green #8CC040 */
-    --primary: 30 86% 53%;
+    /* Sanam brand — sampled from full logo: orange #EC8824, green #8CBC44 */
+    --primary: 30 84% 54%;
     --primary-foreground: 0 0% 100%;
 
-    --primary-dark: 30 86% 42%;
-    --primary-light: 30 90% 62%;
+    --primary-dark: 30 84% 42%;
+    --primary-light: 30 88% 62%;
     --primary-pale: 30 85% 92%;
 
-    --secondary: 84 40% 95%;
-    --secondary-foreground: 84 45% 28%;
+    --secondary: 82 40% 95%;
+    --secondary-foreground: 82 45% 28%;
 
     --muted: 30 20% 96%;
     --muted-foreground: 220 10% 45%;
 
-    --accent: 84 45% 94%;
-    --accent-foreground: 84 50% 32%;
+    --accent: 82 45% 94%;
+    --accent-foreground: 82 50% 32%;
 
-    --brand-green: 84 50% 50%;
+    --brand-green: 82 48% 50%;
     --brand-green-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -38,7 +38,7 @@
 
     --border: 30 15% 90%;
     --input: 30 15% 90%;
-    --ring: 30 86% 53%;
+    --ring: 30 84% 54%;
 
     --radius: 0.75rem;
 

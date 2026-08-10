@@ -158,20 +158,17 @@ CREATE TRIGGER trg_enforce_delivery_zone_on_order
   FOR EACH ROW
   EXECUTE FUNCTION public.enforce_delivery_zone_on_order();
 
--- Default coverage: خميس مشيط + أبها (rough metro polygon). Admins can edit on the map.
+-- Default coverage: مكة المكرمة (تقريبي). يمكن تعديلها من لوحة التحكم على الخريطة.
 INSERT INTO public.delivery_zones (name, polygon, is_active, color, sort_order)
 VALUES (
-  'خميس مشيط وأبها',
+  'مكة المكرمة',
   '[
-    {"lat": 18.42, "lng": 42.48},
-    {"lat": 18.42, "lng": 42.88},
-    {"lat": 18.28, "lng": 42.95},
-    {"lat": 18.12, "lng": 42.88},
-    {"lat": 18.08, "lng": 42.55},
-    {"lat": 18.12, "lng": 42.40},
-    {"lat": 18.28, "lng": 42.38}
+    {"lat": 21.55, "lng": 39.70},
+    {"lat": 21.55, "lng": 39.95},
+    {"lat": 21.30, "lng": 39.95},
+    {"lat": 21.30, "lng": 39.70}
   ]'::jsonb,
   true,
-  '#16a34a',
+  '#EE8820',
   0
 );

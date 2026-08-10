@@ -6,9 +6,9 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   // For production native app: load bundled files from dist/ (no server URL).
   // To re-enable hot-reload during development, uncomment the server block below
-  // and use the published URL (not the preview URL which requires Lovable login).
+  // and point it at your local Vite URL (e.g. http://YOUR_LAN_IP:8080).
   // server: {
-  //   url: 'https://bazarmawasim.lovable.app',
+  //   url: 'http://192.168.1.10:8080',
   //   cleartext: true,
   // },
   ios: {
@@ -47,8 +47,8 @@ const config: CapacitorConfig = {
     // Google Sign-In is configured at runtime via
     // @capgo/capacitor-social-login (SocialLogin.initialize) in AuthPage.tsx.
     // The Web Client ID is used to obtain an idToken that Supabase
-    // signInWithIdToken can verify. The same Web Client ID + Secret must
-    // be configured in Lovable Cloud → Users → Auth Settings → Google.
+    // signInWithIdToken can verify. Configure the same Client ID + Secret
+    // in Supabase Auth → Providers → Google.
   },
 };
 

@@ -11,7 +11,15 @@ import { Loader2, MapPin, Pencil, Plus, Trash2, Save, X, Eye, Check } from "luci
 import { toast } from "sonner";
 import type { LatLng } from "@/lib/geo";
 
-const KHAMIS_CENTER = { lat: 18.3, lng: 42.73 };
+const DEFAULT_CENTER = { lat: 21.4225, lng: 39.8262 }; // Makkah
+
+type DeliveryZonesEditorProps = {
+  /** When set, only that branch's zones are shown and new zones are linked to it. */
+  branchId?: string | null;
+  branchName?: string;
+  branchCenter?: { lat: number; lng: number } | null;
+  mapHeightClass?: string;
+};
 
 const pathToPolygon = (path: any): LatLng[] => {
   const result: LatLng[] = [];
@@ -33,9 +41,18 @@ const fitPolygonOnMap = (map: any, polygon: LatLng[]) => {
   }
 };
 
-const DeliveryZonesEditor = () => {
+const DeliveryZonesEditor = ({
+  branchId = null,
+  branchName,
+  branchCenter = null,
+  mapHeightClass = "h-72",
+}: DeliveryZonesEditorProps) => {
   const queryClient = useQueryClient();
-  const { data: zones = [], isLoading } = useDeliveryZones();
+  const { data: zones = [], isLoading } = useDeliveryZones(branchId);
+  const mapCenter =
+    branchCenter && Number.isFinite(branchCenter.lat) && Number.isFinite(branchCenter.lng)
+      ? branchCenter
+      : DEFAULT_CENTER;
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const polygonsRef = useRef<Map<string, any>>(new Map());
@@ -58,7 +75,10 @@ const DeliveryZonesEditor = () => {
   const [editingName, setEditingName] = useState("");
   const [editPath, setEditPath] = useState<LatLng[] | null>(null);
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["delivery-zones"] });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["delivery-zones"] });
+    queryClient.invalidateQueries({ queryKey: ["admin-branches"] });
+  };
 
   const clearPathListeners = () => {
     pathListenersRef.current.forEach((listener) => {
@@ -99,15 +119,19 @@ const DeliveryZonesEditor = () => {
       is_active?: boolean;
       color?: string;
     }) => {
+      if (!payload.id && !branchId) {
+        throw new Error("اختر فرعاً أولاً قبل حفظ نطاق التوصيل");
+      }
       if (payload.id) {
         const { error } = await supabase
           .from("delivery_zones")
           .update({
             name: payload.name,
             polygon: payload.polygon as any,
+            ...(branchId ? { branch_id: branchId } : {}),
             ...(payload.is_active !== undefined ? { is_active: payload.is_active } : {}),
             ...(payload.color ? { color: payload.color } : {}),
-          })
+          } as any)
           .eq("id", payload.id);
         if (error) throw error;
       } else {
@@ -116,7 +140,8 @@ const DeliveryZonesEditor = () => {
           polygon: payload.polygon as any,
           is_active: payload.is_active ?? true,
           color: payload.color || "#16a34a",
-        });
+          branch_id: branchId,
+        } as any);
         if (error) throw error;
       }
     },
@@ -229,8 +254,8 @@ const DeliveryZonesEditor = () => {
         if (cancelled || !mapRef.current) return;
 
         const map = new window.google.maps.Map(mapRef.current, {
-          center: KHAMIS_CENTER,
-          zoom: 11,
+          center: mapCenter,
+          zoom: 12,
           mapTypeControl: false,
           streetViewControl: false,
           fullscreenControl: false,
@@ -240,7 +265,7 @@ const DeliveryZonesEditor = () => {
 
         const refresh = () => {
           triggerMapResize(map);
-          map.setCenter(KHAMIS_CENTER);
+          map.setCenter(mapCenter);
         };
         requestAnimationFrame(() => {
           refresh();
@@ -272,7 +297,14 @@ const DeliveryZonesEditor = () => {
       clearPathListeners();
       clearDraftOverlays();
     };
-  }, []);
+  }, [mapCenter.lat, mapCenter.lng]);
+
+  // Keep map centered on branch when branch changes and no zones yet
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current || zones.length > 0) return;
+    mapInstance.current.setCenter(mapCenter);
+    mapInstance.current.setZoom(12);
+  }, [mapReady, mapCenter.lat, mapCenter.lng, zones.length]);
 
   // Render saved polygons
   useEffect(() => {
@@ -428,6 +460,10 @@ const DeliveryZonesEditor = () => {
   };
 
   const startDrawing = () => {
+    if (!branchId) {
+      toast.error("اختر فرعاً أولاً لربط نطاق التوصيل به");
+      return;
+    }
     if (!mapReady || !mapInstance.current || !window.google?.maps) {
       toast.error("انتظر حتى تظهر الخريطة ثم حاول مرة أخرى");
       return;
@@ -436,7 +472,7 @@ const DeliveryZonesEditor = () => {
     cancelDraft();
 
     setSelectedId(null);
-    setDraftName("منطقة توصيل جديدة");
+    setDraftName(branchName ? `نطاق ${branchName}` : "منطقة توصيل جديدة");
     setDraftComplete(false);
     setDrawing(true);
     drawingRef.current = true;
@@ -511,11 +547,17 @@ const DeliveryZonesEditor = () => {
         <p className="font-medium text-foreground mb-1 flex items-center gap-1.5">
           <MapPin className="h-4 w-4 text-primary" />
           نطاق التوصيل على الخريطة
+          {branchName ? ` — ${branchName}` : ""}
         </p>
         <p>
-          ارسم المناطق المسموح بالتوصيل إليها. الطلبات خارج المناطق المفعّلة تُرفض تلقائياً. إذا لم توجد
-          أي منطقة مفعّلة فلن يُحظر أي طلب.
+          ارسم المضلع بدقة حول منطقة خدمة الفرع. انقر لإضافة نقاط الحدود، ثم اسحبها للتعديل.
+          الطلبات خارج المناطق المفعّلة تُرفض تلقائياً.
         </p>
+        {!branchId && (
+          <p className="mt-2 text-destructive text-xs font-medium">
+            يجب اختيار فرع قبل رسم أو حفظ نطاق جغرافي.
+          </p>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -561,7 +603,7 @@ const DeliveryZonesEditor = () => {
       )}
 
       <div className="relative rounded-xl overflow-hidden border">
-        <div ref={mapRef} className="w-full h-72 bg-muted" />
+        <div ref={mapRef} className={`w-full bg-muted ${mapHeightClass}`} />
         {mapLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-muted/90 text-sm text-muted-foreground gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />

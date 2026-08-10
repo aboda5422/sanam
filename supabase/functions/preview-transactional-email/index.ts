@@ -7,29 +7,40 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, content-type',
 }
 
+function parseJwtClaims(token: string): Record<string, unknown> | null {
+  const parts = token.split('.')
+  if (parts.length < 2) return null
+  try {
+    const payload = parts[1]
+      .replaceAll('-', '+')
+      .replaceAll('_', '/')
+      .padEnd(Math.ceil(parts[1].length / 4) * 4, '=')
+    return JSON.parse(atob(payload)) as Record<string, unknown>
+  } catch {
+    return null
+  }
+}
+
 // Renders all registered templates with their previewData.
-// Gated by LOVABLE_API_KEY — only the Go API calls this.
+// Gated by service_role JWT (or EMAIL_INTERNAL_KEY).
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
-  const apiKey = Deno.env.get('LOVABLE_API_KEY')
-  if (!apiKey) {
-    return new Response(
-      JSON.stringify({ error: 'Server configuration error' }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
-  }
-
-  // Verify the caller is authorized with LOVABLE_API_KEY
+  const internalKey = Deno.env.get('EMAIL_INTERNAL_KEY')
   const authHeader = req.headers.get('Authorization')
   const token = authHeader?.replace(/^Bearer\s+/i, '')
-  if (token !== apiKey) {
+
+  let authorized = false
+  if (internalKey && token === internalKey) authorized = true
+  if (!authorized && token) {
+    const claims = parseJwtClaims(token)
+    authorized = claims?.role === 'service_role'
+  }
+
+  if (!authorized) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -78,10 +89,6 @@ Deno.serve(async (req) => {
         status: 'ready',
       })
     } catch (err) {
-      console.error('Failed to render template for preview', {
-        template: name,
-        error: err,
-      })
       results.push({
         templateName: name,
         displayName,
@@ -94,7 +101,6 @@ Deno.serve(async (req) => {
   }
 
   return new Response(JSON.stringify({ templates: results }), {
-    status: 200,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
 })

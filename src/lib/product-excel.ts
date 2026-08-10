@@ -122,7 +122,7 @@ export function downloadProductsTemplate(categories: CategoryOption[]) {
   catsSheet["!cols"] = [{ wch: 40 }, { wch: 28 }, { wch: 12 }];
 
   const helpAoA: unknown[][] = [
-    ["نموذج رفع المنتجات — بازار مواسم"],
+    ["نموذج رفع المنتجات — سنام"],
     [""],
     ["تم توليد هذا الملف تلقائيًا من الأقسام والحقول الحالية في بطاقة المنتج."],
     [""],

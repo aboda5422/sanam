@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { BranchProvider } from "@/contexts/BranchContext";
+import BranchPickerDialog from "@/components/branch/BranchPickerDialog";
 import Index from "./pages/Index";
 import CategoryPage from "./pages/CategoryPage";
 import CategoriesPage from "./pages/CategoriesPage";
@@ -63,8 +65,10 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <BranchProvider>
           <ScrollToTop />
           <RouteTracker />
+          <BranchPickerDialog />
           <Routes>
             {/* Customer Routes */}
             <Route path="/" element={<Index />} />
@@ -115,6 +119,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           <MobileBottomNav />
+          </BranchProvider>
         </BrowserRouter>
       </CartProvider>
       </LanguageProvider>
