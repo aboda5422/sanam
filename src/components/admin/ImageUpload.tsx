@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -88,7 +88,7 @@ const ImageUpload = ({ value, onChange, folder, label = "الصورة" }: ImageU
             src={value}
             alt="preview"
             className="w-16 h-16 rounded-lg object-cover border"
-            onError={(e) => { e.currentTarget.src = "/placeholder.svg"; }}
+            onError={(e) => { e.currentTarget.src = "/placeholder.png"; }}
           />
           <button
             type="button"

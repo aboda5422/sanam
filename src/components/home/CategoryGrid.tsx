@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useCategories } from "@/hooks/useCategories";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,11 +44,11 @@ const CategoryGrid = () => {
             >
               <div className="aspect-[4/3] overflow-hidden">
                 <img
-                  src={cat.image || "/placeholder.svg"}
+                  src={cat.image || "/placeholder.png"}
                   alt={cat.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
-                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/placeholder.svg"; }}
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/placeholder.png"; }}
                 />
               </div>
               <div className="p-3 text-center">

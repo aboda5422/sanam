@@ -1,4 +1,4 @@
-import { Plus, Minus } from "lucide-react";
+﻿import { Plus, Minus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import type { Product } from "@/types/product";
 import { toLegacyProduct } from "@/types/product";
@@ -21,11 +21,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
       <Link to={`/product/${product.id}`} className="block">
         <div className="relative aspect-square overflow-hidden bg-white p-3">
           <img
-            src={product.image || "/placeholder.svg"}
+            src={product.image || "/placeholder.png"}
             alt={product.name}
             className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
-            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/placeholder.svg"; }}
+            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/placeholder.png"; }}
           />
           {discount > 0 && (
             <span className="absolute top-2 right-2 bg-destructive text-white text-[10px] font-bold px-1.5 py-0.5 rounded">

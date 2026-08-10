@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -491,7 +491,7 @@ const AdminProductsPage = () => {
                     </td>
                     <td className="p-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <img src={p.image || "/placeholder.svg"} alt={p.name} className="w-9 h-9 rounded-md object-cover bg-white border flex-shrink-0" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/placeholder.svg"; }} />
+                        <img src={p.image || "/placeholder.png"} alt={p.name} className="w-9 h-9 rounded-md object-cover bg-white border flex-shrink-0" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/placeholder.png"; }} />
                         <div className="min-w-0 flex-1">
                           <p className="font-medium truncate">{p.name}</p>
                           <p className="text-xs text-muted-foreground truncate">

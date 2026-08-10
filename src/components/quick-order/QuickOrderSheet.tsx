@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Sparkles, Plus, Minus, Trash2, ShoppingCart, X, Loader2, Search } from "lucide-react";
@@ -190,7 +190,7 @@ const QuickOrderSheet = ({ open, onOpenChange }: QuickOrderSheetProps) => {
                   className="w-full flex items-center gap-3 bg-background rounded-xl p-2.5 hover:bg-primary/5 hover:ring-2 hover:ring-primary/30 transition-all text-right"
                 >
                   <img
-                    src={p.image || "/placeholder.svg"}
+                    src={p.image || "/placeholder.png"}
                     alt={p.name}
                     className="w-14 h-14 rounded-lg object-cover bg-muted shrink-0"
                     loading="lazy"
@@ -232,7 +232,7 @@ const QuickOrderSheet = ({ open, onOpenChange }: QuickOrderSheetProps) => {
                     className="flex items-center gap-2 bg-muted/40 rounded-lg p-1.5"
                   >
                     <img
-                      src={n.product.image || "/placeholder.svg"}
+                      src={n.product.image || "/placeholder.png"}
                       alt={n.product.name}
                       className="w-9 h-9 rounded object-cover shrink-0"
                     />

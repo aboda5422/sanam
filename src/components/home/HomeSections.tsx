@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { categorySections, categories } from "@/data/store-data";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCategories } from "@/hooks/useCategories";
@@ -27,7 +27,7 @@ const HomeSections = () => {
             id: c!.slug,
             name: c!.name,
             nameEn: c!.name_en || c!.name,
-            image: c!.image || "/placeholder.svg",
+            image: c!.image || "/placeholder.png",
           }));
 
         if (!sectionCats.length && !extras.length) return null;
@@ -40,18 +40,24 @@ const HomeSections = () => {
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
               {sectionCats.map((cat) => {
                 const db = dbBySlug.get(cat.id);
-                const image = cat.image || db?.image || "/placeholder.svg";
+                const image = cat.image || db?.image || "/placeholder.png";
                 return (
                   <Link key={cat.id} to={`/category/${cat.id}`} className="group block">
-                    <div className="aspect-square rounded-2xl overflow-hidden bg-muted/30 hover:shadow-lg transition-all duration-300 relative">
+                    <div className="aspect-square rounded-2xl overflow-hidden bg-muted/30 hover:shadow-lg transition-all duration-300 relative flex items-center justify-center">
                       <img
                         src={image}
                         alt={lang === "ar" ? cat.name : cat.nameEn}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
+                          image === "/placeholder.png" || image.endsWith("placeholder.png")
+                            ? "object-contain p-4"
+                            : "object-cover"
+                        }`}
                         loading="lazy"
                         onError={(e) => {
                           e.currentTarget.onerror = null;
-                          e.currentTarget.src = "/placeholder.svg";
+                          e.currentTarget.src = "/placeholder.png";
+                          e.currentTarget.classList.add("object-contain", "p-4");
+                          e.currentTarget.classList.remove("object-cover");
                         }}
                       />
                     </div>
@@ -61,17 +67,24 @@ const HomeSections = () => {
                   </Link>
                 );
               })}
-              {extras.map((cat) => (
+              {extras.map((cat) => {
+                const isPlaceholder =
+                  !cat.image || cat.image === "/placeholder.png" || cat.image.endsWith("placeholder.png");
+                return (
                 <Link key={cat.id} to={`/category/${cat.id}`} className="group block">
-                  <div className="aspect-square rounded-2xl overflow-hidden bg-muted/30 hover:shadow-lg transition-all duration-300 relative">
+                  <div className="aspect-square rounded-2xl overflow-hidden bg-muted/30 hover:shadow-lg transition-all duration-300 relative flex items-center justify-center">
                     <img
                       src={cat.image}
                       alt={lang === "ar" ? cat.name : cat.nameEn}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
+                        isPlaceholder ? "object-contain p-4" : "object-cover"
+                      }`}
                       loading="lazy"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
-                        e.currentTarget.src = "/placeholder.svg";
+                        e.currentTarget.src = "/placeholder.png";
+                        e.currentTarget.classList.add("object-contain", "p-4");
+                        e.currentTarget.classList.remove("object-cover");
                       }}
                     />
                   </div>
@@ -79,7 +92,8 @@ const HomeSections = () => {
                     {lang === "ar" ? cat.name : cat.nameEn}
                   </p>
                 </Link>
-              ))}
+                );
+              })}
             </div>
           </section>
         );

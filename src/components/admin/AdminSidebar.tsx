@@ -19,7 +19,7 @@ import {
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/logo-full.png";
+import logo from "@/assets/logo-full-light.png";
 import {
   Sidebar,
   SidebarContent,

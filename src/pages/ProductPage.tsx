@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+﻿import { useParams, Link } from "react-router-dom";
 import { ArrowRight, Plus, Minus, ShoppingCart, Loader2 } from "lucide-react";
 import { useState } from "react";
 import Header from "@/components/layout/Header";
@@ -114,7 +114,7 @@ const ProductPage = () => {
 
           <div className="order-1 md:order-2">
             <div className="aspect-square rounded-2xl overflow-hidden bg-white border sticky top-24">
-              <img src={product.image || "/placeholder.svg"} alt={product.name} className="w-full h-full object-contain p-8" />
+              <img src={product.image || "/placeholder.png"} alt={product.name} className="w-full h-full object-contain p-8" />
             </div>
           </div>
         </div>

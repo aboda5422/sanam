@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import logoFull from "@/assets/logo-full.png";
+import logoFull from "@/assets/logo-full-light.png";
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();

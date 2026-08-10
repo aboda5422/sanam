@@ -1,4 +1,4 @@
-// Product type matching the database schema
+﻿// Product type matching the database schema
 export interface Product {
   id: string;
   name: string;
@@ -33,7 +33,7 @@ export function toLegacyProduct(p: Product) {
     nameEn: p.name_en || "",
     price: p.price,
     oldPrice: p.original_price ?? undefined,
-    image: p.image || "/placeholder.svg",
+    image: p.image || "/placeholder.png",
     categoryId: p.category_id || "",
     unit: p.unit,
     description: p.description || "",
