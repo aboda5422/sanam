@@ -118,6 +118,7 @@ const QuickOrderSheet = ({ open, onOpenChange }: QuickOrderSheetProps) => {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
+        hideClose
         className="h-[92vh] p-0 rounded-t-3xl overflow-hidden flex flex-col"
       >
         {/* Header */}

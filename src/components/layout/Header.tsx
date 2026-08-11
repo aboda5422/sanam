@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Search, ShoppingCart, ChevronLeft, User, MapPin, LogOut, Menu, X, Globe } from "lucide-react";
+import { ShoppingCart, User, MapPin, LogOut, Menu, Globe } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { categorySections, categories } from "@/data/store-data";
 import logoMark from "@/assets/logo-mark.png";
 import logoFullLight from "@/assets/logo-full-light.png";
+import logoMarkHires from "@/assets/logo-mark-hires.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BRAND } from "@/lib/brand";
 import { useBranch } from "@/contexts/BranchContext";
@@ -230,7 +231,12 @@ const Header = () => {
         {/* Search */}
         <div className="flex-1 max-w-xl mx-2 lg:mx-4 relative" ref={searchRef}>
           <div className="relative">
-            <Search className="absolute right-3 lg:right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <img
+              src={logoMarkHires}
+              alt=""
+              aria-hidden="true"
+              className="absolute right-3 lg:right-4 top-1/2 -translate-y-1/2 h-6 w-6 lg:h-7 lg:w-7 object-contain pointer-events-none"
+            />
             <input
               placeholder={t("ابحث عن منتج...", "Search products...")}
               value={searchQuery}
@@ -291,27 +297,28 @@ const Header = () => {
           )}
         </div>
 
-        {/* Cart */}
+        {/* Cart — icon only */}
         <Link
           to="/cart"
-          className="flex items-center gap-1 lg:gap-2 bg-primary/10 hover:bg-primary/15 text-primary rounded-full px-3 lg:px-4 py-2 transition-colors text-sm lg:text-base font-semibold whitespace-nowrap"
+          aria-label={t("عربتي", "Cart")}
+          className="relative flex items-center justify-center bg-primary/10 hover:bg-primary/15 text-primary rounded-full p-2.5 transition-colors"
         >
           <ShoppingCart className="h-5 w-5" />
-          <span className="hidden sm:inline">{t("عربتي", "Cart")}</span>
           {uniqueItems > 0 && (
-            <span className="bg-primary text-primary-foreground text-xs lg:text-sm font-bold w-5 lg:w-6 h-5 lg:h-6 rounded-full flex items-center justify-center">
+            <span className="absolute -top-1 -left-1 bg-primary text-primary-foreground text-[10px] font-bold min-w-5 h-5 px-1 rounded-full flex items-center justify-center">
               {uniqueItems}
             </span>
           )}
-          <ChevronLeft className="h-4 w-4 hidden sm:block" />
         </Link>
 
-        {/* Language - desktop */}
+        {/* Language — icon only (desktop) */}
         <button
+          type="button"
           onClick={toggleLang}
-          className="hidden lg:flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+          aria-label={lang === "ar" ? "English" : "العربية"}
+          title={lang === "ar" ? "English" : "العربية"}
+          className="hidden lg:flex items-center justify-center bg-primary/10 hover:bg-primary/15 text-primary rounded-full p-2.5 transition-colors"
         >
-          <span>{lang === "ar" ? "English" : "العربية"}</span>
           <Globe className="h-5 w-5" />
         </button>
 
@@ -338,10 +345,10 @@ const Header = () => {
               <Link
                 to="/auth"
                 className="flex items-center gap-2 bg-primary/10 hover:bg-primary/15 text-primary rounded-full px-3 py-2 transition-colors text-sm font-semibold whitespace-nowrap"
-                aria-label={t("التسجيل", "Sign Up")}
+                aria-label={t("دخول / تسجيل", "Login / Sign Up")}
               >
                 <User className="h-5 w-5" />
-                <span className="hidden lg:inline">{t("التسجيل", "Sign Up")}</span>
+                <span className="hidden lg:inline">{t("دخول / تسجيل", "Login / Sign Up")}</span>
               </Link>
             )}
           </>

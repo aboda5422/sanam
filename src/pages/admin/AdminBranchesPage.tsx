@@ -23,7 +23,7 @@ import {
   Copy,
   Link2,
   Users,
-  Map,
+  Map as MapIcon,
   Pencil,
   Plus,
   Trash2,
@@ -55,7 +55,7 @@ type StoreAdmin = {
   phone: string | null;
 };
 
-const AdminBranchesPage = () => {
+const AdminBranchesContent = () => {
   const queryClient = useQueryClient();
   const { isSuperAdmin, scopedBranchIds } = useAdminAuth();
 
@@ -252,7 +252,7 @@ const AdminBranchesPage = () => {
   };
 
   return (
-    <AdminLayout title="إدارة الفروع">
+    <>
       <Badge variant="outline" className="mb-4">
         {branches?.length ?? 0} فرع
       </Badge>
@@ -354,7 +354,7 @@ const AdminBranchesPage = () => {
                     className="gap-1"
                     onClick={() => setZonesBranch(b)}
                   >
-                    <Map className="h-3.5 w-3.5" />
+                    <MapIcon className="h-3.5 w-3.5" />
                     مضلعات التوصيل
                   </Button>
                   {isSuperAdmin && (
@@ -392,7 +392,7 @@ const AdminBranchesPage = () => {
         <DialogContent className="max-w-5xl max-h-[92vh] overflow-y-auto" dir="rtl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Map className="h-5 w-5 text-primary" />
+              <MapIcon className="h-5 w-5 text-primary" />
               مضلعات التوصيل — {zonesBranch?.name}
             </DialogTitle>
           </DialogHeader>
@@ -560,8 +560,14 @@ const AdminBranchesPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+    </>
   );
 };
+
+const AdminBranchesPage = () => (
+  <AdminLayout title="إدارة الفروع">
+    <AdminBranchesContent />
+  </AdminLayout>
+);
 
 export default AdminBranchesPage;

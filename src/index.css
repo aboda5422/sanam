@@ -167,3 +167,13 @@ body.keyboard-open .h-16.md\:hidden {
   50%  { transform: translateX(150%); }
   100% { transform: translateX(400%); }
 }
+
+/* Very soft glow for desktop Quick Order FAB */
+@keyframes soft-glow {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.08); }
+}
+
+.animate-soft-glow {
+  animation: soft-glow 2.8s ease-in-out infinite;
+}

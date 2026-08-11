@@ -41,6 +41,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) {
+        setLoading(false);
         navigate("/admin/login");
         return;
       }
@@ -57,6 +58,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       const isStore = roles?.some((r) => r.role === "store_admin") ?? false;
 
       if (!isSuper && !isStore) {
+        setLoading(false);
         navigate("/admin/login");
         return;
       }

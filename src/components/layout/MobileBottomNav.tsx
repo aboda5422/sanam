@@ -28,7 +28,7 @@ const MobileBottomNav = () => {
   const leftItems = items.slice(0, 2);
   const rightItems = items.slice(2);
 
-  const renderItem = (item: typeof items[number]) => {
+  const renderItem = (item: (typeof items)[number]) => {
     const isActive =
       item.path === "/"
         ? location.pathname === "/"
@@ -73,9 +73,7 @@ const MobileBottomNav = () => {
             >
               {/* Glow ring */}
               <span className="absolute inset-0 rounded-full bg-primary/40 blur-md animate-pulse" aria-hidden />
-              <span
-                className="relative flex items-center justify-center w-[58px] h-[58px] rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-xl shadow-primary/40 ring-4 ring-background transition-transform group-active:scale-95"
-              >
+              <span className="relative flex items-center justify-center w-[58px] h-[58px] rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-xl shadow-primary/40 ring-4 ring-background transition-transform group-active:scale-95">
                 <Sparkles className="h-7 w-7" />
                 <span className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 text-[9px] font-black px-1.5 py-0.5 rounded-full shadow">
                   AI
@@ -92,6 +90,26 @@ const MobileBottomNav = () => {
       </nav>
 
       <QuickOrderSheet open={quickOrderOpen} onOpenChange={setQuickOrderOpen} />
+
+      {/* Desktop: floating Quick Order — bottom-left, very soft pulse */}
+      <button
+        type="button"
+        onClick={() => setQuickOrderOpen(true)}
+        aria-label={t("الطلب السريع AI", "Quick Order AI")}
+        title={t("طلب سريع", "Quick Order")}
+        className="hidden md:flex fixed bottom-6 left-6 z-50 items-center justify-center group"
+      >
+        <span
+          className="absolute inset-[-6px] rounded-full bg-primary/25 blur-md animate-soft-glow"
+          aria-hidden
+        />
+        <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/75 text-primary-foreground shadow-lg shadow-primary/25 ring-2 ring-background transition-transform group-hover:scale-105 group-active:scale-95">
+          <Sparkles className="h-6 w-6" />
+          <span className="absolute -top-0.5 -right-0.5 bg-amber-400 text-amber-950 text-[9px] font-black px-1.5 py-0.5 rounded-full shadow">
+            AI
+          </span>
+        </span>
+      </button>
     </>
   );
 };

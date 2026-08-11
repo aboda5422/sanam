@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminAuthProvider, useAdminAuth } from "@/hooks/useAdminAuth";
+import { AdminErrorBoundary } from "./AdminErrorBoundary";
 import { Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -63,7 +64,9 @@ const AdminShell = ({ children, title }: AdminLayoutProps) => {
               </Badge>
             </div>
           </header>
-          <main className="flex-1 p-4 md:p-6 overflow-y-auto">{children}</main>
+          <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+            <AdminErrorBoundary>{children}</AdminErrorBoundary>
+          </main>
         </div>
       </div>
     </SidebarProvider>

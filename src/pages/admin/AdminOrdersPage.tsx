@@ -29,7 +29,7 @@ const paymentStatusMap: Record<string, { label: string; className: string }> = {
   cancelled: { label: "ملغي", className: "bg-gray-100 text-gray-800 border-gray-300" },
 };
 
-const AdminOrdersPage = () => {
+const AdminOrdersContent = () => {
   const { scopedBranchIds, isSuperAdmin } = useAdminAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -143,7 +143,7 @@ const AdminOrdersPage = () => {
   });
 
   return (
-    <AdminLayout title="إدارة الطلبات">
+    <>
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -324,8 +324,14 @@ const AdminOrdersPage = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+    </>
   );
 };
+
+const AdminOrdersPage = () => (
+  <AdminLayout title="إدارة الطلبات">
+    <AdminOrdersContent />
+  </AdminLayout>
+);
 
 export default AdminOrdersPage;
