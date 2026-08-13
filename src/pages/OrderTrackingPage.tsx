@@ -296,6 +296,16 @@ const OrderTrackingPage = () => {
             </div>
             <div className="border-t mt-3 pt-3 space-y-1">
               <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">المجموع</span>
+                <span>{Number(order.subtotal || 0).toFixed(2)} ر.س</span>
+              </div>
+              {Number(order.discount_amount) > 0 && (
+                <div className="flex justify-between text-sm text-green-600">
+                  <span>خصم ({Number(order.discount_percent)}%)</span>
+                  <span>−{Number(order.discount_amount).toFixed(2)} ر.س</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">التوصيل</span>
                 <span>{order.delivery_fee === 0 ? "مجاني" : `${order.delivery_fee} ر.س`}</span>
               </div>

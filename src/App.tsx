@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -39,13 +39,13 @@ import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
 import AdminDriversPage from "./pages/admin/AdminDriversPage";
 import AdminBranchesPage from "./pages/admin/AdminBranchesPage";
 import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
+import AdminDeliverySettingsPage from "./pages/admin/AdminDeliverySettingsPage";
 import AdminSalesPage from "./pages/admin/AdminSalesPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminCustomersPage from "./pages/admin/AdminCustomersPage";
 import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
 import AdminPaymentsPage from "./pages/admin/AdminPaymentsPage";
 import AdminEmailLogsPage from "./pages/admin/AdminEmailLogsPage";
-import AdminTrackingPage from "./pages/admin/AdminTrackingPage";
 import AdminWalletsPage from "./pages/admin/AdminWalletsPage";
 // Driver pages
 import DriverLoginPage from "./pages/driver/DriverLoginPage";
@@ -102,10 +102,11 @@ const App = () => (
             <Route path="/admin/drivers" element={<AdminDriversPage />} />
             <Route path="/admin/branches" element={<AdminBranchesPage />} />
             <Route path="/admin/settings" element={<AdminSettingsPage />} />
+            <Route path="/admin/delivery" element={<AdminDeliverySettingsPage />} />
             <Route path="/admin/sales" element={<AdminSalesPage />} />
             <Route path="/admin/payments" element={<AdminPaymentsPage />} />
             <Route path="/admin/email-logs" element={<AdminEmailLogsPage />} />
-            <Route path="/admin/tracking" element={<AdminTrackingPage />} />
+            <Route path="/admin/tracking" element={<Navigate to="/admin/drivers" replace />} />
             <Route path="/admin/wallets" element={<AdminWalletsPage />} />
 
             {/* Driver Routes */}

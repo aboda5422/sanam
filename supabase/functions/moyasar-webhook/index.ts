@@ -61,7 +61,7 @@ serve(async (req) => {
         try {
           const { data: order } = await supabase
             .from("orders")
-            .select("id, order_number, customer_name, customer_phone, user_id, subtotal, delivery_fee, total")
+            .select("id, order_number, customer_name, customer_phone, user_id, subtotal, discount_percent, discount_amount, delivery_fee, total")
             .eq("id", orderId)
             .maybeSingle();
 
@@ -86,6 +86,8 @@ serve(async (req) => {
                   customerName: order.customer_name,
                   orderNumber: order.order_number,
                   subtotal: Number(order.subtotal),
+                  discountPercent: Number(order.discount_percent || 0),
+                  discountAmount: Number(order.discount_amount || 0),
                   deliveryFee: Number(order.delivery_fee),
                   total: Number(order.total),
                   paymentMethod: verified.source?.type || "دفع إلكتروني",

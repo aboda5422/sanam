@@ -254,8 +254,16 @@ const AdminOrdersContent = () => {
                   </tbody>
                 </table>
               </div>
-              <div className="flex justify-between font-medium pt-2 border-t">
-                <span>الإجمالي</span><span>{selectedOrder.total?.toFixed(2)} ر.س</span>
+              <div className="space-y-1 pt-2 border-t text-sm">
+                {Number((selectedOrder as any).discount_amount) > 0 && (
+                  <div className="flex justify-between text-green-700">
+                    <span>خصم ({Number((selectedOrder as any).discount_percent)}%)</span>
+                    <span>−{Number((selectedOrder as any).discount_amount).toFixed(2)} ر.س</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-medium">
+                  <span>الإجمالي</span><span>{selectedOrder.total?.toFixed(2)} ر.س</span>
+                </div>
               </div>
             </div>
           )}

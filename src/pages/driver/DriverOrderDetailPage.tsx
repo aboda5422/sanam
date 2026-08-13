@@ -221,6 +221,12 @@ const DriverOrderDetailPage = () => {
                   <span>المجموع الفرعي</span>
                   <span>{Number(order.subtotal).toFixed(2)} ر.س</span>
                 </div>
+                {Number((order as any).discount_amount) > 0 && (
+                  <div className="flex justify-between text-sm text-green-700">
+                    <span>خصم ({Number((order as any).discount_percent)}%)</span>
+                    <span>−{Number((order as any).discount_amount).toFixed(2)} ر.س</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span>رسوم التوصيل</span>
                   <span>{Number(order.delivery_fee).toFixed(2)} ر.س</span>

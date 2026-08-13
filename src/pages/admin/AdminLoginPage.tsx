@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import logoFull from "@/assets/logo-full-light.png";
+import { staffEmailFromUsername } from "@/lib/admin-username";
 
 const REMEMBER_KEY = "sanam:admin-login-remember";
 
@@ -42,7 +43,10 @@ const AdminLoginPage = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: staffEmailFromUsername(email),
+      password,
+    });
     if (error) {
       toast.error("فشل تسجيل الدخول: " + error.message);
       setLoading(false);
@@ -92,12 +96,12 @@ const AdminLoginPage = () => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <Label>البريد الإلكتروني</Label>
+              <Label>اسم المستخدم أو البريد</Label>
               <Input
-                type="email"
+                type="text"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="admin@example.com"
+                placeholder="username"
                 dir="ltr"
                 required
                 className="mt-1"

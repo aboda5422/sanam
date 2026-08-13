@@ -5,9 +5,9 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ProductCard from "@/components/product/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
-import { useCategories } from "@/hooks/useCategories";
+import { useCategories, useCategorySections } from "@/hooks/useCategories";
 import { Skeleton } from "@/components/ui/skeleton";
-import { categories as staticCategories, categorySections } from "@/data/store-data";
+import { categories as staticCategories } from "@/data/store-data";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,7 @@ const CategoryPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: dbCategories } = useCategories();
+  const { data: categorySections = [] } = useCategorySections();
   const sectionScrollRef = useRef<HTMLDivElement>(null);
   const subScrollRef = useRef<HTMLDivElement>(null);
   const { lang, t } = useLanguage();
@@ -56,16 +57,17 @@ const CategoryPage = () => {
       if (match) return match.section;
     }
     return categorySections[0]?.id ?? "daily";
-  }, [staticCat, dbCategory]);
+  }, [staticCat, dbCategory, categorySections]);
 
   const sectionOptions = useMemo(() => {
     return categorySections.filter((section) => {
       const hasStatic = staticCategories.some((c) => c.section === section.id);
       const extra = EXTRA_BY_SECTION[section.id] || [];
       const hasExtra = extra.some((slug) => dbCategories?.some((c) => c.slug === slug));
-      return hasStatic || hasExtra;
+      const hasDb = dbCategories?.some((c) => c.section === section.id);
+      return hasStatic || hasExtra || hasDb;
     });
-  }, [dbCategories]);
+  }, [dbCategories, categorySections]);
 
   const subCategories = useMemo(() => {
     const fromStatic = staticCategories

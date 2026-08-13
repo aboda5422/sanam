@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff, Truck } from "lucide-react";
+import { Lock, Eye, EyeOff, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { staffEmailFromUsername } from "@/lib/admin-username";
 
 const DriverLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +21,10 @@ const DriverLoginPage = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: staffEmailFromUsername(email),
+        password,
+      });
       if (error) throw error;
 
       // Verify driver role
@@ -58,20 +62,18 @@ const DriverLoginPage = () => {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <Label htmlFor="email" className="text-sm">البريد الإلكتروني</Label>
-              <div className="relative mt-1">
-                <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="example@email.com"
-                  className="pr-10 text-sm"
-                  dir="ltr"
-                  required
-                />
-              </div>
+              <Label htmlFor="email" className="text-sm">اسم المستخدم</Label>
+              <Input
+                id="email"
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="username"
+                className="mt-1 text-sm"
+                dir="ltr"
+                required
+                autoComplete="username"
+              />
             </div>
 
             <div>

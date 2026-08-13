@@ -33,8 +33,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
             </span>
           )}
           {product.is_featured && (
-            <span className="absolute top-2 left-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
-              الأكثر مبيعاً
+            <span className="absolute top-2 left-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded max-w-[7rem] truncate">
+              {product.extra_label || "الأكثر مبيعاً"}
             </span>
           )}
         </div>

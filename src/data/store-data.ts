@@ -29,26 +29,28 @@ export interface CategorySection {
   id: string;
   title: string;
   titleEn: string;
+  image?: string;
+  sortOrder?: number;
 }
 
 // ===== الأقسام الرئيسية مطابقة لنينجا =====
 export const categorySections: CategorySection[] = [
-  { id: "offers", title: "أحدث العروض", titleEn: "Latest Offers" },
-  { id: "daily", title: "الاحتياجات اليومية", titleEn: "Daily Essentials" },
-  { id: "pantry", title: "مقاضي", titleEn: "Pantry" },
-  { id: "drinks", title: "المشروبات", titleEn: "Beverages" },
-  { id: "snacks", title: "السناكات والحلويات", titleEn: "Snacks & Sweets" },
-  { id: "health", title: "التغذية الصحية", titleEn: "Healthy Nutrition" },
-  { id: "makeup", title: "المكياج", titleEn: "Makeup" },
-  { id: "perfumes", title: "العطور", titleEn: "Perfumes" },
-  { id: "beauty", title: "الجمال", titleEn: "Beauty" },
-  { id: "home", title: "العناية بالمنزل", titleEn: "Home Care" },
-  { id: "electronics", title: "الإلكترونيات والعناية بالسيارة", titleEn: "Electronics & Car Care" },
-  { id: "baby", title: "العناية بالطفل", titleEn: "Baby Care" },
-  { id: "pets", title: "الحيوانات الأليفة", titleEn: "Pets" },
-  { id: "toys", title: "الألعاب", titleEn: "Toys" },
-  { id: "stationery", title: "القرطاسية", titleEn: "Stationery" },
-  { id: "pharmacy", title: "الصيدلية والتغذية الصحية", titleEn: "Pharmacy & Health" },
+  { id: "offers", title: "أحدث العروض", titleEn: "Latest Offers", sortOrder: 1 },
+  { id: "daily", title: "الاحتياجات اليومية", titleEn: "Daily Essentials", sortOrder: 2 },
+  { id: "pantry", title: "مقاضي", titleEn: "Pantry", sortOrder: 3 },
+  { id: "drinks", title: "المشروبات", titleEn: "Beverages", sortOrder: 4 },
+  { id: "snacks", title: "السناكات والحلويات", titleEn: "Snacks & Sweets", sortOrder: 5 },
+  { id: "health", title: "التغذية الصحية", titleEn: "Healthy Nutrition", sortOrder: 6 },
+  { id: "makeup", title: "المكياج", titleEn: "Makeup", sortOrder: 7 },
+  { id: "perfumes", title: "العطور", titleEn: "Perfumes", sortOrder: 8 },
+  { id: "beauty", title: "الجمال", titleEn: "Beauty", sortOrder: 9 },
+  { id: "home", title: "العناية بالمنزل", titleEn: "Home Care", sortOrder: 10 },
+  { id: "electronics", title: "الإلكترونيات والعناية بالسيارة", titleEn: "Electronics & Car Care", sortOrder: 11 },
+  { id: "baby", title: "العناية بالطفل", titleEn: "Baby Care", sortOrder: 12 },
+  { id: "pets", title: "الحيوانات الأليفة", titleEn: "Pets", sortOrder: 13 },
+  { id: "toys", title: "الألعاب", titleEn: "Toys", sortOrder: 14 },
+  { id: "stationery", title: "القرطاسية", titleEn: "Stationery", sortOrder: 15 },
+  { id: "pharmacy", title: "الصيدلية والتغذية الصحية", titleEn: "Pharmacy & Health", sortOrder: 16 },
 ];
 
 export const categories: Category[] = [

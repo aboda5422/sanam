@@ -26,6 +26,7 @@ import {
   isValidNationalAddress,
   normalizeNationalAddress,
 } from "@/lib/branch";
+import { applyCustomerDiscount } from "@/lib/customer-discount";
 
 const deliveryTimes = [
   "الآن (في أقرب وقت)",
@@ -58,6 +59,7 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("cash");
   const [processing, setProcessing] = useState(false);
   const [deliveryFee, setDeliveryFee] = useState<number>(15);
+  const [customerDiscountPercent, setCustomerDiscountPercent] = useState(0);
 
   // Online payment temporarily disabled while licensing is finalized with Moyasar
   const ONLINE_PAYMENT_ENABLED = false;
@@ -73,6 +75,7 @@ const CheckoutPage = () => {
           setName(profile.full_name || session.user.user_metadata?.full_name || "");
           setPhone(profile.phone || "");
           setSavedPhone(profile.phone || "");
+          setCustomerDiscountPercent(Number((profile as any).discount_percent) || 0);
         }
         // Auto-select default delivery address
         const { data: defaultAddr } = await supabase
@@ -142,7 +145,11 @@ const CheckoutPage = () => {
       : null;
 
   const delivery = totalPrice >= 100 ? 0 : deliveryFee;
-  const total = totalPrice + delivery;
+  const { percent: discountPercent, amount: discountAmount } = applyCustomerDiscount(
+    totalPrice,
+    customerDiscountPercent,
+  );
+  const total = totalPrice - discountAmount + delivery;
 
   if (!selectedBranch) {
     return (
@@ -273,6 +280,8 @@ const CheckoutPage = () => {
         delivery_lat: selectedAddress.lat,
         delivery_lng: selectedAddress.lng,
         subtotal: totalPrice,
+        discount_percent: discountPercent,
+        discount_amount: discountAmount,
         delivery_fee: delivery,
         total,
         status: "pending",
@@ -544,6 +553,16 @@ const CheckoutPage = () => {
               ))}
             </div>
             <div className="border-t pt-3 space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">المجموع</span>
+                <span>{totalPrice.toFixed(1)} ر.س</span>
+              </div>
+              {discountAmount > 0 && (
+                <div className="flex justify-between text-green-600">
+                  <span>خصم العميل ({discountPercent}%)</span>
+                  <span>−{discountAmount.toFixed(1)} ر.س</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   التوصيل

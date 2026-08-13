@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { categorySections, categories } from "@/data/store-data";
+import { categories } from "@/data/store-data";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useCategories } from "@/hooks/useCategories";
+import { useCategories, useCategorySections } from "@/hooks/useCategories";
 
 /** Sanam-only categories that live in Supabase but not in the Ninja static catalog. */
 const EXTRA_BY_SECTION: Record<string, string[]> = {
@@ -55,6 +55,7 @@ const CategoryTile = ({
 const HomeSections = () => {
   const { lang } = useLanguage();
   const { data: dbCategories } = useCategories();
+  const { data: categorySections = [] } = useCategorySections();
   const dbBySlug = new Map((dbCategories || []).map((c) => [c.slug, c]));
   const forceCaptionOverlay = lang === "en";
 

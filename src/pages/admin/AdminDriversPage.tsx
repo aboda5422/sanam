@@ -53,41 +53,40 @@ const KPICards = ({ drivers, wallets }: { drivers: any[]; wallets: any[] }) => {
 /* ─── Add Driver Dialog ─── */
 const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) => {
   const qc = useQueryClient();
-  const [form, setForm] = useState({ email: "", password: "", full_name: "", phone: "", id_number: "", vehicle_type: "car" });
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+    full_name: "",
+    phone: "",
+    id_number: "",
+    vehicle_type: "car",
+  });
 
   const addMutation = useMutation({
     mutationFn: async () => {
-      // Create user via edge function
-      const { data: fnData, error: fnError } = await supabase.functions.invoke("create-test-user", {
-        body: { email: form.email, password: form.password, full_name: form.full_name },
+      if (!form.full_name.trim() || !form.username.trim() || !form.password.trim()) {
+        throw new Error("الاسم الكامل واسم المستخدم وكلمة المرور مطلوبة");
+      }
+      if (form.password.trim().length < 6) {
+        throw new Error("كلمة المرور يجب ألا تقل عن 6 أحرف");
+      }
+      const { data, error } = await supabase.rpc("create_driver", {
+        p_full_name: form.full_name.trim(),
+        p_username: form.username.trim(),
+        p_password: form.password,
+        p_phone: form.phone.trim() || undefined,
+        p_id_number: form.id_number.trim() || undefined,
+        p_vehicle_type: form.vehicle_type,
       });
-      if (fnError) throw fnError;
-      const userId = fnData?.user_id || fnData?.id;
-      if (!userId) throw new Error("فشل في إنشاء الحساب");
-
-      // Add driver role
-      const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: userId, role: "driver" as any });
-      if (roleErr) console.warn("Role may already exist:", roleErr);
-
-      // Create driver record
-      const { error: drvErr } = await supabase.from("drivers").insert({
-        user_id: userId,
-        phone: form.phone,
-        full_name: form.full_name,
-        email: form.email,
-        id_number: form.id_number,
-        vehicle_type: form.vehicle_type,
-      } as any);
-      if (drvErr) throw drvErr;
-
-      // Create wallet
-      await supabase.from("driver_wallet").insert({ driver_id: userId } as any).maybeSingle();
+      if (error) throw error;
+      const payload = data as { success?: boolean } | null;
+      if (!payload?.success) throw new Error("فشل في إنشاء الحساب");
     },
     onSuccess: () => {
       toast.success("تم إضافة المندوب بنجاح");
       qc.invalidateQueries({ queryKey: ["admin-drivers"] });
       onOpenChange(false);
-      setForm({ email: "", password: "", full_name: "", phone: "", id_number: "", vehicle_type: "car" });
+      setForm({ username: "", password: "", full_name: "", phone: "", id_number: "", vehicle_type: "car" });
     },
     onError: (e: any) => toast.error(e.message || "فشل في إضافة المندوب"),
   });
@@ -97,9 +96,26 @@ const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: 
       <DialogContent className="max-w-md" dir="rtl">
         <DialogHeader><DialogTitle>إضافة مندوب جديد</DialogTitle></DialogHeader>
         <div className="space-y-3">
-          <div><Label>الاسم الكامل</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
-          <div><Label>البريد الإلكتروني</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-          <div><Label>كلمة المرور</Label><Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></div>
+          <div><Label>الاسم الكامل *</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
+          <div>
+            <Label>اسم المستخدم *</Label>
+            <Input
+              dir="ltr"
+              value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value })}
+              autoComplete="off"
+            />
+          </div>
+          <div>
+            <Label>كلمة المرور *</Label>
+            <Input
+              type="password"
+              dir="ltr"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              autoComplete="new-password"
+            />
+          </div>
           <div><Label>رقم الجوال</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
           <div><Label>رقم الهوية</Label><Input value={form.id_number} onChange={(e) => setForm({ ...form, id_number: e.target.value })} /></div>
           <div>
@@ -113,7 +129,7 @@ const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: 
               </SelectContent>
             </Select>
           </div>
-          <Button className="w-full" onClick={() => addMutation.mutate()} disabled={addMutation.isPending || !form.email || !form.password || !form.full_name}>
+          <Button className="w-full" onClick={() => addMutation.mutate()} disabled={addMutation.isPending || !form.username.trim() || !form.password.trim() || !form.full_name.trim()}>
             {addMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <UserPlus className="h-4 w-4 ml-2" />}
             إضافة المندوب
           </Button>
@@ -331,6 +347,7 @@ const WalletsTab = () => {
 const AdminDriversPage = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [occupancyFilter, setOccupancyFilter] = useState("all");
   const [addOpen, setAddOpen] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState<any>(null);
   const qc = useQueryClient();
@@ -352,6 +369,24 @@ const AdminDriversPage = () => {
       return data;
     },
   });
+
+  const { data: activeAssignments } = useQuery({
+    queryKey: ["admin-drivers-active-orders"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("driver_id")
+        .not("driver_id", "is", null)
+        .in("status", ["assigned", "preparing", "on_the_way"]);
+      if (error) throw error;
+      return data;
+    },
+    refetchInterval: 8000,
+  });
+
+  const busyDriverIds = new Set(
+    (activeAssignments || []).map((o) => o.driver_id).filter(Boolean) as string[],
+  );
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
@@ -377,8 +412,17 @@ const AdminDriversPage = () => {
 
   const filtered = drivers?.filter((d) => {
     const matchSearch = !search || (d as any).full_name?.includes(search) || d.phone?.includes(search);
-    const matchStatus = statusFilter === "all" || (d as any).status === statusFilter;
-    return matchSearch && matchStatus;
+    const isActive = (d as any).status === "active";
+    const matchStatus =
+      statusFilter === "all" ||
+      (statusFilter === "active" && isActive) ||
+      (statusFilter === "inactive" && !isActive);
+    const hasOrder = busyDriverIds.has(d.id);
+    const matchOccupancy =
+      occupancyFilter === "all" ||
+      (occupancyFilter === "busy" && hasOrder) ||
+      (occupancyFilter === "free" && !hasOrder);
+    return matchSearch && matchStatus && matchOccupancy;
   });
 
   return (
@@ -401,12 +445,19 @@ const AdminDriversPage = () => {
               <Input placeholder="بحث بالاسم أو الجوال..." value={search} onChange={(e) => setSearch(e.target.value)} className="pr-9" />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-36"><SelectValue placeholder="الحالة" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">الكل</SelectItem>
-                <SelectItem value="active">نشط</SelectItem>
-                <SelectItem value="suspended">معلق</SelectItem>
-                <SelectItem value="inactive">غير نشط</SelectItem>
+                <SelectItem value="active">مفعل</SelectItem>
+                <SelectItem value="inactive">غير مفعل</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={occupancyFilter} onValueChange={setOccupancyFilter}>
+              <SelectTrigger className="w-36"><SelectValue placeholder="التوفر" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">الكل</SelectItem>
+                <SelectItem value="busy">شاغر</SelectItem>
+                <SelectItem value="free">متوفر</SelectItem>
               </SelectContent>
             </Select>
             <Button onClick={() => setAddOpen(true)} className="gap-1"><Plus className="h-4 w-4" />إضافة مندوب</Button>
@@ -425,6 +476,7 @@ const AdminDriversPage = () => {
                     <th className="text-center p-3 font-medium">التقييم</th>
                     <th className="text-center p-3 font-medium">التوصيلات</th>
                     <th className="text-center p-3 font-medium">الحالة</th>
+                    <th className="text-center p-3 font-medium">التوفر</th>
                     <th className="text-center p-3 font-medium">إجراءات</th>
                   </tr></thead>
                   <tbody>
@@ -451,8 +503,13 @@ const AdminDriversPage = () => {
                         </td>
                         <td className="p-3 text-center">{d.total_deliveries}</td>
                         <td className="p-3 text-center">
-                          <Badge variant={(d as any).status === "active" ? "default" : (d as any).status === "suspended" ? "destructive" : "secondary"}>
-                            {(d as any).status === "active" ? "نشط" : (d as any).status === "suspended" ? "معلق" : "غير نشط"}
+                          <Badge variant={(d as any).status === "active" ? "default" : "secondary"}>
+                            {(d as any).status === "active" ? "مفعل" : "غير مفعل"}
+                          </Badge>
+                        </td>
+                        <td className="p-3 text-center">
+                          <Badge variant={busyDriverIds.has(d.id) ? "outline" : "secondary"}>
+                            {busyDriverIds.has(d.id) ? "شاغر" : "متوفر"}
                           </Badge>
                         </td>
                         <td className="p-3 text-center">
@@ -478,7 +535,7 @@ const AdminDriversPage = () => {
                         </td>
                       </tr>
                     ))}
-                    {(!filtered || filtered.length === 0) && <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">لا يوجد مناديب</td></tr>}
+                    {(!filtered || filtered.length === 0) && <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">لا يوجد مناديب</td></tr>}
                   </tbody>
                 </table>
               </div>

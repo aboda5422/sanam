@@ -78,6 +78,7 @@ const DeliveryZonesEditor = ({
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["delivery-zones"] });
     queryClient.invalidateQueries({ queryKey: ["admin-branches"] });
+    queryClient.invalidateQueries({ queryKey: ["admin-branches-delivery"] });
   };
 
   const clearPathListeners = () => {

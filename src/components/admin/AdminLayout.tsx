@@ -32,10 +32,10 @@ const AdminShell = ({ children, title }: AdminLayoutProps) => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full" dir="rtl">
+      <div className="h-svh flex w-full overflow-hidden" dir="rtl">
         <AdminSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <header className="sticky top-0 z-40 h-14 flex items-center gap-3 border-b bg-background/95 backdrop-blur px-4">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0">
+          <header className="sticky top-0 z-40 h-14 shrink-0 flex items-center gap-3 border-b bg-background/95 backdrop-blur px-4">
             <SidebarTrigger />
             {title && <h1 className="font-heading font-bold text-lg">{title}</h1>}
             <div className="mr-auto flex items-center gap-2">
@@ -64,7 +64,8 @@ const AdminShell = ({ children, title }: AdminLayoutProps) => {
               </Badge>
             </div>
           </header>
-          <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+          {/* dir=rtl keeps the content scrollbar on the left (toward the page start) */}
+          <main className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto" dir="rtl">
             <AdminErrorBoundary>{children}</AdminErrorBoundary>
           </main>
         </div>

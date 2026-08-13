@@ -10,6 +10,8 @@ interface PaymentReceiptProps {
   customerName?: string
   orderNumber?: string | number
   subtotal?: number
+  discountPercent?: number
+  discountAmount?: number
   deliveryFee?: number
   total?: number
   paymentMethod?: string
@@ -23,6 +25,8 @@ const PaymentReceiptEmail = ({
   customerName,
   orderNumber,
   subtotal,
+  discountPercent,
+  discountAmount,
   deliveryFee,
   total,
   paymentMethod,
@@ -82,6 +86,14 @@ const PaymentReceiptEmail = ({
             <Column style={totalLabel}>المجموع الفرعي</Column>
             <Column style={totalValue}>{fmt(subtotal)} ر.س</Column>
           </Row>
+          {typeof discountAmount === 'number' && discountAmount > 0 && (
+            <Row style={totalRow}>
+              <Column style={{ ...totalLabel, color: '#15803d' }}>
+                خصم العميل{discountPercent ? ` (${discountPercent}%)` : ''}
+              </Column>
+              <Column style={{ ...totalValue, color: '#15803d' }}>−{fmt(discountAmount)} ر.س</Column>
+            </Row>
+          )}
           <Row style={totalRow}>
             <Column style={totalLabel}>التوصيل</Column>
             <Column style={totalValue}>
@@ -111,8 +123,10 @@ export const template = {
     customerName: 'محمد',
     orderNumber: 1024,
     subtotal: 85,
+    discountPercent: 10,
+    discountAmount: 8.5,
     deliveryFee: 15,
-    total: 100,
+    total: 91.5,
     paymentMethod: 'مدى',
     paymentId: 'pay_abc123',
     items: [

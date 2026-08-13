@@ -35,7 +35,85 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "صلاحيات غير كافية - يتطلب مدير موقع" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { action, email, role, user_id } = await req.json();
+    const { action, email, role, user_id, full_name, username, password, branch_id } = await req.json();
+
+    const staffEmailFromUsername = (raw: string) => {
+      const u = (raw || "").trim().toLowerCase();
+      if (!u) return "";
+      if (u.includes("@")) return u;
+      return `${u}@staff.sanam`;
+    };
+
+    if (action === "create_branch_manager") {
+      const name = (full_name || "").trim();
+      const uname = (username || "").trim();
+      const pass = (password || "").trim();
+      const branchId = (branch_id || "").trim();
+
+      if (!name) {
+        return new Response(JSON.stringify({ error: "الاسم مطلوب" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      if (!uname) {
+        return new Response(JSON.stringify({ error: "اسم المستخدم مطلوب" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      if (!uname.includes("@") && !/^[a-zA-Z0-9._-]{3,32}$/.test(uname)) {
+        return new Response(JSON.stringify({ error: "اسم المستخدم يجب أن يكون 3–32 حرفاً (أحرف إنجليزية أو أرقام أو . _ -)" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      if (pass.length < 6) {
+        return new Response(JSON.stringify({ error: "كلمة المرور يجب ألا تقل عن 6 أحرف" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      if (!branchId) {
+        return new Response(JSON.stringify({ error: "الفرع مطلوب" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      const { data: branch, error: branchErr } = await supabaseAdmin
+        .from("branches")
+        .select("id")
+        .eq("id", branchId)
+        .maybeSingle();
+      if (branchErr) throw branchErr;
+      if (!branch) {
+        return new Response(JSON.stringify({ error: "الفرع غير موجود" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      const managerEmail = staffEmailFromUsername(uname);
+      const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+        email: managerEmail,
+        password: pass,
+        email_confirm: true,
+        user_metadata: { full_name: name, username: uname },
+      });
+      if (createErr) {
+        const msg = createErr.message || "";
+        if (/already|registered|exists/i.test(msg)) {
+          return new Response(JSON.stringify({ error: "اسم المستخدم مستخدم مسبقاً" }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+        throw createErr;
+      }
+
+      const newUserId = created.user?.id;
+      if (!newUserId) throw new Error("تعذر إنشاء الحساب");
+
+      const { error: roleErr } = await supabaseAdmin
+        .from("user_roles")
+        .upsert({ user_id: newUserId, role: "store_admin" }, { onConflict: "user_id,role" });
+      if (roleErr) throw roleErr;
+
+      const { error: accessErr } = await supabaseAdmin
+        .from("admin_branch_access")
+        .upsert({ user_id: newUserId, branch_id: branchId }, { onConflict: "user_id,branch_id" });
+      if (accessErr) throw accessErr;
+
+      await supabaseAdmin
+        .from("profiles")
+        .update({ full_name: name })
+        .eq("user_id", newUserId);
+
+      return new Response(
+        JSON.stringify({ success: true, user_id: newUserId, email: managerEmail }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     if (action === "add") {
       const normalizedEmail = (email || "").trim().toLowerCase();

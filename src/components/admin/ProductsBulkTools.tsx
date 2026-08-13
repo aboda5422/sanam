@@ -192,7 +192,7 @@ const ProductsBulkTools = ({ categories, productsCount }: Props) => {
 
   return (
     <>
-      <div className="mb-4 rounded-xl border-2 border-red-500/80 bg-red-50/80 dark:bg-red-950/20 p-4 shadow-sm">
+      <div className="mt-4 rounded-xl border-2 border-red-500/80 bg-red-50/80 dark:bg-red-950/20 p-4 shadow-sm">
         <div className="flex items-start gap-3 mb-3">
           <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
             <AlertTriangle className="h-5 w-5" />

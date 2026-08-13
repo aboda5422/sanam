@@ -13,8 +13,8 @@ import {
   Users,
   Megaphone,
   Mail,
-  MapPin,
   Wallet as WalletIcon,
+  Timer,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -44,7 +44,7 @@ const mainItems = [
 const operationItems = [
   { title: "إدارة العملاء", url: "/admin/customers", icon: Users },
   { title: "إدارة المناديب", url: "/admin/drivers", icon: Truck },
-  { title: "تتبع المناديب", url: "/admin/tracking", icon: MapPin },
+  { title: "إعدادات التوصيل", url: "/admin/delivery", icon: Timer },
   { title: "الشكاوى", url: "/admin/complaints", icon: MessageSquare },
 ];
 
@@ -106,18 +106,21 @@ export function AdminSidebar() {
 
   return (
     <Sidebar collapsible="icon" side="right" className="border-l-0 border-r">
-      <SidebarContent>
-        {!collapsed && (
-          <div className="p-4 border-b border-sidebar-border flex items-center gap-2">
-            <img src={logo} alt="سنام" className="h-9 w-auto" />
-            <div>
-              <p className="text-xs text-muted-foreground">لوحة الإدارة</p>
+      {/* direction:ltr moves the menu scrollbar to the physical right edge */}
+      <SidebarContent className="[direction:ltr]">
+        <div dir="rtl" className="flex min-h-0 flex-1 flex-col gap-2">
+          {!collapsed && (
+            <div className="p-4 border-b border-sidebar-border flex items-center gap-2">
+              <img src={logo} alt="سنام" className="h-9 w-auto" />
+              <div>
+                <p className="text-xs text-muted-foreground">لوحة الإدارة</p>
+              </div>
             </div>
-          </div>
-        )}
-        {renderGroup("الرئيسية", mainItems)}
-        {renderGroup("العمليات", operationItems)}
-        {renderGroup("النظام", settingsItems)}
+          )}
+          {renderGroup("الرئيسية", mainItems)}
+          {renderGroup("العمليات", operationItems)}
+          {renderGroup("النظام", settingsItems)}
+        </div>
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>

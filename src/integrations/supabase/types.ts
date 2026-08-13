@@ -549,6 +549,8 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
+          discount_percent: number
+          discount_amount: number
           total: number
           updated_at: string
           user_id: string | null
@@ -574,6 +576,8 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
+          discount_percent?: number
+          discount_amount?: number
           total?: number
           updated_at?: string
           user_id?: string | null
@@ -599,6 +603,8 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
+          discount_percent?: number
+          discount_amount?: number
           total?: number
           updated_at?: string
           user_id?: string | null
@@ -1046,6 +1052,46 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      create_driver: {
+        Args: {
+          p_full_name: string
+          p_username: string
+          p_password: string
+          p_phone?: string
+          p_id_number?: string
+          p_vehicle_type?: string
+        }
+        Returns: Json
+      }
+      create_branch_manager: {
+        Args: {
+          p_full_name: string
+          p_username: string
+          p_password: string
+          p_branch_id: string
+        }
+        Returns: Json
+      }
+      get_branch_manager_account: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
+      admin_customer_emails: {
+        Args: Record<string, never>
+        Returns: {
+          user_id: string
+          email: string | null
+        }[]
+      }
+      update_branch_manager: {
+        Args: {
+          p_user_id: string
+          p_full_name: string
+          p_username: string
+          p_password?: string
+        }
+        Returns: Json
       }
       is_within_delivery_zone: {
         Args: { p_lat: number; p_lng: number }

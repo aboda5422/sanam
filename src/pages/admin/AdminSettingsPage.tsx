@@ -9,11 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Store, Bell, Shield, Truck, Save, Loader2, Users } from "lucide-react";
+import { Store, Bell, Shield, Save, Loader2, Users } from "lucide-react";
 import { toast } from "sonner";
 import AdminUsersSection from "@/components/admin/AdminUsersSection";
-import DeliveryZonesEditor from "@/components/admin/DeliveryZonesEditor";
 
 const useSetting = (key: string, defaultValue: any) => {
   const queryClient = useQueryClient();
@@ -155,94 +153,6 @@ const SecuritySection = () => {
   );
 };
 
-// ─── Delivery Section ───
-const DeliverySection = () => {
-  const { data, isLoading, save, saving } = useSetting("delivery", {
-    delivery_fee: 10,
-    free_delivery_threshold: 100,
-    min_order: 20,
-    work_start: "08:00",
-    work_end: "23:00",
-  });
-  const [form, setForm] = useState<any>(null);
-  const [zonesBranchId, setZonesBranchId] = useState<string>("");
-  const d = form ?? data;
-
-  const { data: branches = [] } = useQuery({
-    queryKey: ["admin-branches-lite"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("branches")
-        .select("id, name, city, lat, lng, is_active")
-        .eq("is_active", true)
-        .order("name");
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  const selectedBranch = branches.find((b) => b.id === zonesBranchId);
-
-  if (isLoading) return <Loader2 className="h-6 w-6 animate-spin mx-auto" />;
-
-  return (
-    <div className="space-y-6">
-      <div className="grid gap-3 sm:grid-cols-3">
-        <div><Label>رسوم التوصيل (ر.س)</Label><Input type="number" value={d.delivery_fee} onChange={e => setForm({ ...d, delivery_fee: Number(e.target.value) })} /></div>
-        <div><Label>توصيل مجاني فوق (ر.س)</Label><Input type="number" value={d.free_delivery_threshold} onChange={e => setForm({ ...d, free_delivery_threshold: Number(e.target.value) })} /></div>
-        <div><Label>أقل طلب (ر.س)</Label><Input type="number" value={d.min_order} onChange={e => setForm({ ...d, min_order: Number(e.target.value) })} /></div>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div><Label>بداية الدوام</Label><Input type="time" value={d.work_start} onChange={e => setForm({ ...d, work_start: e.target.value })} dir="ltr" /></div>
-        <div><Label>نهاية الدوام</Label><Input type="time" value={d.work_end} onChange={e => setForm({ ...d, work_end: e.target.value })} dir="ltr" /></div>
-      </div>
-
-      <Button onClick={() => save(form ?? d)} disabled={saving}>
-        {saving ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <Save className="h-4 w-4 ml-2" />}
-        حفظ رسوم وأوقات التوصيل
-      </Button>
-
-      <div className="border-t pt-4 space-y-3">
-        <div>
-          <Label>نطاق التوصيل حسب الفرع</Label>
-          <Select value={zonesBranchId} onValueChange={setZonesBranchId}>
-            <SelectTrigger className="mt-1">
-              <SelectValue placeholder="اختر فرعاً لرسم/تعديل مضلعاته" />
-            </SelectTrigger>
-            <SelectContent>
-              {branches.map((b) => (
-                <SelectItem key={b.id} value={b.id}>
-                  {b.name}{b.city ? ` — ${b.city}` : ""}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p className="text-xs text-muted-foreground mt-1">
-            أو افتح صفحة «الفروع» ← مضلعات التوصيل لكل فرع على حدة.
-          </p>
-        </div>
-        {selectedBranch ? (
-          <DeliveryZonesEditor
-            key={selectedBranch.id}
-            branchId={selectedBranch.id}
-            branchName={selectedBranch.name}
-            branchCenter={
-              selectedBranch.lat != null && selectedBranch.lng != null
-                ? { lat: Number(selectedBranch.lat), lng: Number(selectedBranch.lng) }
-                : null
-            }
-            mapHeightClass="h-80"
-          />
-        ) : (
-          <p className="text-sm text-muted-foreground rounded-lg border border-dashed p-4 text-center">
-            اختر فرعاً أعلاه لضبط مضلع التوصيل بدقة على الخريطة.
-          </p>
-        )}
-      </div>
-    </div>
-  );
-};
-
 // ─── Main Page ───
 const AdminSettingsPage = () => {
   const [openSection, setOpenSection] = useState<string | null>(null);
@@ -252,7 +162,6 @@ const AdminSettingsPage = () => {
     { key: "users", icon: Users, title: "المشرفين والصلاحيات", desc: "إضافة مشرفين وإدارة صلاحياتهم", component: AdminUsersSection },
     { key: "notifications", icon: Bell, title: "الإشعارات", desc: "إعدادات التنبيهات والإشعارات الفورية", component: NotificationsSection },
     { key: "security", icon: Shield, title: "الأمان", desc: "إدارة الصلاحيات والمستخدمين", component: SecuritySection },
-    { key: "delivery", icon: Truck, title: "إعدادات التوصيل", desc: "رسوم التوصيل، نطاق الخدمة، أوقات العمل", component: DeliverySection },
   ];
 
   return (
@@ -278,7 +187,7 @@ const AdminSettingsPage = () => {
       {sections.map(s => (
         <Dialog key={s.key} open={openSection === s.key} onOpenChange={open => !open && setOpenSection(null)}>
           <DialogContent
-            className={`${s.key === "delivery" ? "max-w-4xl" : "max-w-2xl"} max-h-[90vh] overflow-y-auto`}
+            className="max-w-2xl max-h-[90vh] overflow-y-auto"
             dir="rtl"
           >
             <DialogHeader>

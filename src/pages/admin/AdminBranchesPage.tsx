@@ -2,13 +2,12 @@ import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
-import DeliveryZonesEditor from "@/components/admin/DeliveryZonesEditor";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -17,18 +16,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import {
-  Loader2,
-  MapPin,
-  Copy,
-  Link2,
-  Users,
-  Map as MapIcon,
-  Pencil,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Loader2, MapPin, Plus, Pencil, ExternalLink, Store, Link2, UserPlus } from "lucide-react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { mapsLinkFromCoords, parseMapsCoords } from "@/lib/maps-link";
 
 type BranchRow = {
   id: string;
@@ -40,13 +30,6 @@ type BranchRow = {
   lat?: number | null;
   lng?: number | null;
   is_active: boolean;
-  delivery_zones?: { id: string; name: string; is_active: boolean }[];
-  branch_delivery_rates?: {
-    id: string;
-    max_distance_km: number;
-    fee: number;
-    sort_order: number;
-  }[];
 };
 
 type StoreAdmin = {
@@ -59,23 +42,24 @@ const AdminBranchesContent = () => {
   const queryClient = useQueryClient();
   const { isSuperAdmin, scopedBranchIds } = useAdminAuth();
 
-  const [zonesBranch, setZonesBranch] = useState<BranchRow | null>(null);
   const [managersBranch, setManagersBranch] = useState<BranchRow | null>(null);
-  const [ratesBranch, setRatesBranch] = useState<BranchRow | null>(null);
   const [selectedManagerIds, setSelectedManagerIds] = useState<string[]>([]);
-  const [rateDrafts, setRateDrafts] = useState<
-    { id?: string; max_distance_km: number; fee: number }[]
-  >([]);
+  const [newManagerName, setNewManagerName] = useState("");
+  const [newManagerUsername, setNewManagerUsername] = useState("");
+  const [newManagerPassword, setNewManagerPassword] = useState("");
+  const [locationBranch, setLocationBranch] = useState<BranchRow | null>(null);
+  const [locationLink, setLocationLink] = useState("");
+  const [editManagerId, setEditManagerId] = useState<string | null>(null);
+  const [editManagerName, setEditManagerName] = useState("");
+  const [editManagerUsername, setEditManagerUsername] = useState("");
+  const [editManagerPassword, setEditManagerPassword] = useState("");
+  const [editManagerLoading, setEditManagerLoading] = useState(false);
 
   const { data: branches, isLoading } = useQuery({
     queryKey: ["admin-branches", scopedBranchIds],
     queryFn: async () => {
-      let q = supabase
-        .from("branches")
-        .select(
-          "*, delivery_zones(id, name, is_active), branch_delivery_rates(id, max_distance_km, fee, sort_order)"
-        )
-        .order("created_at");
+      let q = supabase.from("branches").select("*").order("created_at");
+      // Store admins only see their assigned branches
       if (scopedBranchIds && scopedBranchIds.length > 0) {
         q = q.in("id", scopedBranchIds);
       }
@@ -120,6 +104,7 @@ const AdminBranchesContent = () => {
     },
   });
 
+  /** Managers grouped strictly by branch_id — never mix across branches */
   const managersByBranch = useMemo(() => {
     const map = new Map<string, string[]>();
     for (const row of allAccess) {
@@ -143,9 +128,29 @@ const AdminBranchesContent = () => {
     onError: () => toast.error("حدث خطأ"),
   });
 
+  const saveLocationMutation = useMutation({
+    mutationFn: async ({ id, lat, lng }: { id: string; lat: number; lng: number }) => {
+      const { error } = await supabase
+        .from("branches")
+        .update({ lat, lng })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-branches"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-branches-delivery"] });
+      toast.success("تم حفظ موقع الفرع");
+      setLocationBranch(null);
+    },
+    onError: (e: any) => toast.error(e?.message || "تعذر حفظ الموقع"),
+  });
+
   const saveManagersMutation = useMutation({
     mutationFn: async ({ branchId, userIds }: { branchId: string; userIds: string[] }) => {
-      const current = allAccess.filter((a) => a.branch_id === branchId).map((a) => a.user_id);
+      // Only touch access rows for THIS branch
+      const current = allAccess
+        .filter((a) => a.branch_id === branchId)
+        .map((a) => a.user_id);
       const toAdd = userIds.filter((id) => !current.includes(id));
       const toRemove = current.filter((id) => !userIds.includes(id));
 
@@ -159,97 +164,140 @@ const AdminBranchesContent = () => {
       }
       if (toAdd.length > 0) {
         const { error } = await supabase.from("admin_branch_access" as any).insert(
-          toAdd.map((user_id) => ({ user_id, branch_id: branchId }))
+          toAdd.map((user_id) => ({ user_id, branch_id: branchId })),
         );
         if (error) throw error;
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-branch-access"] });
-      toast.success("تم تحديث مدراء الفرع");
+      toast.success("تم تحديث مدراء الفرع — لديهم صلاحيات هذا الفرع فقط");
       setManagersBranch(null);
     },
     onError: (e: any) => toast.error(e?.message || "تعذر حفظ المدراء"),
   });
 
-  const saveRatesMutation = useMutation({
+  const createManagerMutation = useMutation({
     mutationFn: async ({
       branchId,
-      rates,
+      fullName,
+      username,
+      password,
     }: {
       branchId: string;
-      rates: { id?: string; max_distance_km: number; fee: number }[];
+      fullName: string;
+      username: string;
+      password: string;
     }) => {
-      const existing = ratesBranch?.branch_delivery_rates || [];
-      const keepIds = rates.filter((r) => r.id).map((r) => r.id!);
-      const toDelete = existing.filter((r) => !keepIds.includes(r.id)).map((r) => r.id);
-
-      if (toDelete.length > 0) {
-        const { error } = await supabase
-          .from("branch_delivery_rates" as any)
-          .delete()
-          .in("id", toDelete);
-        if (error) throw error;
-      }
-
-      for (let i = 0; i < rates.length; i++) {
-        const r = rates[i];
-        const row = {
-          branch_id: branchId,
-          max_distance_km: Number(r.max_distance_km),
-          fee: Number(r.fee),
-          sort_order: i,
-        };
-        if (r.id) {
-          const { error } = await supabase
-            .from("branch_delivery_rates" as any)
-            .update(row)
-            .eq("id", r.id);
-          if (error) throw error;
-        } else {
-          const { error } = await supabase.from("branch_delivery_rates" as any).insert(row);
-          if (error) throw error;
-        }
-      }
+      const { data, error } = await supabase.rpc("create_branch_manager", {
+        p_full_name: fullName,
+        p_username: username,
+        p_password: password,
+        p_branch_id: branchId,
+      });
+      if (error) throw error;
+      const payload = data as { user_id?: string; error?: string } | null;
+      if (payload?.error) throw new Error(payload.error);
+      if (!payload?.user_id) throw new Error("تعذر إنشاء المدير");
+      return payload as { user_id: string };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-branches"] });
-      toast.success("تم حفظ شرائح التوصيل");
-      setRatesBranch(null);
+    onSuccess: (data) => {
+      if (data?.user_id) {
+        setSelectedManagerIds((prev) =>
+          prev.includes(data.user_id) ? prev : [...prev, data.user_id],
+        );
+      }
+      setNewManagerName("");
+      setNewManagerUsername("");
+      setNewManagerPassword("");
+      queryClient.invalidateQueries({ queryKey: ["store-admins-for-branches"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-branch-access"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("تم إنشاء مدير الفرع وتعيينه لهذا الفرع");
     },
-    onError: (e: any) => toast.error(e?.message || "تعذر حفظ الأسعار"),
+    onError: (e: any) => toast.error(e?.message || "تعذر إنشاء المدير"),
   });
 
-  const copyLink = (slug: string) => {
-    const url = `${window.location.origin}/?location=${slug}`;
-    navigator.clipboard.writeText(url);
-    toast.success("تم نسخ رابط الفرع");
+  const updateManagerMutation = useMutation({
+    mutationFn: async ({
+      userId,
+      fullName,
+      username,
+      password,
+    }: {
+      userId: string;
+      fullName: string;
+      username: string;
+      password: string;
+    }) => {
+      const { data, error } = await supabase.rpc("update_branch_manager", {
+        p_user_id: userId,
+        p_full_name: fullName,
+        p_username: username,
+        p_password: password.trim() ? password : "",
+      });
+      if (error) throw error;
+      const payload = data as { success?: boolean } | null;
+      if (!payload?.success) throw new Error("تعذر حفظ التعديلات");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["store-admins-for-branches"] });
+      toast.success("تم تحديث بيانات مدير الفرع");
+      setEditManagerId(null);
+      setEditManagerPassword("");
+    },
+    onError: (e: any) => toast.error(e?.message || "تعذر تحديث المدير"),
+  });
+
+  const openEditManager = async (userId: string) => {
+    setEditManagerId(userId);
+    setEditManagerPassword("");
+    setEditManagerLoading(true);
+    try {
+      const { data, error } = await supabase.rpc("get_branch_manager_account", {
+        p_user_id: userId,
+      });
+      if (error) throw error;
+      const payload = data as { full_name?: string; username?: string } | null;
+      setEditManagerName(payload?.full_name || "");
+      setEditManagerUsername(payload?.username || "");
+    } catch (e: any) {
+      toast.error(e?.message || "تعذر تحميل بيانات المدير");
+      setEditManagerId(null);
+    } finally {
+      setEditManagerLoading(false);
+    }
   };
 
   const openManagers = (branch: BranchRow) => {
     setManagersBranch(branch);
     setSelectedManagerIds([...(managersByBranch.get(branch.id) || [])]);
+    setNewManagerName("");
+    setNewManagerUsername("");
+    setNewManagerPassword("");
   };
 
-  const openRates = (branch: BranchRow) => {
-    const rates = [...(branch.branch_delivery_rates || [])].sort(
-      (a, b) => a.max_distance_km - b.max_distance_km
-    );
-    setRatesBranch(branch);
-    setRateDrafts(
-      rates.length > 0
-        ? rates.map((r) => ({
-            id: r.id,
-            max_distance_km: r.max_distance_km,
-            fee: Number(r.fee),
-          }))
-        : [
-            { max_distance_km: 3, fee: 10 },
-            { max_distance_km: 7, fee: 18 },
-            { max_distance_km: 15, fee: 28 },
-          ]
-    );
+  const openLocation = (branch: BranchRow) => {
+    setLocationBranch(branch);
+    if (
+      branch.lat != null &&
+      branch.lng != null &&
+      Number.isFinite(Number(branch.lat)) &&
+      Number.isFinite(Number(branch.lng))
+    ) {
+      setLocationLink(mapsLinkFromCoords(Number(branch.lat), Number(branch.lng)));
+    } else {
+      setLocationLink("");
+    }
   };
+
+  const visitBranchStorefront = (branch: BranchRow) => {
+    const url = `${window.location.origin}/?location=${encodeURIComponent(branch.slug)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const hasLocation = (b: BranchRow) =>
+    b.lat != null && b.lng != null && Number.isFinite(Number(b.lat)) && Number.isFinite(Number(b.lng));
 
   return (
     <>
@@ -263,194 +311,327 @@ const AdminBranchesContent = () => {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {branches?.map((b) => {
-            const rates = [...(b.branch_delivery_rates || [])].sort(
-              (a, b) => a.max_distance_km - b.max_distance_km
-            );
             const managerIds = managersByBranch.get(b.id) || [];
             return (
               <div key={b.id} className="bg-card rounded-xl border p-4 space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="font-semibold">{b.name}</h3>
-                  {isSuperAdmin && (
-                    <Switch
-                      checked={b.is_active}
-                      onCheckedChange={(v) => toggleMutation.mutate({ id: b.id, value: v })}
-                    />
-                  )}
+                  <div className="flex items-center gap-4">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-8 gap-1"
+                      title="فتح واجهة العميل لهذا الفرع"
+                      onClick={() => visitBranchStorefront(b)}
+                    >
+                      <Store className="h-3.5 w-3.5" />
+                      زيارة الفرع
+                      <ExternalLink className="h-3 w-3 opacity-60" />
+                    </Button>
+                    {isSuperAdmin && (
+                      <Switch
+                        checked={b.is_active}
+                        onCheckedChange={(v) => toggleMutation.mutate({ id: b.id, value: v })}
+                      />
+                    )}
+                  </div>
                 </div>
+
                 <div className="text-sm text-muted-foreground space-y-1">
                   {b.city && <p className="font-medium text-foreground">{b.city}</p>}
                   {b.address && (
                     <p className="flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
+                      <MapPin className="h-3 w-3 shrink-0" />
                       {b.address}
                     </p>
                   )}
                   {b.phone && <p>📞 {b.phone}</p>}
-                  <p className="text-xs font-mono" dir="ltr">
-                    ?location={b.slug}
-                  </p>
                 </div>
 
-                <div className="rounded-lg bg-muted/50 p-3 text-xs space-y-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="font-semibold">أسعار التوصيل حسب المسافة</p>
+                {/* Branch location — foundation for zones & rate tiers */}
+                <div className="rounded-lg bg-muted/50 p-3 text-xs space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-semibold">موقع الفرع (اللوكيشن)</p>
                     {(isSuperAdmin || (scopedBranchIds || []).includes(b.id)) && (
                       <Button
                         type="button"
                         size="sm"
                         variant="ghost"
                         className="h-7 px-2"
-                        onClick={() => openRates(b)}
+                        onClick={() => openLocation(b)}
                       >
                         <Pencil className="h-3.5 w-3.5 ml-1" />
-                        تعديل
+                        {hasLocation(b) ? "تعديل" : "تعيين"}
                       </Button>
                     )}
                   </div>
-                  {rates.length === 0 ? (
-                    <p className="text-muted-foreground">لا توجد شرائح بعد</p>
+                  {hasLocation(b) ? (
+                    <a
+                      href={mapsLinkFromCoords(Number(b.lat), Number(b.lng))}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-primary hover:underline break-all"
+                      dir="ltr"
+                    >
+                      <Link2 className="h-3 w-3 shrink-0" />
+                      <span className="text-[11px] font-mono truncate max-w-full">
+                        {mapsLinkFromCoords(Number(b.lat), Number(b.lng))}
+                      </span>
+                    </a>
                   ) : (
-                    rates.map((r) => (
-                      <div key={r.id} className="flex justify-between">
-                        <span>حتى {r.max_distance_km} كم</span>
-                        <span className="font-medium">{r.fee} ر.س</span>
-                      </div>
-                    ))
+                    <p className="text-amber-700 dark:text-amber-400">
+                      لم يُحدَّد موقع بعد — حدّده ليُبنى عليه النطاق الجغرافي وشرائح التوصيل
+                    </p>
                   )}
+                  <p className="text-[11px] text-muted-foreground">
+                    النطاق الجغرافي والشرائح الخاصة بهذا الفرع تُدار من «إعدادات التوصيل» بعد تعيين الموقع.
+                  </p>
                 </div>
 
                 {isSuperAdmin && (
-                  <div className="rounded-lg bg-muted/50 p-3 text-xs">
-                    <p className="font-semibold mb-1">مدراء الفرع</p>
+                  <div className="rounded-lg bg-muted/50 p-3 text-xs space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-semibold">مدراء الفرع</p>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="outline"
+                        className="h-7 w-7"
+                        title="إضافة / تعديل مدراء هذا الفرع"
+                        onClick={() => openManagers(b)}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
                     {accessLoading ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     ) : managerIds.length === 0 ? (
                       <p className="text-muted-foreground">لم يُعيَّن مدراء بعد</p>
                     ) : (
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-1.5">
                         {managerIds.map((uid) => {
                           const admin = storeAdmins.find((a) => a.user_id === uid);
                           return (
-                            <Badge key={uid} variant="secondary">
-                              {admin?.full_name || uid.slice(0, 8)}
-                            </Badge>
+                            <div
+                              key={uid}
+                              className="inline-flex items-center gap-1 rounded-full bg-secondary text-secondary-foreground px-2 py-0.5"
+                            >
+                              <span className="text-xs font-medium">
+                                {admin?.full_name || uid.slice(0, 8)}
+                              </span>
+                              <button
+                                type="button"
+                                className="h-5 w-5 inline-flex items-center justify-center rounded-full hover:bg-background/70"
+                                title="تعديل بيانات المدير"
+                                onClick={() => openEditManager(uid)}
+                              >
+                                <Pencil className="h-3 w-3" />
+                              </button>
+                            </div>
                           );
                         })}
                       </div>
                     )}
+                    <p className="text-[11px] text-muted-foreground">
+                      المدير المعيَّن هنا يحصل على كل صلاحيات هذا الفرع فقط (لا يرى فروع أخرى).
+                    </p>
                   </div>
                 )}
-
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant={b.is_active ? "default" : "secondary"}>
-                    {b.is_active ? "مفعّل" : "معطّل"}
-                  </Badge>
-                  <Badge variant="outline">{b.delivery_zones?.length || 0} نطاق جغرافي</Badge>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    className="gap-1"
-                    onClick={() => setZonesBranch(b)}
-                  >
-                    <MapIcon className="h-3.5 w-3.5" />
-                    مضلعات التوصيل
-                  </Button>
-                  {isSuperAdmin && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="gap-1"
-                      onClick={() => openManagers(b)}
-                    >
-                      <Users className="h-3.5 w-3.5" />
-                      تعيين المدراء
-                    </Button>
-                  )}
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    className="gap-1"
-                    onClick={() => copyLink(b.slug)}
-                  >
-                    <Link2 className="h-3.5 w-3.5" />
-                    نسخ الرابط
-                    <Copy className="h-3 w-3 opacity-60" />
-                  </Button>
-                </div>
               </div>
             );
           })}
         </div>
       )}
 
-      {/* Zones map dialog */}
-      <Dialog open={!!zonesBranch} onOpenChange={(open) => !open && setZonesBranch(null)}>
-        <DialogContent className="max-w-5xl max-h-[92vh] overflow-y-auto" dir="rtl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <MapIcon className="h-5 w-5 text-primary" />
-              مضلعات التوصيل — {zonesBranch?.name}
-            </DialogTitle>
-          </DialogHeader>
-          {zonesBranch && (
-            <DeliveryZonesEditor
-              key={zonesBranch.id}
-              branchId={zonesBranch.id}
-              branchName={zonesBranch.name}
-              branchCenter={
-                zonesBranch.lat != null && zonesBranch.lng != null
-                  ? { lat: Number(zonesBranch.lat), lng: Number(zonesBranch.lng) }
-                  : null
-              }
-              mapHeightClass="h-[420px]"
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Managers dialog */}
-      <Dialog open={!!managersBranch} onOpenChange={(open) => !open && setManagersBranch(null)}>
+      {/* Location dialog — scoped to one branch */}
+      <Dialog open={!!locationBranch} onOpenChange={(open) => !open && setLocationBranch(null)}>
         <DialogContent className="max-w-md" dir="rtl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              مدراء فرع {managersBranch?.name}
+              <MapPin className="h-5 w-5 text-primary" />
+              موقع الفرع — {locationBranch?.name}
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            اختر مشرفي المتجر المسموح لهم بإدارة هذا الفرع فقط. يجب أن يكون لديهم صلاحية «مشرف المتجر».
+            الصق رابط موقع الفرع من خرائط جوجل (أو إحداثيات lat,lng). يُستخدم كمركز للنطاق الجغرافي وشرائح التوصيل.
           </p>
+          <div className="space-y-2">
+            <Label htmlFor="branch-maps-link">رابط الموقع</Label>
+            <Input
+              id="branch-maps-link"
+              dir="ltr"
+              type="url"
+              value={locationLink}
+              onChange={(e) => setLocationLink(e.target.value)}
+              placeholder="https://www.google.com/maps?q=21.452,39.857"
+              className="font-mono text-sm"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLocationBranch(null)}>
+              إلغاء
+            </Button>
+            <Button
+              disabled={
+                !locationBranch ||
+                saveLocationMutation.isPending ||
+                !locationLink.trim()
+              }
+              onClick={() => {
+                if (!locationBranch) return;
+                const coords = parseMapsCoords(locationLink);
+                if (!coords) {
+                  toast.error("تعذر قراءة الموقع من الرابط — استخدم رابط خرائط جوجل أو lat,lng");
+                  return;
+                }
+                saveLocationMutation.mutate({
+                  id: locationBranch.id,
+                  lat: coords.lat,
+                  lng: coords.lng,
+                });
+              }}
+            >
+              {saveLocationMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+              ) : null}
+              حفظ الموقع
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Managers dialog — access rows filtered by this branch only */}
+      <Dialog
+        open={!!managersBranch}
+        onOpenChange={(open) => {
+          if (!open) {
+            setManagersBranch(null);
+            setNewManagerName("");
+            setNewManagerUsername("");
+            setNewManagerPassword("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>مدراء {managersBranch?.name}</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            عيّن مشرفي المتجر لهذا الفرع فقط. يحصل كل مدير على صلاحيات إدارة هذا الفرع دون الوصول لفروع أخرى.
+          </p>
+
+          <div className="rounded-lg border p-3 space-y-3">
+            <p className="text-sm font-semibold flex items-center gap-2">
+              <UserPlus className="h-4 w-4 text-primary" />
+              إضافة مدير فرع جديد
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="new-manager-name">الاسم</Label>
+              <Input
+                id="new-manager-name"
+                value={newManagerName}
+                onChange={(e) => setNewManagerName(e.target.value)}
+                placeholder="الاسم الكامل"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-manager-username">اسم المستخدم</Label>
+              <Input
+                id="new-manager-username"
+                dir="ltr"
+                value={newManagerUsername}
+                onChange={(e) => setNewManagerUsername(e.target.value)}
+                placeholder="username"
+                autoComplete="off"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-manager-password">كلمة المرور</Label>
+              <Input
+                id="new-manager-password"
+                dir="ltr"
+                type="password"
+                value={newManagerPassword}
+                onChange={(e) => setNewManagerPassword(e.target.value)}
+                placeholder="••••••••"
+                autoComplete="new-password"
+              />
+            </div>
+            <Button
+              type="button"
+              className="w-full"
+              disabled={
+                !managersBranch ||
+                createManagerMutation.isPending ||
+                !newManagerName.trim() ||
+                !newManagerUsername.trim() ||
+                !newManagerPassword.trim()
+              }
+              onClick={() => {
+                if (!managersBranch) return;
+                if (newManagerPassword.trim().length < 6) {
+                  toast.error("كلمة المرور يجب ألا تقل عن 6 أحرف");
+                  return;
+                }
+                createManagerMutation.mutate({
+                  branchId: managersBranch.id,
+                  fullName: newManagerName.trim(),
+                  username: newManagerUsername.trim(),
+                  password: newManagerPassword,
+                });
+              }}
+            >
+              {createManagerMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+              ) : (
+                <UserPlus className="h-4 w-4 ml-2" />
+              )}
+              إنشاء المدير
+            </Button>
+          </div>
+
           {storeAdmins.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4 text-center">
-              لا يوجد مشرفو متجر. أضفهم من الإعدادات ← المشرفين والصلاحيات.
+            <p className="text-sm text-muted-foreground py-2 text-center">
+              لا يوجد مدراء بعد. أنشئ مديراً من الحقول أعلاه.
             </p>
           ) : (
-            <div className="space-y-2 max-h-72 overflow-y-auto">
+            <div className="space-y-2 max-h-56 overflow-y-auto">
               {storeAdmins.map((admin) => {
                 const checked = selectedManagerIds.includes(admin.user_id);
                 return (
                   <label
                     key={admin.user_id}
-                    className="flex items-center gap-3 rounded-lg border p-3 cursor-pointer hover:bg-muted/40"
+                    className="flex items-center gap-3 rounded-lg border p-3 hover:bg-muted/40"
                   >
                     <Checkbox
                       checked={checked}
                       onCheckedChange={(v) => {
                         setSelectedManagerIds((prev) =>
-                          v
-                            ? [...prev, admin.user_id]
-                            : prev.filter((id) => id !== admin.user_id)
+                          v ? [...prev, admin.user_id] : prev.filter((id) => id !== admin.user_id),
                         );
                       }}
                     />
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">{admin.full_name || "بدون اسم"}</p>
-                      <p className="text-xs text-muted-foreground">{admin.phone || admin.user_id.slice(0, 8)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {admin.phone || admin.user_id.slice(0, 8)}
+                      </p>
                     </div>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 shrink-0"
+                      title="تعديل بيانات المدير"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openEditManager(admin.user_id);
+                      }}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
                   </label>
                 );
               })}
@@ -476,86 +657,87 @@ const AdminBranchesContent = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Rates dialog */}
-      <Dialog open={!!ratesBranch} onOpenChange={(open) => !open && setRatesBranch(null)}>
+      <Dialog
+        open={!!editManagerId}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditManagerId(null);
+            setEditManagerPassword("");
+          }
+        }}
+      >
         <DialogContent className="max-w-md" dir="rtl">
           <DialogHeader>
-            <DialogTitle>شرائح التوصيل — {ratesBranch?.name}</DialogTitle>
+            <DialogTitle>تعديل مدير الفرع</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            {rateDrafts.map((r, idx) => (
-              <div key={r.id || `new-${idx}`} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-end">
-                <div>
-                  <Label className="text-xs">حتى (كم)</Label>
-                  <Input
-                    type="number"
-                    min={0.1}
-                    step={0.5}
-                    value={r.max_distance_km}
-                    onChange={(e) => {
-                      const v = Number(e.target.value);
-                      setRateDrafts((prev) =>
-                        prev.map((row, i) => (i === idx ? { ...row, max_distance_km: v } : row))
-                      );
-                    }}
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">الرسوم (ر.س)</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    step={1}
-                    value={r.fee}
-                    onChange={(e) => {
-                      const v = Number(e.target.value);
-                      setRateDrafts((prev) =>
-                        prev.map((row, i) => (i === idx ? { ...row, fee: v } : row))
-                      );
-                    }}
-                  />
-                </div>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  className="text-destructive"
-                  onClick={() => setRateDrafts((prev) => prev.filter((_, i) => i !== idx))}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+          {editManagerLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="edit-manager-name">الاسم</Label>
+                <Input
+                  id="edit-manager-name"
+                  value={editManagerName}
+                  onChange={(e) => setEditManagerName(e.target.value)}
+                />
               </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setRateDrafts((prev) => [
-                  ...prev,
-                  {
-                    max_distance_km: (prev[prev.length - 1]?.max_distance_km || 0) + 5,
-                    fee: 10,
-                  },
-                ])
-              }
-            >
-              <Plus className="h-4 w-4 ml-1" />
-              إضافة شريحة
-            </Button>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-manager-username">اسم المستخدم</Label>
+                <Input
+                  id="edit-manager-username"
+                  dir="ltr"
+                  value={editManagerUsername}
+                  onChange={(e) => setEditManagerUsername(e.target.value)}
+                  autoComplete="off"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-manager-password">كلمة المرور الجديدة</Label>
+                <Input
+                  id="edit-manager-password"
+                  dir="ltr"
+                  type="password"
+                  value={editManagerPassword}
+                  onChange={(e) => setEditManagerPassword(e.target.value)}
+                  placeholder="اتركها فارغة إذا لا تريد التغيير"
+                  autoComplete="new-password"
+                />
+              </div>
+            </div>
+          )}
           <DialogFooter>
+            <Button variant="outline" onClick={() => setEditManagerId(null)}>
+              إلغاء
+            </Button>
             <Button
-              onClick={() =>
-                ratesBranch &&
-                saveRatesMutation.mutate({ branchId: ratesBranch.id, rates: rateDrafts })
+              disabled={
+                !editManagerId ||
+                editManagerLoading ||
+                updateManagerMutation.isPending ||
+                !editManagerName.trim() ||
+                !editManagerUsername.trim()
               }
-              disabled={!ratesBranch || saveRatesMutation.isPending || rateDrafts.length === 0}
+              onClick={() => {
+                if (!editManagerId) return;
+                if (editManagerPassword.trim() && editManagerPassword.trim().length < 6) {
+                  toast.error("كلمة المرور يجب ألا تقل عن 6 أحرف");
+                  return;
+                }
+                updateManagerMutation.mutate({
+                  userId: editManagerId,
+                  fullName: editManagerName.trim(),
+                  username: editManagerUsername.trim(),
+                  password: editManagerPassword,
+                });
+              }}
             >
-              {saveRatesMutation.isPending ? (
+              {updateManagerMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin ml-2" />
               ) : null}
-              حفظ الشرائح
+              حفظ التعديلات
             </Button>
           </DialogFooter>
         </DialogContent>
