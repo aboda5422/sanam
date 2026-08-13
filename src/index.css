@@ -177,3 +177,24 @@ body.keyboard-open .h-16.md\:hidden {
 .animate-soft-glow {
   animation: soft-glow 2.8s ease-in-out infinite;
 }
+
+/* Center Sonner toasts in the middle of the viewport (keep horizontal layout) */
+[data-sonner-toaster].toaster-viewport-center {
+  top: 50% !important;
+  bottom: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  transform: translateY(-50%) !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+[data-sonner-toaster].toaster-viewport-center [data-sonner-toast] {
+  width: auto !important;
+  min-width: 8rem;
+  max-width: min(24rem, calc(100vw - 2rem));
+  writing-mode: horizontal-tb !important;
+}

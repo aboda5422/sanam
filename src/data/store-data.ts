@@ -52,7 +52,9 @@ export const categorySections: CategorySection[] = [
 ];
 
 export const categories: Category[] = [
-  { id: "latest-offers", name: "أحدث العروض", nameEn: "Latest Offers", icon: "🛒", image: "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/latest-offers.webp?v=202608131932", color: "bg-red-50", section: "offers" },
+  { id: "latest-offers", name: "أحدث العروض", nameEn: "Latest Offers", icon: "🛒", image: "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/latest-offers.webp?v=202608132143", color: "bg-red-50", section: "offers" },
+  { id: "weekly-offers", name: "العروض الأسبوعية", nameEn: "Weekly Offers", icon: "🛒", image: "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/weekly-offers.webp?v=202608132143", color: "bg-orange-50", section: "offers" },
+  { id: "riyalak-yofreq", name: "ريالك يفرق", nameEn: "Riyalak Yofreq", icon: "🛒", image: "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/riyalak-yofreq.webp?v=202608132143", color: "bg-amber-50", section: "offers" },
   { id: "daily-cheese", name: "أجبان", nameEn: "Cheese", icon: "🛒", image: "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-cheese.webp?v=202608131932", color: "bg-green-50", section: "daily" },
   { id: "daily-fish", name: "أسماك", nameEn: "Fish", icon: "🛒", image: "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-fish.webp?v=202608131932", color: "bg-orange-50", section: "daily" },
   { id: "daily-herbs", name: "أعشاب", nameEn: "Herbs", icon: "🛒", image: "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-herbs.webp?v=202608131932", color: "bg-blue-50", section: "daily" },

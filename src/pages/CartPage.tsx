@@ -20,7 +20,9 @@ const CartPage = () => {
             <Button>تصفح المنتجات</Button>
           </Link>
         </main>
-        <Footer />
+        <div className="hidden md:block">
+          <Footer />
+        </div>
       </div>
     );
   }
@@ -92,7 +94,10 @@ const CartPage = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      {/* Site footer: desktop only — keep mobile bottom nav (categories/cart) */}
+      <div className="hidden md:block">
+        <Footer />
+      </div>
     </div>
   );
 };

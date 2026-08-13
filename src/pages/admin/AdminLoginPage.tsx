@@ -1,19 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import logoFull from "@/assets/logo-full-light.png";
 
+const REMEMBER_KEY = "sanam:admin-login-remember";
+
+type Remembered = { email: string; password: string };
+
+const loadRemembered = (): Remembered | null => {
+  try {
+    const raw = localStorage.getItem(REMEMBER_KEY);
+    if (!raw) return null;
+    const v = JSON.parse(raw);
+    if (typeof v?.email === "string" && typeof v?.password === "string") return v;
+  } catch {}
+  return null;
+};
+
 const AdminLoginPage = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const remembered = loadRemembered();
+  const [email, setEmail] = useState(remembered?.email || "");
+  const [password, setPassword] = useState(remembered?.password || "");
+  const [rememberPassword, setRememberPassword] = useState(!!remembered);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!rememberPassword) {
+      localStorage.removeItem(REMEMBER_KEY);
+    }
+  }, [rememberPassword]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +61,12 @@ const AdminLoginPage = () => {
       toast.error("ليس لديك صلاحية الوصول للوحة التحكم");
       setLoading(false);
       return;
+    }
+
+    if (rememberPassword) {
+      localStorage.setItem(REMEMBER_KEY, JSON.stringify({ email, password }));
+    } else {
+      localStorage.removeItem(REMEMBER_KEY);
     }
 
     toast.success("مرحباً بك في لوحة التحكم");
@@ -72,6 +101,7 @@ const AdminLoginPage = () => {
                 dir="ltr"
                 required
                 className="mt-1"
+                autoComplete="username"
               />
             </div>
             <div>
@@ -84,8 +114,17 @@ const AdminLoginPage = () => {
                 dir="ltr"
                 required
                 className="mt-1"
+                autoComplete="current-password"
               />
             </div>
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <Checkbox
+                checked={rememberPassword}
+                onCheckedChange={(v) => setRememberPassword(v === true)}
+                id="remember-password"
+              />
+              <span className="text-sm text-muted-foreground">حفظ كلمة المرور</span>
+            </label>
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <ShieldCheck className="h-4 w-4 ml-2" />}
               {loading ? "جاري الدخول..." : "تسجيل الدخول"}

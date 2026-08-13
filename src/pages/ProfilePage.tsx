@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Package, MapPin, Phone, Mail, Save, Loader2, ChevronLeft, AlertTriangle, ShoppingCart, Settings, Trash2, ShieldAlert } from "lucide-react";
+import { User, Package, MapPin, Phone, Mail, Save, Loader2, ChevronLeft, AlertTriangle, ShoppingCart, Settings, Trash2, ShieldAlert, LogOut, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,8 @@ const ProfilePage = () => {
   const [deleting, setDeleting] = useState(false);
   const [deleteBlock, setDeleteBlock] = useState<{ pendingOrders: number; openComplaints: number } | null>(null);
   const [deleteConfirmed, setDeleteConfirmed] = useState(false);
+  const [showAddAddress, setShowAddAddress] = useState(false);
+  const [addressesRefreshKey, setAddressesRefreshKey] = useState(0);
 
   const handleStartDelete = async () => {
     setDeleteOpen(true);
@@ -82,6 +84,12 @@ const ProfilePage = () => {
     } finally {
       setDeleting(false);
     }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success(t("تم تسجيل الخروج", "Signed out"));
+    navigate("/auth", { replace: true });
   };
 
   useEffect(() => {
@@ -170,8 +178,13 @@ const ProfilePage = () => {
           {t("حسابي", "My Account")}
         </h1>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="w-full grid grid-cols-4">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-4"
+          dir={lang === "ar" ? "rtl" : "ltr"}
+        >
+          <TabsList className="!grid h-10 w-full grid-cols-4">
             <TabsTrigger value="profile">{t("الملف الشخصي", "Profile")}</TabsTrigger>
             <TabsTrigger value="addresses">{t("عناويني", "Addresses")}</TabsTrigger>
             <TabsTrigger value="orders">{t("طلباتي", "Orders")} ({orders.length})</TabsTrigger>
@@ -182,30 +195,61 @@ const ProfilePage = () => {
           <TabsContent value="profile">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">{t("البيانات الشخصية", "Personal Info")}</CardTitle>
+                <CardTitle className="text-lg text-start">{t("البيانات الشخصية", "Personal Info")}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4" dir={lang === "ar" ? "rtl" : "ltr"}>
                 <div>
-                  <Label>{t("البريد الإلكتروني", "Email")}</Label>
-                  <div className="flex items-center gap-2 mt-1 p-2.5 bg-muted rounded-md text-sm text-muted-foreground">
-                    <Mail className="h-4 w-4" />
-                    {user?.email}
+                  <Label className="text-start block">{t("البريد الإلكتروني", "Email")}</Label>
+                  <div className="mt-1 flex items-center gap-2 rounded-md bg-muted p-2.5 text-sm text-muted-foreground">
+                    <Mail className="h-4 w-4 shrink-0" />
+                    <span dir="ltr" className="min-w-0 flex-1 text-start">
+                      {user?.email}
+                    </span>
                   </div>
                 </div>
                 <div>
-                  <Label>{t("الاسم الكامل", "Full Name")}</Label>
-                  <Input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} className="mt-1" />
+                  <Label className="text-start block">{t("الاسم الكامل", "Full Name")}</Label>
+                  <Input
+                    value={form.full_name}
+                    onChange={(e) => setForm((f) => ({ ...f, full_name: e.target.value }))}
+                    className="mt-1 text-start"
+                    dir={lang === "ar" ? "rtl" : "ltr"}
+                  />
                 </div>
                 <div>
-                  <Label>{t("رقم الجوال", "Phone")}</Label>
-                  <Input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="05xxxxxxxx" dir="ltr" className="mt-1" />
+                  <Label className="text-start block">{t("رقم الجوال", "Phone")}</Label>
+                  <Input
+                    value={form.phone}
+                    onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                    placeholder="05xxxxxxxx"
+                    dir="ltr"
+                    className={`mt-1 ${lang === "ar" ? "text-right" : "text-left"}`}
+                  />
                 </div>
                 <div>
-                  <Label>{t("المدينة", "City")}</Label>
-                  <Input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} className="mt-1" />
+                  <Label className="text-start block">{t("المدينة", "City")}</Label>
+                  <select
+                    dir={lang === "ar" ? "rtl" : "ltr"}
+                    value={form.city === "Makkah" || form.city === "مكة المكرمة" ? "مكة المكرمة" : form.city === "Riyadh" || form.city === "الرياض" ? "الرياض" : form.city}
+                    onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+                    className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-start"
+                  >
+                    <option value="مكة المكرمة">{t("مكة المكرمة", "Makkah")}</option>
+                    <option value="الرياض">{t("الرياض", "Riyadh")}</option>
+                  </select>
                 </div>
-                <Button onClick={handleSave} disabled={saving} className="w-full">
-                  {saving ? <><Loader2 className="h-4 w-4 animate-spin ml-2" />{t("جاري الحفظ...", "Saving...")}</> : <><Save className="h-4 w-4 ml-2" />{t("حفظ البيانات", "Save")}</>}
+                <Button onClick={handleSave} disabled={saving} className="w-full gap-2">
+                  {saving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {t("جاري الحفظ...", "Saving...")}
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4" />
+                      {t("حفظ البيانات", "Save")}
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>
@@ -221,28 +265,50 @@ const ProfilePage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {user && <SavedAddresses onSelect={() => {}} onAddNew={() => {}} />}
-                <div className="border-t pt-4">
-                  <h3 className="font-semibold mb-3">{t("إضافة عنوان جديد", "Add New Address")}</h3>
-                  <AddressMapPicker
-                    onAddressSelected={async (addr) => {
-                      if (!user) return;
-                      const { error } = await supabase.from("user_addresses").insert({
-                        user_id: user.id,
-                        label: addr.label,
-                        address: addr.address,
-                        lat: addr.lat,
-                        lng: addr.lng,
-                      });
-                      if (error) {
-                        toast.error(t("فشل حفظ العنوان", "Failed to save address"));
-                      } else {
-                        toast.success(t("تم حفظ العنوان بنجاح! يمكنك الآن التسوق", "Address saved! You can now start shopping"));
-                      }
-                    }}
+                {user && (
+                  <SavedAddresses
+                    onSelect={() => {}}
+                    onAddNew={() => setShowAddAddress(true)}
+                    showAddButton={false}
+                    refreshKey={addressesRefreshKey}
                   />
-                </div>
-                {/* Continue Shopping Button */}
+                )}
+
+                {showAddAddress ? (
+                  <div className="border-t pt-4 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="font-semibold">{t("إضافة عنوان جديد", "Add New Address")}</h3>
+                      <Button variant="ghost" size="sm" onClick={() => setShowAddAddress(false)}>
+                        {t("إلغاء", "Cancel")}
+                      </Button>
+                    </div>
+                    <AddressMapPicker
+                      onAddressSelected={async (addr) => {
+                        if (!user) return;
+                        const { error } = await supabase.from("user_addresses").insert({
+                          user_id: user.id,
+                          label: addr.label,
+                          address: addr.address,
+                          lat: addr.lat,
+                          lng: addr.lng,
+                        });
+                        if (error) {
+                          toast.error(t("فشل حفظ العنوان", "Failed to save address"));
+                        } else {
+                          toast.success(t("تم حفظ العنوان بنجاح! يمكنك الآن التسوق", "Address saved! You can now start shopping"));
+                          setShowAddAddress(false);
+                          setAddressesRefreshKey((k) => k + 1);
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <Button variant="outline" className="w-full gap-2" onClick={() => setShowAddAddress(true)}>
+                    <Plus className="h-4 w-4" />
+                    {t("إضافة عنوان جديد", "Add New Address")}
+                  </Button>
+                )}
+
                 <Button onClick={() => navigate("/")} variant="outline" className="w-full gap-2">
                   <ShoppingCart className="h-4 w-4" />
                   {t("متابعة التسوق", "Continue Shopping")}
@@ -363,10 +429,21 @@ const ProfilePage = () => {
           <TabsContent value="settings">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-primary" />
-                  {t("الإعدادات", "Settings")}
-                </CardTitle>
+                <div className="flex items-center justify-between gap-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Settings className="h-5 w-5 text-primary" />
+                    {t("الإعدادات", "Settings")}
+                  </CardTitle>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 text-sm text-destructive hover:opacity-80 transition-opacity"
+                    aria-label={t("تسجيل الخروج", "Sign out")}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>{t("تسجيل الخروج", "Sign out")}</span>
+                  </button>
+                </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="border border-destructive/30 bg-destructive/5 rounded-xl p-4 space-y-3">

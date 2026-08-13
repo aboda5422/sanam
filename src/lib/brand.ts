@@ -5,6 +5,10 @@ export const BRAND = {
   nameEn: "Sanam",
   fullNameAr: "سنام سوبر ماركت",
   fullNameEn: "Sanam Supermarket",
+  /** Legal entity (commercial registration) */
+  legalNameAr: "شركة المركز التجاري الشامل",
+  legalNameEn: "Al Markaz Al Tejari Al Shamil Co.",
+  crNumber: "7001888937",
   taglineAr: "سنام ... حيث الجودة تلتقي بالثقة!",
   taglineEn: "Sanam... where quality meets trust!",
   descriptionAr:

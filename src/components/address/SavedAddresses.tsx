@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MapPin, Home, Briefcase, Star, Trash2, Plus } from "lucide-react";
+import { Home, Briefcase, Star, Trash2, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -17,9 +17,13 @@ interface SavedAddressesProps {
   onSelect: (address: Address) => void;
   onAddNew: () => void;
   selectedId?: string;
+  /** When false, only the saved list is shown (add button rendered by parent). Default true. */
+  showAddButton?: boolean;
+  /** Bump to refetch after an external save. */
+  refreshKey?: number;
 }
 
-const SavedAddresses = ({ onSelect, onAddNew, selectedId }: SavedAddressesProps) => {
+const SavedAddresses = ({ onSelect, onAddNew, selectedId, showAddButton = true, refreshKey = 0 }: SavedAddressesProps) => {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,7 +41,7 @@ const SavedAddresses = ({ onSelect, onAddNew, selectedId }: SavedAddressesProps)
     setLoading(false);
   };
 
-  useEffect(() => { fetchAddresses(); }, []);
+  useEffect(() => { fetchAddresses(); }, [refreshKey]);
 
   const setDefault = async (id: string) => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -60,10 +64,15 @@ const SavedAddresses = ({ onSelect, onAddNew, selectedId }: SavedAddressesProps)
   if (loading) return <div className="py-4 text-center text-muted-foreground text-sm">جاري التحميل...</div>;
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
+      {addresses.length === 0 && (
+        <p className="text-sm text-muted-foreground text-center py-2">لا توجد عناوين محفوظة بعد</p>
+      )}
+
       {addresses.map((addr) => (
         <button
           key={addr.id}
+          type="button"
           onClick={() => onSelect(addr)}
           className={`w-full text-right p-4 rounded-xl border-2 transition-all ${
             selectedId === addr.id
@@ -93,6 +102,7 @@ const SavedAddresses = ({ onSelect, onAddNew, selectedId }: SavedAddressesProps)
             <div className="flex gap-1 flex-shrink-0">
               {!addr.is_default && (
                 <button
+                  type="button"
                   onClick={(e) => { e.stopPropagation(); setDefault(addr.id); }}
                   className="p-1.5 hover:bg-muted rounded-lg transition-colors"
                   title="تعيين كافتراضي"
@@ -101,6 +111,7 @@ const SavedAddresses = ({ onSelect, onAddNew, selectedId }: SavedAddressesProps)
                 </button>
               )}
               <button
+                type="button"
                 onClick={(e) => { e.stopPropagation(); deleteAddress(addr.id); }}
                 className="p-1.5 hover:bg-destructive/10 rounded-lg transition-colors"
                 title="حذف"
@@ -112,10 +123,12 @@ const SavedAddresses = ({ onSelect, onAddNew, selectedId }: SavedAddressesProps)
         </button>
       ))}
 
-      <Button variant="outline" className="w-full" onClick={onAddNew}>
-        <Plus className="h-4 w-4 ml-2" />
-        إضافة عنوان جديد
-      </Button>
+      {showAddButton && (
+        <Button variant="outline" className="w-full mt-1" onClick={onAddNew}>
+          <Plus className="h-4 w-4 ml-2" />
+          إضافة عنوان جديد
+        </Button>
+      )}
     </div>
   );
 };

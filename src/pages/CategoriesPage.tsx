@@ -15,7 +15,10 @@ const CategoriesPage = () => {
         </h1>
         <HomeSections />
       </main>
-      <Footer />
+      {/* Site footer: desktop only — keep mobile bottom nav (categories/cart) */}
+      <div className="hidden md:block">
+        <Footer />
+      </div>
     </div>
   );
 };

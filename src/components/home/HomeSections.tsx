@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { categorySections, categories } from "@/data/store-data";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCategories } from "@/hooks/useCategories";
@@ -14,12 +14,13 @@ const CategoryTile = ({
   to,
   name,
   image,
-  showCaption,
+  forceCaptionOverlay,
 }: {
   to: string;
   name: string;
   image: string;
-  showCaption?: boolean;
+  /** When true (English UI), cover baked-in Arabic title on the tile image */
+  forceCaptionOverlay?: boolean;
 }) => {
   const isPlaceholder =
     !image || image === "/placeholder.png" || image.endsWith("placeholder.png");
@@ -27,6 +28,11 @@ const CategoryTile = ({
   return (
     <Link to={to} className="group block">
       <div className="aspect-square rounded-2xl overflow-hidden bg-[#f8f8f9] border border-black/[0.03] hover:shadow-sm transition-all duration-300 relative">
+        {forceCaptionOverlay ? (
+          <p className="absolute top-0 inset-x-0 z-10 px-1.5 pt-2 pb-1.5 text-center text-[11px] sm:text-xs font-bold text-foreground leading-tight line-clamp-2 bg-gradient-to-b from-[#f8f8f9] via-[#f8f8f9]/95 to-transparent pointer-events-none">
+            {name}
+          </p>
+        ) : null}
         <img
           src={image}
           alt={name}
@@ -42,11 +48,6 @@ const CategoryTile = ({
           }}
         />
       </div>
-      {showCaption ? (
-        <p className="text-center text-xs sm:text-sm font-semibold mt-2 text-foreground leading-tight line-clamp-2">
-          {name}
-        </p>
-      ) : null}
     </Link>
   );
 };
@@ -55,7 +56,7 @@ const HomeSections = () => {
   const { lang } = useLanguage();
   const { data: dbCategories } = useCategories();
   const dbBySlug = new Map((dbCategories || []).map((c) => [c.slug, c]));
-  const showCaption = lang === "en";
+  const forceCaptionOverlay = lang === "en";
 
   return (
     <div className="space-y-10">
@@ -89,7 +90,7 @@ const HomeSections = () => {
                     to={`/category/${cat.id}`}
                     name={lang === "ar" ? cat.name : cat.nameEn}
                     image={image}
-                    showCaption={showCaption}
+                    forceCaptionOverlay={forceCaptionOverlay}
                   />
                 );
               })}
@@ -99,7 +100,7 @@ const HomeSections = () => {
                   to={`/category/${cat.id}`}
                   name={lang === "ar" ? cat.name : cat.nameEn}
                   image={cat.image}
-                  showCaption={showCaption}
+                  forceCaptionOverlay={forceCaptionOverlay}
                 />
               ))}
             </div>

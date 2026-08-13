@@ -28,6 +28,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import RouteTracker from "./components/RouteTracker";
 import ScrollToTop from "./components/ScrollToTop";
 import MobileBottomNav from "./components/layout/MobileBottomNav";
+import MobileSwipeNavigation from "./components/layout/MobileSwipeNavigation";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -119,6 +120,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           <MobileBottomNav />
+          <MobileSwipeNavigation />
           </BranchProvider>
         </BrowserRouter>
       </CartProvider>

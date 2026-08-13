@@ -1,6 +1,6 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, MapPin, LogOut, Menu, Globe } from "lucide-react";
+import { ShoppingCart, User, MapPin, LogOut, Menu, Globe, Search } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,7 +15,6 @@ import {
 import { categorySections, categories } from "@/data/store-data";
 import logoMark from "@/assets/logo-mark.png";
 import logoFullLight from "@/assets/logo-full-light.png";
-import logoMarkHires from "@/assets/logo-mark-hires.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BRAND } from "@/lib/brand";
 import { useBranch } from "@/contexts/BranchContext";
@@ -166,6 +165,17 @@ const Header = () => {
                   </span>
                 </button>
 
+                {/* Language — directly under delivery */}
+                <button
+                  type="button"
+                  onClick={toggleLang}
+                  className="flex items-center gap-2 w-full p-3 bg-muted/50 rounded-xl text-sm"
+                >
+                  <Globe className="h-5 w-5 text-primary" />
+                  <span className="text-muted-foreground">{t("اللغة:", "Language:")}</span>
+                  <span className="font-semibold">{lang === "ar" ? "English" : "العربية"}</span>
+                </button>
+
                 {/* Categories */}
                 <div className="space-y-2">
                   <h3 className="font-heading font-bold text-sm text-muted-foreground px-1">{t("الأقسام", "Sections")}</h3>
@@ -173,7 +183,9 @@ const Header = () => {
                     const sectionCategories = categories.filter(c => c.section === section.id);
                     return (
                       <div key={section.id}>
-                        <p className="text-xs font-bold text-primary px-1 mb-1">{section.title}</p>
+                        <p className="text-xs font-bold text-primary px-1 mb-1">
+                          {lang === "ar" ? section.title : section.titleEn}
+                        </p>
                         {sectionCategories.slice(0, 4).map((cat) => (
                           <Link
                             key={cat.id}
@@ -187,14 +199,6 @@ const Header = () => {
                       </div>
                     );
                   })}
-                </div>
-
-                {/* Language */}
-                <div className="flex items-center gap-4 pt-2 border-t">
-                  <button onClick={toggleLang} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-                    <Globe className="h-4 w-4" />
-                    <span>{lang === "ar" ? "English" : "العربية"}</span>
-                  </button>
                 </div>
               </div>
             </SheetContent>
@@ -242,11 +246,9 @@ const Header = () => {
         {/* Search */}
         <div className="flex-1 max-w-xl mx-2 lg:mx-4 relative" ref={searchRef}>
           <div className="relative">
-            <img
-              src={logoMarkHires}
-              alt=""
+            <Search
               aria-hidden="true"
-              className="absolute right-3 lg:right-4 top-1/2 -translate-y-1/2 h-6 w-6 lg:h-7 lg:w-7 object-contain pointer-events-none"
+              className="absolute right-3 lg:right-4 top-1/2 -translate-y-1/2 h-5 w-5 lg:h-5 lg:w-5 text-muted-foreground pointer-events-none"
             />
             <input
               placeholder={t("ابحث عن منتج...", "Search products...")}

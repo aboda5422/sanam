@@ -1,4 +1,4 @@
-﻿import { useRef } from "react";
+import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,7 +32,12 @@ const HeroSlider = () => {
   return (
     <section className="mb-6">
       <div className="relative group">
-        <div ref={scrollRef} className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
+        <div
+          ref={scrollRef}
+          data-no-swipe
+          className="flex gap-3 overflow-x-auto pb-2"
+          style={{ scrollbarWidth: "none" }}
+        >
           {bannerItems.map((item) => (
             <div
               key={item.id}

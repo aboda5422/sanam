@@ -65,22 +65,18 @@ const MobileBottomNav = () => {
           {leftItems.map(renderItem)}
 
           {/* Center AI Quick Order FAB */}
-          <div className="flex-1 flex items-start justify-center">
+          <div className="flex-1 flex items-center justify-center">
             <button
               onClick={() => setQuickOrderOpen(true)}
               aria-label={t("الطلب السريع AI", "Quick Order AI")}
-              className="-mt-7 relative group"
+              className="-mt-4 relative group"
             >
-              {/* Glow ring */}
-              <span className="absolute inset-0 rounded-full bg-primary/40 blur-md animate-pulse" aria-hidden />
-              <span className="relative flex items-center justify-center w-[58px] h-[58px] rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-xl shadow-primary/40 ring-4 ring-background transition-transform group-active:scale-95">
-                <Sparkles className="h-7 w-7" />
-                <span className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 text-[9px] font-black px-1.5 py-0.5 rounded-full shadow">
+              <span className="absolute inset-0 rounded-full bg-primary/35 blur-md animate-pulse" aria-hidden />
+              <span className="relative flex items-center justify-center w-[38px] h-[38px] rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-background transition-transform group-active:scale-95">
+                <Sparkles className="h-[18px] w-[18px]" />
+                <span className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 text-[8px] font-black px-1 py-0.5 rounded-full shadow leading-none">
                   AI
                 </span>
-              </span>
-              <span className="block text-center mt-0.5 text-[10px] font-bold text-primary">
-                {t("طلب سريع", "Quick")}
               </span>
             </button>
           </div>
