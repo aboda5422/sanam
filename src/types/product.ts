@@ -12,6 +12,15 @@ export interface Product {
   is_active: boolean;
   is_featured: boolean;
   sort_order: number;
+  barcode?: string | null;
+  brand?: string | null;
+  origin_country?: string | null;
+  size_label?: string | null;
+  product_form?: string | null;
+  gallery_urls?: string[] | null;
+  extra_label?: string | null;
+  stock_quantity?: number;
+  cost_price?: number | null;
 }
 
 export interface Category {

@@ -1,0 +1,1118 @@
+﻿[
+    {
+        "id":  "latest-offers",
+        "name":  "أحدث العروض",
+        "nameEn":  "Latest Offers",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/latest-offers.webp?v=202608131724",
+        "color":  "bg-red-50",
+        "section":  "offers"
+    },
+    {
+        "id":  "daily-cheese",
+        "name":  "أجبان",
+        "nameEn":  "Cheese",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-cheese.webp?v=202608131724",
+        "color":  "bg-green-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-fish",
+        "name":  "أسماك",
+        "nameEn":  "Fish",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-fish.webp?v=202608131724",
+        "color":  "bg-orange-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-herbs",
+        "name":  "أعشاب",
+        "nameEn":  "Herbs",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-herbs.webp?v=202608131724",
+        "color":  "bg-blue-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-dairy",
+        "name":  "ألبان",
+        "nameEn":  "Dairy",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-dairy.webp?v=202608131724",
+        "color":  "bg-amber-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-eggs",
+        "name":  "بيض",
+        "nameEn":  "Eggs",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-eggs.webp?v=202608131724",
+        "color":  "bg-yellow-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-vegetables",
+        "name":  "خضروات",
+        "nameEn":  "Vegetables",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-vegetables.webp?v=202608131724",
+        "color":  "bg-pink-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-poultry",
+        "name":  "دواجن",
+        "nameEn":  "Poultry",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-poultry.webp?v=202608131724",
+        "color":  "bg-purple-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-fresh-juices",
+        "name":  "عصائر طازجة",
+        "nameEn":  "Fresh Juices",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-fresh-juices.webp?v=202608131724",
+        "color":  "bg-cyan-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-fruits",
+        "name":  "فواكه",
+        "nameEn":  "Fruits",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-fruits.webp?v=202608131724",
+        "color":  "bg-teal-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-meat",
+        "name":  "لحوم",
+        "nameEn":  "Meat",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-meat.webp?v=202608131724",
+        "color":  "bg-rose-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-seafood",
+        "name":  "مأكولات بحرية",
+        "nameEn":  "Seafood",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-seafood.webp?v=202608131724",
+        "color":  "bg-gray-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-chilled",
+        "name":  "منتجات مبردة",
+        "nameEn":  "Chilled",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-chilled.webp?v=202608131724",
+        "color":  "bg-red-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "daily-ready-meals",
+        "name":  "وجبات جاهزة",
+        "nameEn":  "Ready Meals",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/daily-ready-meals.webp?v=202608131724",
+        "color":  "bg-green-50",
+        "section":  "daily"
+    },
+    {
+        "id":  "pantry-ice-cream",
+        "name":  "آيس كريم",
+        "nameEn":  "Ice Cream",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-ice-cream.webp?v=202608131724",
+        "color":  "bg-orange-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-rice",
+        "name":  "أرز",
+        "nameEn":  "Rice",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-rice.webp?v=202608131724",
+        "color":  "bg-blue-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-frozen-fish",
+        "name":  "أسماك مجمدة",
+        "nameEn":  "Frozen Fish",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-frozen-fish.webp?v=202608131724",
+        "color":  "bg-amber-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-world-foods",
+        "name":  "أغذية عالمية",
+        "nameEn":  "World Foods",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-world-foods.webp?v=202608131724",
+        "color":  "bg-yellow-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-frozen-fries-sides",
+        "name":  "بطاطس ومقبلات",
+        "nameEn":  "Frozen Fries \u0026 Sides",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-frozen-fries-sides.webp?v=202608131724",
+        "color":  "bg-pink-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-pulses",
+        "name":  "بقوليات",
+        "nameEn":  "Pulses",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-pulses.webp?v=202608131724",
+        "color":  "bg-purple-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-spices",
+        "name":  "بهارات",
+        "nameEn":  "Spices",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-spices.webp?v=202608131724",
+        "color":  "bg-cyan-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-pizza",
+        "name":  "بيتزا",
+        "nameEn":  "Pizza",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-pizza.webp?v=202608131724",
+        "color":  "bg-teal-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-tuna",
+        "name":  "تونة",
+        "nameEn":  "Tuna",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-tuna.webp?v=202608131724",
+        "color":  "bg-rose-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-frozen-vegetables",
+        "name":  "خضروات مجمدة",
+        "nameEn":  "Frozen Vegetables",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-frozen-vegetables.webp?v=202608131724",
+        "color":  "bg-gray-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-flour",
+        "name":  "دقيق",
+        "nameEn":  "Flour",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-flour.webp?v=202608131724",
+        "color":  "bg-red-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-frozen-poultry",
+        "name":  "دواجن مجمدة",
+        "nameEn":  "Frozen Poultry",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-frozen-poultry.webp?v=202608131724",
+        "color":  "bg-green-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-oils",
+        "name":  "زيوت",
+        "nameEn":  "Oils",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-oils.webp?v=202608131724",
+        "color":  "bg-orange-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-sugar",
+        "name":  "سكر",
+        "nameEn":  "Sugar",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-sugar.webp?v=202608131724",
+        "color":  "bg-blue-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-ghee",
+        "name":  "سمن",
+        "nameEn":  "Ghee",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-ghee.webp?v=202608131724",
+        "color":  "bg-amber-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-soups",
+        "name":  "شوربات",
+        "nameEn":  "Soups",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-soups.webp?v=202608131724",
+        "color":  "bg-yellow-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-chips-snacks",
+        "name":  "شيبس ومقبلات",
+        "nameEn":  "Chips \u0026 Snacks",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-chips-snacks.webp?v=202608131724",
+        "color":  "bg-pink-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-sauces",
+        "name":  "صلصات",
+        "nameEn":  "Sauces",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-sauces.webp?v=202608131724",
+        "color":  "bg-purple-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-frozen-meat",
+        "name":  "لحوم مجمدة",
+        "nameEn":  "Frozen Meat",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-frozen-meat.webp?v=202608131724",
+        "color":  "bg-cyan-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-pickles",
+        "name":  "مخللات",
+        "nameEn":  "Pickles",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-pickles.webp?v=202608131724",
+        "color":  "bg-teal-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-jam-honey",
+        "name":  "مربى وعسل",
+        "nameEn":  "Jam \u0026 Honey",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-jam-honey.webp?v=202608131724",
+        "color":  "bg-rose-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-frozen-pastry",
+        "name":  "معجنات مجمدة",
+        "nameEn":  "Frozen Pastry",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-frozen-pastry.webp?v=202608131724",
+        "color":  "bg-gray-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-pasta",
+        "name":  "معكرونة",
+        "nameEn":  "Pasta",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-pasta.webp?v=202608131724",
+        "color":  "bg-red-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-canned-food",
+        "name":  "معلبات",
+        "nameEn":  "Canned Food",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-canned-food.webp?v=202608131724",
+        "color":  "bg-green-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-other",
+        "name":  "منتجات أخرى",
+        "nameEn":  "Other",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-other.webp?v=202608131724",
+        "color":  "bg-orange-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-breakfast",
+        "name":  "منتجات الفطور",
+        "nameEn":  "Breakfast",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-breakfast.webp?v=202608131724",
+        "color":  "bg-blue-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "pantry-ready-meals",
+        "name":  "وجبات جاهزة",
+        "nameEn":  "Ready Meals",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pantry-ready-meals.webp?v=202608131724",
+        "color":  "bg-amber-50",
+        "section":  "pantry"
+    },
+    {
+        "id":  "drinks-tea",
+        "name":  "شاي",
+        "nameEn":  "Tea",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/drinks-tea.webp?v=202608131724",
+        "color":  "bg-yellow-50",
+        "section":  "drinks"
+    },
+    {
+        "id":  "drinks-concentrates",
+        "name":  "شراب مركز",
+        "nameEn":  "Concentrates",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/drinks-concentrates.webp?v=202608131724",
+        "color":  "bg-pink-50",
+        "section":  "drinks"
+    },
+    {
+        "id":  "drinks-juices",
+        "name":  "عصائر",
+        "nameEn":  "Juices",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/drinks-juices.webp?v=202608131724",
+        "color":  "bg-purple-50",
+        "section":  "drinks"
+    },
+    {
+        "id":  "drinks-coffee",
+        "name":  "قهوة",
+        "nameEn":  "Coffee",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/drinks-coffee.webp?v=202608131724",
+        "color":  "bg-cyan-50",
+        "section":  "drinks"
+    },
+    {
+        "id":  "drinks-hot-drinks",
+        "name":  "مشروبات ساخنة",
+        "nameEn":  "Hot Drinks",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/drinks-hot-drinks.webp?v=202608131724",
+        "color":  "bg-teal-50",
+        "section":  "drinks"
+    },
+    {
+        "id":  "drinks-energy-drinks",
+        "name":  "مشروبات طاقة",
+        "nameEn":  "Energy Drinks",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/drinks-energy-drinks.webp?v=202608131724",
+        "color":  "bg-rose-50",
+        "section":  "drinks"
+    },
+    {
+        "id":  "drinks-soft-drinks",
+        "name":  "مشروبات غازية",
+        "nameEn":  "Soft Drinks",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/drinks-soft-drinks.webp?v=202608131724",
+        "color":  "bg-gray-50",
+        "section":  "drinks"
+    },
+    {
+        "id":  "drinks-water",
+        "name":  "مياه",
+        "nameEn":  "Water",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/drinks-water.webp?v=202608131724",
+        "color":  "bg-red-50",
+        "section":  "drinks"
+    },
+    {
+        "id":  "snacks-biscuits",
+        "name":  "بسكويت",
+        "nameEn":  "Biscuits",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/snacks-biscuits.webp?v=202608131724",
+        "color":  "bg-green-50",
+        "section":  "snacks"
+    },
+    {
+        "id":  "snacks-dates",
+        "name":  "تمور",
+        "nameEn":  "Dates",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/snacks-dates.webp?v=202608131724",
+        "color":  "bg-orange-50",
+        "section":  "snacks"
+    },
+    {
+        "id":  "snacks-toast",
+        "name":  "توست",
+        "nameEn":  "Toast",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/snacks-toast.webp?v=202608131724",
+        "color":  "bg-blue-50",
+        "section":  "snacks"
+    },
+    {
+        "id":  "snacks-sweets",
+        "name":  "حلويات",
+        "nameEn":  "Sweets",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/snacks-sweets.webp?v=202608131724",
+        "color":  "bg-amber-50",
+        "section":  "snacks"
+    },
+    {
+        "id":  "snacks-bread",
+        "name":  "خبز",
+        "nameEn":  "Bread",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/snacks-bread.webp?v=202608131724",
+        "color":  "bg-yellow-50",
+        "section":  "snacks"
+    },
+    {
+        "id":  "snacks-chocolate",
+        "name":  "شوكولاتة",
+        "nameEn":  "Chocolate",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/snacks-chocolate.webp?v=202608131724",
+        "color":  "bg-pink-50",
+        "section":  "snacks"
+    },
+    {
+        "id":  "snacks-croissant",
+        "name":  "كرواسون",
+        "nameEn":  "Croissant",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/snacks-croissant.webp?v=202608131724",
+        "color":  "bg-purple-50",
+        "section":  "snacks"
+    },
+    {
+        "id":  "snacks-cake",
+        "name":  "كيك",
+        "nameEn":  "Cake",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/snacks-cake.webp?v=202608131724",
+        "color":  "bg-cyan-50",
+        "section":  "snacks"
+    },
+    {
+        "id":  "snacks-pastries",
+        "name":  "معجنات",
+        "nameEn":  "Pastries",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/snacks-pastries.webp?v=202608131724",
+        "color":  "bg-teal-50",
+        "section":  "snacks"
+    },
+    {
+        "id":  "snacks-nuts",
+        "name":  "مكسرات",
+        "nameEn":  "Nuts",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/snacks-nuts.webp?v=202608131724",
+        "color":  "bg-rose-50",
+        "section":  "snacks"
+    },
+    {
+        "id":  "makeup-cosmetics",
+        "name":  "مستحضرات التجميل",
+        "nameEn":  "Cosmetics",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/makeup-cosmetics.webp?v=202608131724",
+        "color":  "bg-gray-50",
+        "section":  "makeup"
+    },
+    {
+        "id":  "beauty-men-s-shaving",
+        "name":  "الحلاقة الرجالية",
+        "nameEn":  "Men\u0027s Shaving",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-men-s-shaving.webp?v=202608131724",
+        "color":  "bg-red-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-women-s-shaving",
+        "name":  "الحلاقة النسائية",
+        "nameEn":  "Women\u0027s Shaving",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-women-s-shaving.webp?v=202608131724",
+        "color":  "bg-green-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-perfumes",
+        "name":  "العطور",
+        "nameEn":  "Perfumes",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-perfumes.webp?v=202608131724",
+        "color":  "bg-orange-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-skin-care",
+        "name":  "العناية بالبشرة",
+        "nameEn":  "Skin Care",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-skin-care.webp?v=202608131724",
+        "color":  "bg-blue-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-hair-care",
+        "name":  "العناية بالشعر",
+        "nameEn":  "Hair Care",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-hair-care.webp?v=202608131724",
+        "color":  "bg-amber-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-face-care",
+        "name":  "العناية بالوجه",
+        "nameEn":  "Face Care",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-face-care.webp?v=202608131724",
+        "color":  "bg-yellow-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-conditioner",
+        "name":  "بلسم",
+        "nameEn":  "Conditioner",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-conditioner.webp?v=202608131724",
+        "color":  "bg-pink-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-shampoo",
+        "name":  "شامبو",
+        "nameEn":  "Shampoo",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-shampoo.webp?v=202608131724",
+        "color":  "bg-purple-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-soap",
+        "name":  "صابون",
+        "nameEn":  "Soap",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-soap.webp?v=202608131724",
+        "color":  "bg-cyan-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-body-wash",
+        "name":  "غسول الجسم",
+        "nameEn":  "Body Wash",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-body-wash.webp?v=202608131724",
+        "color":  "bg-teal-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-toothbrushes",
+        "name":  "فرش الأسنان",
+        "nameEn":  "Toothbrushes",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-toothbrushes.webp?v=202608131724",
+        "color":  "bg-rose-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-deodorants",
+        "name":  "مزيلات العرق",
+        "nameEn":  "Deodorants",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-deodorants.webp?v=202608131724",
+        "color":  "bg-gray-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "beauty-toothpaste",
+        "name":  "معجون الأسنان",
+        "nameEn":  "Toothpaste",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/beauty-toothpaste.webp?v=202608131724",
+        "color":  "bg-red-50",
+        "section":  "beauty"
+    },
+    {
+        "id":  "home-storage",
+        "name":  "أدوات التخزين",
+        "nameEn":  "Storage",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-storage.webp?v=202608131724",
+        "color":  "bg-green-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-cleaning-tools",
+        "name":  "أدوات التنظيف",
+        "nameEn":  "Cleaning Tools",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-cleaning-tools.webp?v=202608131724",
+        "color":  "bg-orange-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-kitchen-tools",
+        "name":  "أدوات المطبخ",
+        "nameEn":  "Kitchen Tools",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-kitchen-tools.webp?v=202608131724",
+        "color":  "bg-blue-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-cups",
+        "name":  "أكواب",
+        "nameEn":  "Cups",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-cups.webp?v=202608131724",
+        "color":  "bg-amber-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-shopping-bags",
+        "name":  "أكياس تسوق",
+        "nameEn":  "Shopping Bags",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-shopping-bags.webp?v=202608131724",
+        "color":  "bg-yellow-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-garbage-bags",
+        "name":  "أكياس نفايات",
+        "nameEn":  "Garbage Bags",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-garbage-bags.webp?v=202608131724",
+        "color":  "bg-pink-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-sponges-brushes",
+        "name":  "إسفنج وفرش",
+        "nameEn":  "Sponges \u0026 Brushes",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-sponges-brushes.webp?v=202608131724",
+        "color":  "bg-purple-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-outdoor-lighting",
+        "name":  "إضاءة خارجية",
+        "nameEn":  "Outdoor Lighting",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-outdoor-lighting.webp?v=202608131724",
+        "color":  "bg-cyan-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-accessories",
+        "name":  "إكسسوارات",
+        "nameEn":  "Accessories",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-accessories.webp?v=202608131724",
+        "color":  "bg-teal-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-camping",
+        "name":  "تخييم",
+        "nameEn":  "Camping",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-camping.webp?v=202608131724",
+        "color":  "bg-rose-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-food-wrap-storage",
+        "name":  "حفظ وتغليف الطعام",
+        "nameEn":  "Food Wrap \u0026 Storage",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-food-wrap-storage.webp?v=202608131724",
+        "color":  "bg-gray-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-bags",
+        "name":  "حقائب",
+        "nameEn":  "Bags",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-bags.webp?v=202608131724",
+        "color":  "bg-red-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-home-decor",
+        "name":  "ديكور المنزل",
+        "nameEn":  "Home Decor",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-home-decor.webp?v=202608131724",
+        "color":  "bg-green-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-flowers-plants",
+        "name":  "زهور ونباتات",
+        "nameEn":  "Flowers \u0026 Plants",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-flowers-plants.webp?v=202608131724",
+        "color":  "bg-orange-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-grills",
+        "name":  "شوايات",
+        "nameEn":  "Grills",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-grills.webp?v=202608131724",
+        "color":  "bg-blue-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-plates",
+        "name":  "صحون",
+        "nameEn":  "Plates",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-plates.webp?v=202608131724",
+        "color":  "bg-amber-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-charcoal",
+        "name":  "فحم",
+        "nameEn":  "Charcoal",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-charcoal.webp?v=202608131724",
+        "color":  "bg-yellow-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-garden-supplies",
+        "name":  "مستلزمات الحديقة",
+        "nameEn":  "Garden Supplies",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-garden-supplies.webp?v=202608131724",
+        "color":  "bg-pink-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-bathroom-essentials",
+        "name":  "مستلزمات الحمام",
+        "nameEn":  "Bathroom Essentials",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-bathroom-essentials.webp?v=202608131724",
+        "color":  "bg-purple-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-air-fresheners",
+        "name":  "معطرات",
+        "nameEn":  "Air Fresheners",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-air-fresheners.webp?v=202608131724",
+        "color":  "bg-cyan-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-insect-control",
+        "name":  "مكافحة الحشرات",
+        "nameEn":  "Insect Control",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-insect-control.webp?v=202608131724",
+        "color":  "bg-teal-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-men-clothing",
+        "name":  "ملابس رجالية",
+        "nameEn":  "Men Clothing",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-men-clothing.webp?v=202608131724",
+        "color":  "bg-rose-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-women-clothing",
+        "name":  "ملابس نسائية",
+        "nameEn":  "Women Clothing",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-women-clothing.webp?v=202608131724",
+        "color":  "bg-gray-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-tissues",
+        "name":  "مناديل",
+        "nameEn":  "Tissues",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-tissues.webp?v=202608131724",
+        "color":  "bg-red-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-floor-cleaners",
+        "name":  "منظفات الأرضيات",
+        "nameEn":  "Floor Cleaners",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-floor-cleaners.webp?v=202608131724",
+        "color":  "bg-green-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-bathroom-cleaners",
+        "name":  "منظفات الحمام",
+        "nameEn":  "Bathroom Cleaners",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-bathroom-cleaners.webp?v=202608131724",
+        "color":  "bg-orange-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-kitchen-cleaners",
+        "name":  "منظفات المطبخ",
+        "nameEn":  "Kitchen Cleaners",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-kitchen-cleaners.webp?v=202608131724",
+        "color":  "bg-blue-50",
+        "section":  "home"
+    },
+    {
+        "id":  "home-laundry",
+        "name":  "منظفات الملابس",
+        "nameEn":  "Laundry",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/home-laundry.webp?v=202608131724",
+        "color":  "bg-amber-50",
+        "section":  "home"
+    },
+    {
+        "id":  "electronics-small-appliances",
+        "name":  "أجهزة صغيرة",
+        "nameEn":  "Small Appliances",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/electronics-small-appliances.webp?v=202608131724",
+        "color":  "bg-yellow-50",
+        "section":  "electronics"
+    },
+    {
+        "id":  "electronics-phone-accessories",
+        "name":  "إكسسوارات جوال",
+        "nameEn":  "Phone Accessories",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/electronics-phone-accessories.webp?v=202608131724",
+        "color":  "bg-pink-50",
+        "section":  "electronics"
+    },
+    {
+        "id":  "electronics-car-accessories",
+        "name":  "إكسسوارات سيارات",
+        "nameEn":  "Car Accessories",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/electronics-car-accessories.webp?v=202608131724",
+        "color":  "bg-purple-50",
+        "section":  "electronics"
+    },
+    {
+        "id":  "electronics-batteries",
+        "name":  "بطاريات",
+        "nameEn":  "Batteries",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/electronics-batteries.webp?v=202608131724",
+        "color":  "bg-cyan-50",
+        "section":  "electronics"
+    },
+    {
+        "id":  "electronics-mobiles",
+        "name":  "جوالات",
+        "nameEn":  "Mobiles",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/electronics-mobiles.webp?v=202608131724",
+        "color":  "bg-teal-50",
+        "section":  "electronics"
+    },
+    {
+        "id":  "electronics-smartwatches",
+        "name":  "ساعات ذكية",
+        "nameEn":  "Smartwatches",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/electronics-smartwatches.webp?v=202608131724",
+        "color":  "bg-rose-50",
+        "section":  "electronics"
+    },
+    {
+        "id":  "electronics-headphones",
+        "name":  "سماعات",
+        "nameEn":  "Headphones",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/electronics-headphones.webp?v=202608131724",
+        "color":  "bg-gray-50",
+        "section":  "electronics"
+    },
+    {
+        "id":  "electronics-chargers",
+        "name":  "شواحن",
+        "nameEn":  "Chargers",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/electronics-chargers.webp?v=202608131724",
+        "color":  "bg-red-50",
+        "section":  "electronics"
+    },
+    {
+        "id":  "electronics-cables",
+        "name":  "كيابل",
+        "nameEn":  "Cables",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/electronics-cables.webp?v=202608131724",
+        "color":  "bg-green-50",
+        "section":  "electronics"
+    },
+    {
+        "id":  "electronics-car-fresheners",
+        "name":  "معطرات سيارات",
+        "nameEn":  "Car Fresheners",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/electronics-car-fresheners.webp?v=202608131724",
+        "color":  "bg-orange-50",
+        "section":  "electronics"
+    },
+    {
+        "id":  "electronics-car-cleaners",
+        "name":  "منظفات سيارات",
+        "nameEn":  "Car Cleaners",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/electronics-car-cleaners.webp?v=202608131724",
+        "color":  "bg-blue-50",
+        "section":  "electronics"
+    },
+    {
+        "id":  "baby-diapers",
+        "name":  "حفاضات",
+        "nameEn":  "Diapers",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/baby-diapers.webp?v=202608131724",
+        "color":  "bg-amber-50",
+        "section":  "baby"
+    },
+    {
+        "id":  "baby-baby-wipes",
+        "name":  "مناديل أطفال",
+        "nameEn":  "Baby Wipes",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/baby-baby-wipes.webp?v=202608131724",
+        "color":  "bg-yellow-50",
+        "section":  "baby"
+    },
+    {
+        "id":  "pets-pet-accessories",
+        "name":  "إكسسوارات الحيوانات",
+        "nameEn":  "Pet Accessories",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pets-pet-accessories.webp?v=202608131724",
+        "color":  "bg-pink-50",
+        "section":  "pets"
+    },
+    {
+        "id":  "pets-cat-litter",
+        "name":  "رمل القطط",
+        "nameEn":  "Cat Litter",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pets-cat-litter.webp?v=202608131724",
+        "color":  "bg-purple-50",
+        "section":  "pets"
+    },
+    {
+        "id":  "pets-cat-food",
+        "name":  "طعام القطط",
+        "nameEn":  "Cat Food",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/pets-cat-food.webp?v=202608131724",
+        "color":  "bg-cyan-50",
+        "section":  "pets"
+    },
+    {
+        "id":  "toys-kids-toys",
+        "name":  "ألعاب أطفال",
+        "nameEn":  "Kids Toys",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/toys-kids-toys.webp?v=202608131724",
+        "color":  "bg-teal-50",
+        "section":  "toys"
+    },
+    {
+        "id":  "toys-electronic-toys",
+        "name":  "ألعاب إلكترونية",
+        "nameEn":  "Electronic Toys",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/toys-electronic-toys.webp?v=202608131724",
+        "color":  "bg-rose-50",
+        "section":  "toys"
+    },
+    {
+        "id":  "toys-educational-toys",
+        "name":  "ألعاب تعليمية",
+        "nameEn":  "Educational Toys",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/toys-educational-toys.webp?v=202608131724",
+        "color":  "bg-gray-50",
+        "section":  "toys"
+    },
+    {
+        "id":  "stationery-office-supplies",
+        "name":  "أدوات مكتبية",
+        "nameEn":  "Office Supplies",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/stationery-office-supplies.webp?v=202608131724",
+        "color":  "bg-red-50",
+        "section":  "stationery"
+    },
+    {
+        "id":  "stationery-pens",
+        "name":  "أقلام",
+        "nameEn":  "Pens",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/stationery-pens.webp?v=202608131724",
+        "color":  "bg-green-50",
+        "section":  "stationery"
+    },
+    {
+        "id":  "stationery-notebooks",
+        "name":  "دفاتر",
+        "nameEn":  "Notebooks",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/stationery-notebooks.webp?v=202608131724",
+        "color":  "bg-orange-50",
+        "section":  "stationery"
+    },
+    {
+        "id":  "stationery-school-supplies",
+        "name":  "مستلزمات مدرسية",
+        "nameEn":  "School Supplies",
+        "icon":  "🛒",
+        "image":  "https://orfzjequjosvdvvmeiqi.supabase.co/storage/v1/object/public/images/categories/banners/stationery-school-supplies.webp?v=202608131724",
+        "color":  "bg-blue-50",
+        "section":  "stationery"
+    }
+]

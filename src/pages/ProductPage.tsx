@@ -16,10 +16,18 @@ const ProductPage = () => {
   const { data: categories } = useCategories();
   const { items, addItem, updateQuantity } = useCart();
   const [qty, setQty] = useState(1);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
 
   const category = categories?.find((c) => c.id === product?.category_id);
   const { data: similarProducts } = useProducts(product?.category_id || undefined);
   const similar = (similarProducts || []).filter((p) => p.id !== product?.id).slice(0, 6);
+
+  const gallery = product
+    ? [product.image, ...((product.gallery_urls || []).filter(Boolean))].filter(
+        (u, i, arr): u is string => !!u && arr.indexOf(u) === i
+      )
+    : [];
+  const mainImage = activeImage || gallery[0] || "/placeholder.png";
 
   if (isLoading) {
     return (
@@ -80,7 +88,45 @@ const ProductPage = () => {
                 <div className="text-base text-muted-foreground leading-relaxed whitespace-pre-line">{product.description}</div>
               </div>
             )}
-            <p className="text-sm text-muted-foreground mb-4">الوحدة: {product.unit}</p>
+            <div className="grid grid-cols-2 gap-2 text-sm mb-6">
+              {product.brand && (
+                <div className="rounded-lg bg-muted/50 px-3 py-2">
+                  <p className="text-muted-foreground text-xs">الماركة</p>
+                  <p className="font-medium">{product.brand}</p>
+                </div>
+              )}
+              {product.origin_country && (
+                <div className="rounded-lg bg-muted/50 px-3 py-2">
+                  <p className="text-muted-foreground text-xs">بلد المنشأ</p>
+                  <p className="font-medium">{product.origin_country}</p>
+                </div>
+              )}
+              {product.size_label && (
+                <div className="rounded-lg bg-muted/50 px-3 py-2">
+                  <p className="text-muted-foreground text-xs">الحجم</p>
+                  <p className="font-medium">{product.size_label}</p>
+                </div>
+              )}
+              {product.product_form && (
+                <div className="rounded-lg bg-muted/50 px-3 py-2">
+                  <p className="text-muted-foreground text-xs">شكل المنتج</p>
+                  <p className="font-medium">{product.product_form}</p>
+                </div>
+              )}
+              {product.barcode && (
+                <div className="rounded-lg bg-muted/50 px-3 py-2">
+                  <p className="text-muted-foreground text-xs">الباركود</p>
+                  <p className="font-medium dir-ltr" dir="ltr">{product.barcode}</p>
+                </div>
+              )}
+              <div className="rounded-lg bg-muted/50 px-3 py-2">
+                <p className="text-muted-foreground text-xs">الوحدة</p>
+                <p className="font-medium">{product.unit}</p>
+              </div>
+            </div>
+            {product.extra_label && (
+              <p className="text-sm text-primary font-medium mb-4">{product.extra_label}</p>
+            )}
 
             {cartItem ? (
               <div className="flex items-center gap-3 mb-4">
@@ -114,8 +160,32 @@ const ProductPage = () => {
 
           <div className="order-1 md:order-2">
             <div className="aspect-square rounded-2xl overflow-hidden bg-white border sticky top-24">
-              <img src={product.image || "/placeholder.png"} alt={product.name} className="w-full h-full object-contain p-8" />
+              <img
+                src={mainImage}
+                alt={product.name}
+                className="w-full h-full object-contain p-8"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "/placeholder.png";
+                }}
+              />
             </div>
+            {gallery.length > 1 && (
+              <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+                {gallery.map((src) => (
+                  <button
+                    key={src}
+                    type="button"
+                    onClick={() => setActiveImage(src)}
+                    className={`shrink-0 w-16 h-16 rounded-lg border overflow-hidden bg-white ${
+                      mainImage === src ? "ring-2 ring-primary" : ""
+                    }`}
+                  >
+                    <img src={src} alt="" className="w-full h-full object-contain p-1" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

@@ -10,10 +10,52 @@ const EXTRA_BY_SECTION: Record<string, string[]> = {
   home: ["plastics-section", "charcoal-gas", "cooking-tools", "summer-resort-goods"],
 };
 
+const CategoryTile = ({
+  to,
+  name,
+  image,
+  showCaption,
+}: {
+  to: string;
+  name: string;
+  image: string;
+  showCaption?: boolean;
+}) => {
+  const isPlaceholder =
+    !image || image === "/placeholder.png" || image.endsWith("placeholder.png");
+
+  return (
+    <Link to={to} className="group block">
+      <div className="aspect-square rounded-2xl overflow-hidden bg-[#f8f8f9] border border-black/[0.03] hover:shadow-sm transition-all duration-300 relative">
+        <img
+          src={image}
+          alt={name}
+          className={`w-full h-full transition-transform duration-500 group-hover:scale-[1.03] ${
+            isPlaceholder ? "object-contain p-6" : "object-cover"
+          }`}
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "/placeholder.png";
+            e.currentTarget.classList.add("object-contain", "p-6");
+            e.currentTarget.classList.remove("object-cover");
+          }}
+        />
+      </div>
+      {showCaption ? (
+        <p className="text-center text-xs sm:text-sm font-semibold mt-2 text-foreground leading-tight line-clamp-2">
+          {name}
+        </p>
+      ) : null}
+    </Link>
+  );
+};
+
 const HomeSections = () => {
   const { lang } = useLanguage();
   const { data: dbCategories } = useCategories();
   const dbBySlug = new Map((dbCategories || []).map((c) => [c.slug, c]));
+  const showCaption = lang === "en";
 
   return (
     <div className="space-y-10">
@@ -40,60 +82,26 @@ const HomeSections = () => {
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
               {sectionCats.map((cat) => {
                 const db = dbBySlug.get(cat.id);
-                const image = cat.image || db?.image || "/placeholder.png";
+                const image = db?.image || cat.image || "/placeholder.png";
                 return (
-                  <Link key={cat.id} to={`/category/${cat.id}`} className="group block">
-                    <div className="aspect-square rounded-2xl overflow-hidden bg-muted/30 hover:shadow-lg transition-all duration-300 relative flex items-center justify-center">
-                      <img
-                        src={image}
-                        alt={lang === "ar" ? cat.name : cat.nameEn}
-                        className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
-                          image === "/placeholder.png" || image.endsWith("placeholder.png")
-                            ? "object-contain p-4"
-                            : "object-cover"
-                        }`}
-                        loading="lazy"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = "/placeholder.png";
-                          e.currentTarget.classList.add("object-contain", "p-4");
-                          e.currentTarget.classList.remove("object-cover");
-                        }}
-                      />
-                    </div>
-                    <p className="text-center text-xs sm:text-sm font-semibold mt-2 text-foreground leading-tight line-clamp-2">
-                      {lang === "ar" ? cat.name : cat.nameEn}
-                    </p>
-                  </Link>
+                  <CategoryTile
+                    key={cat.id}
+                    to={`/category/${cat.id}`}
+                    name={lang === "ar" ? cat.name : cat.nameEn}
+                    image={image}
+                    showCaption={showCaption}
+                  />
                 );
               })}
-              {extras.map((cat) => {
-                const isPlaceholder =
-                  !cat.image || cat.image === "/placeholder.png" || cat.image.endsWith("placeholder.png");
-                return (
-                <Link key={cat.id} to={`/category/${cat.id}`} className="group block">
-                  <div className="aspect-square rounded-2xl overflow-hidden bg-muted/30 hover:shadow-lg transition-all duration-300 relative flex items-center justify-center">
-                    <img
-                      src={cat.image}
-                      alt={lang === "ar" ? cat.name : cat.nameEn}
-                      className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
-                        isPlaceholder ? "object-contain p-4" : "object-cover"
-                      }`}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = "/placeholder.png";
-                        e.currentTarget.classList.add("object-contain", "p-4");
-                        e.currentTarget.classList.remove("object-cover");
-                      }}
-                    />
-                  </div>
-                  <p className="text-center text-xs sm:text-sm font-semibold mt-2 text-foreground leading-tight line-clamp-2">
-                    {lang === "ar" ? cat.name : cat.nameEn}
-                  </p>
-                </Link>
-                );
-              })}
+              {extras.map((cat) => (
+                <CategoryTile
+                  key={cat.id}
+                  to={`/category/${cat.id}`}
+                  name={lang === "ar" ? cat.name : cat.nameEn}
+                  image={cat.image}
+                  showCaption={showCaption}
+                />
+              ))}
             </div>
           </section>
         );

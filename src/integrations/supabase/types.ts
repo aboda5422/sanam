@@ -719,18 +719,24 @@ export type Database = {
       products: {
         Row: {
           barcode: string | null
+          brand: string | null
           category_id: string | null
           cost_price: number | null
           created_at: string
           description: string | null
+          extra_label: string | null
+          gallery_urls: string[] | null
           id: string
           image: string | null
           is_active: boolean
           is_featured: boolean
           name: string
           name_en: string | null
+          origin_country: string | null
           original_price: number | null
           price: number
+          product_form: string | null
+          size_label: string | null
           sort_order: number
           stock_quantity: number
           unit: string
@@ -738,18 +744,24 @@ export type Database = {
         }
         Insert: {
           barcode?: string | null
+          brand?: string | null
           category_id?: string | null
           cost_price?: number | null
           created_at?: string
           description?: string | null
+          extra_label?: string | null
+          gallery_urls?: string[] | null
           id?: string
           image?: string | null
           is_active?: boolean
           is_featured?: boolean
           name: string
           name_en?: string | null
+          origin_country?: string | null
           original_price?: number | null
           price?: number
+          product_form?: string | null
+          size_label?: string | null
           sort_order?: number
           stock_quantity?: number
           unit?: string
@@ -757,18 +769,24 @@ export type Database = {
         }
         Update: {
           barcode?: string | null
+          brand?: string | null
           category_id?: string | null
           cost_price?: number | null
           created_at?: string
           description?: string | null
+          extra_label?: string | null
+          gallery_urls?: string[] | null
           id?: string
           image?: string | null
           is_active?: boolean
           is_featured?: boolean
           name?: string
           name_en?: string | null
+          origin_country?: string | null
           original_price?: number | null
           price?: number
+          product_form?: string | null
+          size_label?: string | null
           sort_order?: number
           stock_quantity?: number
           unit?: string

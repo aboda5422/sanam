@@ -5,6 +5,13 @@ import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { categorySections, categories } from "@/data/store-data";
 import logoMark from "@/assets/logo-mark.png";
 import logoFullLight from "@/assets/logo-full-light.png";
@@ -127,16 +134,20 @@ const Header = () => {
               </SheetHeader>
               <div className="p-4 space-y-4">
                 {user ? (
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-xl">
+                  <div className="p-3 bg-muted rounded-xl space-y-2">
                     <Link
                       to="/profile"
-                      className="flex items-center gap-2 flex-1"
+                      className="flex items-center gap-2"
                     >
                       <User className="h-5 w-5 text-primary" />
                       <span className="font-medium text-sm">{user.user_metadata?.full_name || t("حسابي", "My Account")}</span>
                     </Link>
-                    <button onClick={handleLogout} className="text-muted-foreground hover:text-destructive">
-                      <LogOut className="h-5 w-5" />
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 w-full pt-2 border-t border-border/60 text-sm text-destructive"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>{t("تسجيل الخروج", "Sign out")}</span>
                     </button>
                   </div>
                 ) : (
@@ -326,21 +337,36 @@ const Header = () => {
         {!isMobile && (
           <>
             {user ? (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => navigate("/profile")}
-                  className="flex items-center gap-2 bg-primary/10 hover:bg-primary/15 text-primary rounded-full px-3 py-2 transition-colors cursor-pointer text-sm font-semibold"
-                >
-                  <User className="h-5 w-5" />
-                  <span className="hidden sm:inline">{user.user_metadata?.full_name || t("حسابي", "Account")}</span>
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-1 p-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-muted transition-colors"
-                >
-                  <LogOut className="h-5 w-5" />
-                </button>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 bg-primary/10 hover:bg-primary/15 text-primary rounded-full px-3 py-2 transition-colors cursor-pointer text-sm font-semibold outline-none"
+                  >
+                    <User className="h-5 w-5" />
+                    <span className="hidden sm:inline max-w-[120px] truncate">
+                      {user.user_metadata?.full_name || t("حسابي", "Account")}
+                    </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => navigate("/profile")}
+                  >
+                    <User className="h-4 w-4 ml-2" />
+                    {t("حسابي", "My Account")}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer text-destructive focus:text-destructive"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-4 w-4 ml-2" />
+                    {t("تسجيل الخروج", "Sign out")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link
                 to="/auth"

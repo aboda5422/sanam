@@ -80,6 +80,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
             {product.name}
           </h3>
         </Link>
+        {(product.brand || product.size_label) && (
+          <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">
+            {[product.brand, product.size_label].filter(Boolean).join(" · ")}
+          </p>
+        )}
+        {product.extra_label && (
+          <p className="text-[10px] text-primary mt-0.5 line-clamp-1">{product.extra_label}</p>
+        )}
       </div>
     </div>
   );

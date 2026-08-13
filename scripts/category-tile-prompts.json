@@ -1,0 +1,1042 @@
+[
+  {
+    "slug": "latest-offers",
+    "name": "أحدث العروض",
+    "section": "offers",
+    "glow": "soft warm peach-orange glow",
+    "subject": "two promotional grocery items side by side: a branded juice bottle and a snack pack with red SALE feel, filling lower half",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أحدث العروض\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm peach-orange glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: two promotional grocery items side by side: a branded juice bottle and a snack pack with red SALE feel, filling lower half. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-cheese",
+    "name": "أجبان",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "ONE large block/wedge of cheese and a small cheese pack beside it, filling the frame generously",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أجبان\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE large block/wedge of cheese and a small cheese pack beside it, filling the frame generously. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-fish",
+    "name": "أسماك",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "ONE whole fresh fish and a few fillets as a single neat seafood still-life, NO plate",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أسماك\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE whole fresh fish and a few fillets as a single neat seafood still-life, NO plate. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-herbs",
+    "name": "أعشاب",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "a generous bunch of fresh green herbs (parsley, mint, coriander) tied together, filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أعشاب\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: a generous bunch of fresh green herbs (parsley, mint, coriander) tied together, filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-dairy",
+    "name": "ألبان",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "ONE large milk bottle and ONE yogurt cup side by side, famous grocery dairy look, filling lower half",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"ألبان\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE large milk bottle and ONE yogurt cup side by side, famous grocery dairy look, filling lower half. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-eggs",
+    "name": "بيض",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "ONE large cardboard egg tray packed with white eggs filling most of the lower two-thirds of the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"بيض\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE large cardboard egg tray packed with white eggs filling most of the lower two-thirds of the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-vegetables",
+    "name": "خضروات",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "a rich freestanding pile of fresh vegetables (tomato, cucumber, pepper, lettuce) with NO bowl/plate",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"خضروات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: a rich freestanding pile of fresh vegetables (tomato, cucumber, pepper, lettuce) with NO bowl/plate. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-poultry",
+    "name": "دواجن",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "raw fresh chicken pieces neatly arranged as ONE subject, supermarket quality, NO plate clutter",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"دواجن\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: raw fresh chicken pieces neatly arranged as ONE subject, supermarket quality, NO plate clutter. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-fresh-juices",
+    "name": "عصائر طازجة",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "TWO fresh juice bottles side by side, clear labels, filling lower half",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"عصائر طازجة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO fresh juice bottles side by side, clear labels, filling lower half. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-fruits",
+    "name": "فواكه",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "a generous freestanding pile of many fresh fruits with NO bowl/plate: grapes apples oranges bananas strawberries kiwi",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"فواكه\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: a generous freestanding pile of many fresh fruits with NO bowl/plate: grapes apples oranges bananas strawberries kiwi. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-meat",
+    "name": "لحوم",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "fresh red meat cuts arranged as one neat butcher still-life, filling frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"لحوم\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: fresh red meat cuts arranged as one neat butcher still-life, filling frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-seafood",
+    "name": "مأكولات بحرية",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "shrimp and seafood pieces as one neat pile, NO plate",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مأكولات بحرية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: shrimp and seafood pieces as one neat pile, NO plate. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-chilled",
+    "name": "منتجات مبردة",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "ONE chilled dairy/juice carton and a yogurt, cold grocery look",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"منتجات مبردة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE chilled dairy/juice carton and a yogurt, cold grocery look. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "daily-ready-meals",
+    "name": "وجبات جاهزة",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "ONE ready meal tray and a sandwich pack side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"وجبات جاهزة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE ready meal tray and a sandwich pack side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-ice-cream",
+    "name": "آيس كريم",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO ice cream tubs/pops side by side, famous dessert brands look",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"آيس كريم\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO ice cream tubs/pops side by side, famous dessert brands look. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-rice",
+    "name": "أرز",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE large rice bag standing upright filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أرز\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE large rice bag standing upright filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-frozen-fish",
+    "name": "أسماك مجمدة",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE frozen fish pack filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أسماك مجمدة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE frozen fish pack filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-world-foods",
+    "name": "أغذية عالمية",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO international pantry jars/packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أغذية عالمية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO international pantry jars/packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-frozen-fries-sides",
+    "name": "بطاطس ومقبلات",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE frozen fries bag filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"بطاطس ومقبلات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE frozen fries bag filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-pulses",
+    "name": "بقوليات",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE large lentils/beans bag filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"بقوليات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE large lentils/beans bag filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-spices",
+    "name": "بهارات",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO spice jars side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"بهارات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO spice jars side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-pizza",
+    "name": "بيتزا",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE frozen pizza box filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"بيتزا\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE frozen pizza box filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-tuna",
+    "name": "تونة",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO tuna cans side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"تونة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO tuna cans side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-frozen-vegetables",
+    "name": "خضروات مجمدة",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE frozen vegetables bag filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"خضروات مجمدة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE frozen vegetables bag filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-flour",
+    "name": "دقيق",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE flour bag standing upright filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"دقيق\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE flour bag standing upright filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-frozen-poultry",
+    "name": "دواجن مجمدة",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE frozen chicken pack filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"دواجن مجمدة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE frozen chicken pack filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-oils",
+    "name": "زيوت",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO cooking oil bottles side by side (sunflower/olive)",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"زيوت\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO cooking oil bottles side by side (sunflower/olive). Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-sugar",
+    "name": "سكر",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE sugar pack filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"سكر\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE sugar pack filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-ghee",
+    "name": "سمن",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE ghee tin filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"سمن\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE ghee tin filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-soups",
+    "name": "شوربات",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO soup cans/cartons side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"شوربات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO soup cans/cartons side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-chips-snacks",
+    "name": "شيبس ومقبلات",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO famous chip bags side by side (e.g. Lay's style)",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"شيبس ومقبلات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO famous chip bags side by side (e.g. Lay's style). Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-sauces",
+    "name": "صلصات",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO sauce bottles side by side (ketchup/mayonnaise)",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"صلصات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO sauce bottles side by side (ketchup/mayonnaise). Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-frozen-meat",
+    "name": "لحوم مجمدة",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE frozen meat pack filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"لحوم مجمدة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE frozen meat pack filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-pickles",
+    "name": "مخللات",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO pickle jars side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مخللات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO pickle jars side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-jam-honey",
+    "name": "مربى وعسل",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE jam jar and ONE honey jar side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مربى وعسل\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE jam jar and ONE honey jar side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-frozen-pastry",
+    "name": "معجنات مجمدة",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE frozen pastry pack filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"معجنات مجمدة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE frozen pastry pack filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-pasta",
+    "name": "معكرونة",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO pasta packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"معكرونة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO pasta packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-canned-food",
+    "name": "معلبات",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO canned food cans side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"معلبات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO canned food cans side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-other",
+    "name": "منتجات أخرى",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "TWO pantry grocery packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"منتجات أخرى\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO pantry grocery packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-breakfast",
+    "name": "منتجات الفطور",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE cereal box and ONE oats pack side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"منتجات الفطور\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE cereal box and ONE oats pack side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pantry-ready-meals",
+    "name": "وجبات جاهزة",
+    "section": "pantry",
+    "glow": "soft warm cream-beige glow",
+    "subject": "ONE ready meal pack filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"وجبات جاهزة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm cream-beige glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE ready meal pack filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "drinks-tea",
+    "name": "شاي",
+    "section": "drinks",
+    "glow": "soft light blue glow",
+    "subject": "TWO famous tea boxes side by side: classic yellow Lipton Yellow Label and red Rabea tea, filling lower half",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"شاي\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO famous tea boxes side by side: classic yellow Lipton Yellow Label and red Rabea tea, filling lower half. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "drinks-concentrates",
+    "name": "شراب مركز",
+    "section": "drinks",
+    "glow": "soft light blue glow",
+    "subject": "TWO juice concentrate bottles/cartons side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"شراب مركز\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO juice concentrate bottles/cartons side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "drinks-juices",
+    "name": "عصائر",
+    "section": "drinks",
+    "glow": "soft light blue glow",
+    "subject": "TWO famous juice cartons side by side filling lower half",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"عصائر\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO famous juice cartons side by side filling lower half. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "drinks-coffee",
+    "name": "قهوة",
+    "section": "drinks",
+    "glow": "soft light blue glow",
+    "subject": "TWO coffee packs/jars side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"قهوة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO coffee packs/jars side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "drinks-hot-drinks",
+    "name": "مشروبات ساخنة",
+    "section": "drinks",
+    "glow": "soft light blue glow",
+    "subject": "ONE hot chocolate tin and ONE powdered drink pack side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مشروبات ساخنة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE hot chocolate tin and ONE powdered drink pack side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "drinks-energy-drinks",
+    "name": "مشروبات طاقة",
+    "section": "drinks",
+    "glow": "soft light blue glow",
+    "subject": "TWO energy drink cans side by side (Red Bull style)",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مشروبات طاقة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO energy drink cans side by side (Red Bull style). Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "drinks-soft-drinks",
+    "name": "مشروبات غازية",
+    "section": "drinks",
+    "glow": "soft light blue glow",
+    "subject": "TWO soft drink bottles/cans side by side (Coca-Cola and Pepsi style)",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مشروبات غازية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO soft drink bottles/cans side by side (Coca-Cola and Pepsi style). Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "drinks-water",
+    "name": "مياه",
+    "section": "drinks",
+    "glow": "soft light blue glow",
+    "subject": "TWO mineral water bottles side by side filling lower half",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مياه\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO mineral water bottles side by side filling lower half. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "snacks-biscuits",
+    "name": "بسكويت",
+    "section": "snacks",
+    "glow": "soft light blue glow",
+    "subject": "TWO famous biscuit packs side by side (Oreo style)",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"بسكويت\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO famous biscuit packs side by side (Oreo style). Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "snacks-dates",
+    "name": "تمور",
+    "section": "snacks",
+    "glow": "soft light blue glow",
+    "subject": "ONE dates box filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"تمور\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE dates box filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "snacks-toast",
+    "name": "توست",
+    "section": "snacks",
+    "glow": "soft light blue glow",
+    "subject": "ONE toast/rusk pack filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"توست\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE toast/rusk pack filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "snacks-sweets",
+    "name": "حلويات",
+    "section": "snacks",
+    "glow": "soft light blue glow",
+    "subject": "ONE open baklava tin and ONE chocolate candy container side by side on soft glow, no clutter",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"حلويات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE open baklava tin and ONE chocolate candy container side by side on soft glow, no clutter. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "snacks-bread",
+    "name": "خبز",
+    "section": "snacks",
+    "glow": "soft light blue glow",
+    "subject": "fresh bakery bread loaves as one neat pile, NO plate",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"خبز\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: fresh bakery bread loaves as one neat pile, NO plate. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "snacks-chocolate",
+    "name": "شوكولاتة",
+    "section": "snacks",
+    "glow": "soft light blue glow",
+    "subject": "TWO famous chocolate bars side by side (KitKat/Snickers style)",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"شوكولاتة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO famous chocolate bars side by side (KitKat/Snickers style). Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "snacks-croissant",
+    "name": "كرواسون",
+    "section": "snacks",
+    "glow": "soft light blue glow",
+    "subject": "fresh croissants as one neat pile, NO plate",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"كرواسون\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: fresh croissants as one neat pile, NO plate. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "snacks-cake",
+    "name": "كيك",
+    "section": "snacks",
+    "glow": "soft light blue glow",
+    "subject": "ONE packaged cake and ONE cake slice box side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"كيك\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE packaged cake and ONE cake slice box side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "snacks-pastries",
+    "name": "معجنات",
+    "section": "snacks",
+    "glow": "soft light blue glow",
+    "subject": "assorted pastries as one neat pile, NO plate",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"معجنات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: assorted pastries as one neat pile, NO plate. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "snacks-nuts",
+    "name": "مكسرات",
+    "section": "snacks",
+    "glow": "soft light blue glow",
+    "subject": "a generous freestanding pile of mixed nuts with NO bowl",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مكسرات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: a generous freestanding pile of mixed nuts with NO bowl. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "makeup-cosmetics",
+    "name": "مستحضرات التجميل",
+    "section": "makeup",
+    "glow": "soft blush pink glow",
+    "subject": "TWO makeup products side by side (lipstick and foundation)",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مستحضرات التجميل\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO makeup products side by side (lipstick and foundation). Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-men-s-shaving",
+    "name": "الحلاقة الرجالية",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "ONE shaving foam and ONE razor pack side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"الحلاقة الرجالية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE shaving foam and ONE razor pack side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-women-s-shaving",
+    "name": "الحلاقة النسائية",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "ONE women shaving product and ONE cream side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"الحلاقة النسائية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE women shaving product and ONE cream side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-perfumes",
+    "name": "العطور",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "TWO perfume bottles side by side, elegant",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"العطور\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO perfume bottles side by side, elegant. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-skin-care",
+    "name": "العناية بالبشرة",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "TWO skincare bottles/jars side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"العناية بالبشرة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO skincare bottles/jars side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-hair-care",
+    "name": "العناية بالشعر",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "TWO hair care bottles side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"العناية بالشعر\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO hair care bottles side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-face-care",
+    "name": "العناية بالوجه",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "TWO face cream jars side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"العناية بالوجه\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO face cream jars side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-conditioner",
+    "name": "بلسم",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "ONE conditioner bottle filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"بلسم\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE conditioner bottle filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-shampoo",
+    "name": "شامبو",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "TWO shampoo bottles side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"شامبو\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO shampoo bottles side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-soap",
+    "name": "صابون",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "TWO soap bars/packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"صابون\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO soap bars/packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-body-wash",
+    "name": "غسول الجسم",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "TWO body wash bottles side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"غسول الجسم\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO body wash bottles side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-toothbrushes",
+    "name": "فرش الأسنان",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "TWO toothbrush packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"فرش الأسنان\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO toothbrush packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-deodorants",
+    "name": "مزيلات العرق",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "TWO deodorant sticks/sprays side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مزيلات العرق\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO deodorant sticks/sprays side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "beauty-toothpaste",
+    "name": "معجون الأسنان",
+    "section": "beauty",
+    "glow": "soft blush pink glow",
+    "subject": "TWO toothpaste tubes side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"معجون الأسنان\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft blush pink glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO toothpaste tubes side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-storage",
+    "name": "أدوات التخزين",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO storage containers side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أدوات التخزين\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO storage containers side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-cleaning-tools",
+    "name": "أدوات التنظيف",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "ONE mop/broom and cleaning cloths as one neat set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أدوات التنظيف\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE mop/broom and cleaning cloths as one neat set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-kitchen-tools",
+    "name": "أدوات المطبخ",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "kitchen utensils as one neat set, NO clutter",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أدوات المطبخ\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: kitchen utensils as one neat set, NO clutter. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-cups",
+    "name": "أكواب",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO cups/mugs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أكواب\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO cups/mugs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-shopping-bags",
+    "name": "أكياس تسوق",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO reusable shopping bags side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أكياس تسوق\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO reusable shopping bags side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-garbage-bags",
+    "name": "أكياس نفايات",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "ONE garbage bags pack filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أكياس نفايات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE garbage bags pack filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-sponges-brushes",
+    "name": "إسفنج وفرش",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "sponges and brushes as one neat cleaning set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"إسفنج وفرش\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: sponges and brushes as one neat cleaning set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-outdoor-lighting",
+    "name": "إضاءة خارجية",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "ONE clear representative grocery product for category 'إضاءة خارجية', filling lower half generously",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"إضاءة خارجية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE clear representative grocery product for category 'إضاءة خارجية', filling lower half generously. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-accessories",
+    "name": "إكسسوارات",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO home accessory items side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"إكسسوارات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO home accessory items side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-camping",
+    "name": "تخييم",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "camping lantern and thermos as one neat set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"تخييم\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: camping lantern and thermos as one neat set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-food-wrap-storage",
+    "name": "حفظ وتغليف الطعام",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "ONE cling film and ONE foil pack side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"حفظ وتغليف الطعام\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE cling film and ONE foil pack side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-bags",
+    "name": "حقائب",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO household bags side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"حقائب\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO household bags side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-home-decor",
+    "name": "ديكور المنزل",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "ONE decor item filling the frame tastefully",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"ديكور المنزل\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE decor item filling the frame tastefully. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-flowers-plants",
+    "name": "زهور ونباتات",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "ONE potted plant filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"زهور ونباتات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE potted plant filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-grills",
+    "name": "شوايات",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "ONE small grill/BBQ accessory filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"شوايات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE small grill/BBQ accessory filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-plates",
+    "name": "صحون",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO plates side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"صحون\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO plates side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-charcoal",
+    "name": "فحم",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "ONE charcoal bag filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"فحم\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE charcoal bag filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-garden-supplies",
+    "name": "مستلزمات الحديقة",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "garden tools/supplies as one neat set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مستلزمات الحديقة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: garden tools/supplies as one neat set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-bathroom-essentials",
+    "name": "مستلزمات الحمام",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO bathroom essentials side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مستلزمات الحمام\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO bathroom essentials side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-air-fresheners",
+    "name": "معطرات",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO air freshener packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"معطرات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO air freshener packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-insect-control",
+    "name": "مكافحة الحشرات",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "ONE insect control spray/pack filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مكافحة الحشرات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE insect control spray/pack filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-men-clothing",
+    "name": "ملابس رجالية",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "folded men clothing items as one neat stack",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"ملابس رجالية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: folded men clothing items as one neat stack. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-women-clothing",
+    "name": "ملابس نسائية",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "folded women clothing items as one neat stack",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"ملابس نسائية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: folded women clothing items as one neat stack. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-tissues",
+    "name": "مناديل",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO tissue packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مناديل\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO tissue packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-floor-cleaners",
+    "name": "منظفات الأرضيات",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO floor cleaner bottles side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"منظفات الأرضيات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO floor cleaner bottles side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-bathroom-cleaners",
+    "name": "منظفات الحمام",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO bathroom cleaner bottles side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"منظفات الحمام\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO bathroom cleaner bottles side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-kitchen-cleaners",
+    "name": "منظفات المطبخ",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "TWO kitchen cleaner bottles side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"منظفات المطبخ\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO kitchen cleaner bottles side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "home-laundry",
+    "name": "منظفات الملابس",
+    "section": "home",
+    "glow": "soft cool grey-blue glow",
+    "subject": "ONE detergent bottle and ONE softener side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"منظفات الملابس\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey-blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE detergent bottle and ONE softener side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "electronics-small-appliances",
+    "name": "أجهزة صغيرة",
+    "section": "electronics",
+    "glow": "soft cool grey glow",
+    "subject": "ONE small kitchen appliance filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أجهزة صغيرة\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE small kitchen appliance filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "electronics-phone-accessories",
+    "name": "إكسسوارات جوال",
+    "section": "electronics",
+    "glow": "soft cool grey glow",
+    "subject": "phone case and charger as one neat set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"إكسسوارات جوال\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: phone case and charger as one neat set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "electronics-car-accessories",
+    "name": "إكسسوارات سيارات",
+    "section": "electronics",
+    "glow": "soft cool grey glow",
+    "subject": "TWO car accessory items side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"إكسسوارات سيارات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO car accessory items side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "electronics-batteries",
+    "name": "بطاريات",
+    "section": "electronics",
+    "glow": "soft cool grey glow",
+    "subject": "TWO battery packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"بطاريات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO battery packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "electronics-mobiles",
+    "name": "جوالات",
+    "section": "electronics",
+    "glow": "soft cool grey glow",
+    "subject": "ONE smartphone filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"جوالات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE smartphone filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "electronics-smartwatches",
+    "name": "ساعات ذكية",
+    "section": "electronics",
+    "glow": "soft cool grey glow",
+    "subject": "ONE smartwatch filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"ساعات ذكية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE smartwatch filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "electronics-headphones",
+    "name": "سماعات",
+    "section": "electronics",
+    "glow": "soft cool grey glow",
+    "subject": "ONE headphones product filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"سماعات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE headphones product filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "electronics-chargers",
+    "name": "شواحن",
+    "section": "electronics",
+    "glow": "soft cool grey glow",
+    "subject": "TWO chargers/cables packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"شواحن\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO chargers/cables packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "electronics-cables",
+    "name": "كيابل",
+    "section": "electronics",
+    "glow": "soft cool grey glow",
+    "subject": "TWO cable packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"كيابل\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO cable packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "electronics-car-fresheners",
+    "name": "معطرات سيارات",
+    "section": "electronics",
+    "glow": "soft cool grey glow",
+    "subject": "TWO car freshener packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"معطرات سيارات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO car freshener packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "electronics-car-cleaners",
+    "name": "منظفات سيارات",
+    "section": "electronics",
+    "glow": "soft cool grey glow",
+    "subject": "TWO car cleaner bottles side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"منظفات سيارات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft cool grey glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO car cleaner bottles side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "baby-diapers",
+    "name": "حفاضات",
+    "section": "baby",
+    "glow": "soft pastel mint glow",
+    "subject": "ONE diaper pack filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"حفاضات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft pastel mint glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE diaper pack filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "baby-baby-wipes",
+    "name": "مناديل أطفال",
+    "section": "baby",
+    "glow": "soft pastel mint glow",
+    "subject": "TWO baby wipes packs side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مناديل أطفال\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft pastel mint glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO baby wipes packs side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pets-pet-accessories",
+    "name": "إكسسوارات الحيوانات",
+    "section": "pets",
+    "glow": "soft warm sand glow",
+    "subject": "pet bowl and toy as one neat set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"إكسسوارات الحيوانات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm sand glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: pet bowl and toy as one neat set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pets-cat-litter",
+    "name": "رمل القطط",
+    "section": "pets",
+    "glow": "soft warm sand glow",
+    "subject": "ONE cat litter bag filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"رمل القطط\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm sand glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE cat litter bag filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "pets-cat-food",
+    "name": "طعام القطط",
+    "section": "pets",
+    "glow": "soft warm sand glow",
+    "subject": "TWO cat food packs/cans side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"طعام القطط\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft warm sand glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO cat food packs/cans side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "toys-kids-toys",
+    "name": "ألعاب أطفال",
+    "section": "toys",
+    "glow": "soft sky blue glow",
+    "subject": "TWO kids toys side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"ألعاب أطفال\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft sky blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO kids toys side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "toys-electronic-toys",
+    "name": "ألعاب إلكترونية",
+    "section": "toys",
+    "glow": "soft sky blue glow",
+    "subject": "ONE electronic toy filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"ألعاب إلكترونية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft sky blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE electronic toy filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "toys-educational-toys",
+    "name": "ألعاب تعليمية",
+    "section": "toys",
+    "glow": "soft sky blue glow",
+    "subject": "educational toys as one neat set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"ألعاب تعليمية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft sky blue glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: educational toys as one neat set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "stationery-office-supplies",
+    "name": "أدوات مكتبية",
+    "section": "stationery",
+    "glow": "soft pale yellow glow",
+    "subject": "office supplies as one neat set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أدوات مكتبية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft pale yellow glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: office supplies as one neat set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "stationery-pens",
+    "name": "أقلام",
+    "section": "stationery",
+    "glow": "soft pale yellow glow",
+    "subject": "pens set filling the frame",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"أقلام\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft pale yellow glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: pens set filling the frame. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "stationery-notebooks",
+    "name": "دفاتر",
+    "section": "stationery",
+    "glow": "soft pale yellow glow",
+    "subject": "TWO notebooks side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"دفاتر\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft pale yellow glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: TWO notebooks side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "stationery-school-supplies",
+    "name": "مستلزمات مدرسية",
+    "section": "stationery",
+    "glow": "soft pale yellow glow",
+    "subject": "school supplies kit as one neat set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"مستلزمات مدرسية\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft pale yellow glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: school supplies kit as one neat set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "plastics-section",
+    "name": "قسم البلاستيكات",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "plastic household items as one neat set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"قسم البلاستيكات\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: plastic household items as one neat set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "charcoal-gas",
+    "name": "قسم الفحم والغاز",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "ONE charcoal bag and a small gas canister side by side",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"قسم الفحم والغاز\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: ONE charcoal bag and a small gas canister side by side. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "roastery-weighed",
+    "name": "قسم المحمصة (بالميزان)",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "roasted nuts/coffee weighed goods as one generous pile, NO bowl",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"قسم المحمصة (بالميزان)\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: roasted nuts/coffee weighed goods as one generous pile, NO bowl. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "cheese-pickles-weighed",
+    "name": "قسم الأجبان والمخللات (بالميزان)",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "cheese and pickles weighed deli items as one neat still-life, NO plate clutter",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"قسم الأجبان والمخللات (بالميزان)\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: cheese and pickles weighed deli items as one neat still-life, NO plate clutter. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "cooking-tools",
+    "name": "قسم أدوات الطهي",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "cooking tools as one neat set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"قسم أدوات الطهي\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: cooking tools as one neat set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  },
+  {
+    "slug": "summer-resort-goods",
+    "name": "قسم خردوات المصيف",
+    "section": "daily",
+    "glow": "soft light green glow",
+    "subject": "summer beach/resort goods as one neat set",
+    "prompt": "Square supermarket category card UI, 1:1, clean modern grocery app like Ninja/Carrefour/Lulu. Soft off-white background. Top center ONLY Arabic title \"قسم خردوات المصيف\" in bold black modern sans-serif — absolutely NO orange line, NO underline, NO colored bar under the text. Bottom ~15-20%: professional soft feathered soft light green glow semi-circular wash blending upward (same treatment as premium supermarket category tiles). Hero: summer beach/resort goods as one neat set. Soft realistic contact shadows only. Products fill the lower area generously like a hero shot. NO decorative shapes besides the soft bottom glow, NO frames, NO strong shadows, NO random multi-product collage clutter, NO busy background. High resolution studio product photo."
+  }
+]
