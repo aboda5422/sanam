@@ -16,7 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Loader2, MapPin, Plus, Pencil, ExternalLink, Store, Link2, UserPlus } from "lucide-react";
+import { Loader2, MapPin, Plus, Pencil, ExternalLink, Store, Link2, UserPlus, Clock } from "lucide-react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { mapsLinkFromCoords, parseMapsCoords } from "@/lib/maps-link";
 
@@ -30,12 +30,83 @@ type BranchRow = {
   lat?: number | null;
   lng?: number | null;
   is_active: boolean;
+  work_start?: string | null;
+  work_end?: string | null;
 };
 
 type StoreAdmin = {
   user_id: string;
   full_name: string | null;
   phone: string | null;
+};
+
+const toTimeInput = (value?: string | null, fallback = "08:00") => {
+  if (!value) return fallback;
+  return value.slice(0, 5);
+};
+
+const BranchHoursEditor = ({
+  branch,
+  canEdit,
+  saving,
+  onSave,
+}: {
+  branch: BranchRow;
+  canEdit: boolean;
+  saving: boolean;
+  onSave: (hours: { work_start: string; work_end: string }) => void;
+}) => {
+  const [start, setStart] = useState(() => toTimeInput(branch.work_start, "08:00"));
+  const [end, setEnd] = useState(() => toTimeInput(branch.work_end, "23:00"));
+
+  const dirty =
+    toTimeInput(start) !== toTimeInput(branch.work_start, "08:00") ||
+    toTimeInput(end) !== toTimeInput(branch.work_end, "23:00");
+
+  return (
+    <div className="rounded-lg bg-muted/50 p-3 text-xs space-y-2">
+      <p className="font-semibold flex items-center gap-1">
+        <Clock className="h-3.5 w-3.5" />
+        أوقات الدوام
+      </p>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <Label className="text-[11px]">بداية الدوام</Label>
+          <Input
+            type="time"
+            dir="ltr"
+            className="h-9"
+            value={start}
+            disabled={!canEdit}
+            onChange={(e) => setStart(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label className="text-[11px]">نهاية الدوام</Label>
+          <Input
+            type="time"
+            dir="ltr"
+            className="h-9"
+            value={end}
+            disabled={!canEdit}
+            onChange={(e) => setEnd(e.target.value)}
+          />
+        </div>
+      </div>
+      {canEdit && (
+        <Button
+          type="button"
+          size="sm"
+          className="h-8 w-full"
+          disabled={!dirty || saving || !start || !end}
+          onClick={() => onSave({ work_start: start, work_end: end })}
+        >
+          {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin ml-1" /> : null}
+          حفظ الدوام
+        </Button>
+      )}
+    </div>
+  );
 };
 
 const AdminBranchesContent = () => {
@@ -143,6 +214,26 @@ const AdminBranchesContent = () => {
       setLocationBranch(null);
     },
     onError: (e: any) => toast.error(e?.message || "تعذر حفظ الموقع"),
+  });
+
+  const saveHoursMutation = useMutation({
+    mutationFn: async ({
+      id,
+      work_start,
+      work_end,
+    }: {
+      id: string;
+      work_start: string;
+      work_end: string;
+    }) => {
+      const { error } = await supabase.from("branches").update({ work_start, work_end }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-branches"] });
+      toast.success("تم حفظ أوقات الدوام");
+    },
+    onError: (e: any) => toast.error(e?.message || "تعذر حفظ الدوام"),
   });
 
   const saveManagersMutation = useMutation({
@@ -388,6 +479,16 @@ const AdminBranchesContent = () => {
                     النطاق الجغرافي والشرائح الخاصة بهذا الفرع تُدار من «إعدادات التوصيل» بعد تعيين الموقع.
                   </p>
                 </div>
+
+                <BranchHoursEditor
+                  key={`${b.id}-${toTimeInput(b.work_start)}-${toTimeInput(b.work_end)}`}
+                  branch={b}
+                  canEdit={isSuperAdmin || (scopedBranchIds || []).includes(b.id)}
+                  saving={saveHoursMutation.isPending && saveHoursMutation.variables?.id === b.id}
+                  onSave={({ work_start, work_end }) =>
+                    saveHoursMutation.mutate({ id: b.id, work_start, work_end })
+                  }
+                />
 
                 {isSuperAdmin && (
                   <div className="rounded-lg bg-muted/50 p-3 text-xs space-y-2">

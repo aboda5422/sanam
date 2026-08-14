@@ -36,7 +36,7 @@ const BranchContext = createContext<BranchContextValue | null>(null);
 async function fetchBranches(): Promise<Branch[]> {
   const { data, error } = await supabase
     .from("branches")
-    .select("id, name, address, city, slug, lat, lng, phone, is_active")
+    .select("id, name, address, city, slug, lat, lng, phone, is_active, delivery_fee, free_delivery_threshold, min_order, work_start, work_end")
     .eq("is_active", true)
     .order("city", { ascending: true })
     .order("name", { ascending: true });
@@ -51,6 +51,11 @@ async function fetchBranches(): Promise<Branch[]> {
     lng: Number(b.lng),
     phone: b.phone,
     is_active: !!b.is_active,
+    delivery_fee: Number(b.delivery_fee ?? 10),
+    free_delivery_threshold: Number(b.free_delivery_threshold ?? 100),
+    min_order: Number(b.min_order ?? 20),
+    work_start: String(b.work_start || "08:00").slice(0, 5),
+    work_end: String(b.work_end || "23:00").slice(0, 5),
   }));
 }
 

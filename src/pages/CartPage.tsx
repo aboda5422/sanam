@@ -4,9 +4,14 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
+import { useBranch } from "@/contexts/BranchContext";
 
 const CartPage = () => {
   const { items, updateQuantity, removeItem, clearCart, totalPrice } = useCart();
+  const { selectedBranch } = useBranch();
+  const freeFrom = selectedBranch?.free_delivery_threshold ?? 100;
+  const baseFee = selectedBranch?.delivery_fee ?? 10;
+  const delivery = totalPrice >= freeFrom ? 0 : baseFee;
 
   if (items.length === 0) {
     return (
@@ -72,11 +77,11 @@ const CartPage = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">التوصيل</span>
-                <span className={totalPrice >= 100 ? "text-success" : ""}>{totalPrice >= 100 ? "مجاني" : "15 ر.س"}</span>
+                <span className={delivery === 0 ? "text-success" : ""}>{delivery === 0 ? "مجاني" : `${baseFee} ر.س`}</span>
               </div>
               <div className="border-t pt-2 mt-2 flex justify-between font-heading font-bold text-lg">
                 <span>الإجمالي</span>
-                <span className="text-primary">{(totalPrice + (totalPrice >= 100 ? 0 : 15)).toFixed(1)} ر.س</span>
+                <span className="text-primary">{(totalPrice + delivery).toFixed(1)} ر.س</span>
               </div>
             </div>
             <Link to="/checkout">

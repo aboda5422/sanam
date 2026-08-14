@@ -13,14 +13,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import {
   Users, Search, Ban, CheckCircle, Trash2, Percent,
-  Filter, RefreshCcw, ChevronDown, ShieldOff,
+  Filter, RefreshCcw, ChevronDown, ShieldOff, Download,
 } from "lucide-react";
+import * as XLSX from "xlsx";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -82,6 +83,46 @@ const FieldValue = ({
   );
 };
 
+const EXPORT_COLUMNS = [
+  { id: "full_name", label: "الاسم" },
+  { id: "phone", label: "الجوال" },
+  { id: "email", label: "الإيميل" },
+  { id: "national_address", label: "العنوان المختصر" },
+  { id: "city", label: "المدينة" },
+  { id: "status", label: "الحالة" },
+  { id: "discount_percent", label: "نسبة الخصم" },
+  { id: "order_count", label: "عدد الطلبات" },
+  { id: "total_spent", label: "إجمالي المشتريات" },
+  { id: "created_at", label: "تاريخ التسجيل" },
+] as const;
+
+type ExportColumnId = (typeof EXPORT_COLUMNS)[number]["id"];
+
+const customerExportValue = (c: CustomerProfile, col: ExportColumnId): string | number => {
+  switch (col) {
+    case "full_name":
+      return c.full_name?.trim() || "لا يوجد";
+    case "phone":
+      return c.phone?.trim() || "لا يوجد";
+    case "email":
+      return c.email?.trim() || "لا يوجد";
+    case "national_address":
+      return c.national_address?.trim() || "لا يوجد";
+    case "city":
+      return c.city?.trim() || "لا يوجد";
+    case "status":
+      return STATUS_META[c.status]?.label || c.status;
+    case "discount_percent":
+      return Number(c.discount_percent) || 0;
+    case "order_count":
+      return Number(c.order_count) || 0;
+    case "total_spent":
+      return Number(c.total_spent?.toFixed(2) ?? 0);
+    case "created_at":
+      return c.created_at ? new Date(c.created_at).toLocaleDateString("ar-SA") : "لا يوجد";
+  }
+};
+
 const AdminCustomersPage = () => {
   const [customers, setCustomers] = useState<CustomerProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,6 +137,10 @@ const AdminCustomersPage = () => {
   const [customerAddresses, setCustomerAddresses] = useState<any[]>([]);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportCols, setExportCols] = useState<Set<ExportColumnId>>(
+    () => new Set(EXPORT_COLUMNS.map((c) => c.id)),
+  );
 
   const fetchCustomers = async () => {
     setLoading(true);
@@ -109,7 +154,7 @@ const AdminCustomersPage = () => {
     const { data: staffRoles } = await supabase
       .from("user_roles")
       .select("user_id, role")
-      .in("role", ["store_admin", "site_admin", "driver"]);
+      .in("role", ["store_admin", "site_admin", "driver", "accountant", "inventory", "support"]);
     const staffIds = new Set((staffRoles || []).map((r) => r.user_id));
     const customerProfiles = profiles.filter((p) => !staffIds.has(p.user_id));
 
@@ -297,6 +342,32 @@ const AdminCustomersPage = () => {
 
   const noneSelected = selectedIds.size === 0;
 
+  const toggleExportCol = (id: ExportColumnId) => {
+    setExportCols((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleExportExcel = () => {
+    const cols = EXPORT_COLUMNS.filter((c) => exportCols.has(c.id));
+    if (cols.length === 0) {
+      toast.error("اختر عموداً واحداً على الأقل");
+      return;
+    }
+    const rows = selectedCustomers.map((c) => cols.map((col) => customerExportValue(c, col.id)));
+    const sheet = XLSX.utils.aoa_to_sheet([cols.map((c) => c.label), ...rows]);
+    sheet["!cols"] = cols.map((c) => ({ wch: Math.max(14, c.label.length + 4) }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, sheet, "العملاء");
+    const stamp = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `عملاء_سنام_${stamp}.xlsx`);
+    toast.success(`تم تصدير ${selectedCustomers.length} عميل`);
+    setExportOpen(false);
+  };
+
   return (
     <AdminLayout title="إدارة العملاء">
       <div className="space-y-4">
@@ -379,6 +450,15 @@ const AdminCustomersPage = () => {
           >
             <Trash2 className="ml-1 h-4 w-4" />
             حذف
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={noneSelected}
+            onClick={() => setExportOpen(true)}
+          >
+            <Download className="ml-1 h-4 w-4" />
+            تصدير
           </Button>
         </div>
 
@@ -617,6 +697,48 @@ const AdminCustomersPage = () => {
                 )}
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={exportOpen} onOpenChange={setExportOpen}>
+          <DialogContent dir="rtl" className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>تصدير بيانات العملاء</DialogTitle>
+              <DialogDescription>
+                اختر الأعمدة ثم صدّر {selectedCustomers.length} عميل محدداً إلى ملف Excel.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setExportCols(new Set(EXPORT_COLUMNS.map((c) => c.id)))}
+              >
+                تحديد الكل
+              </Button>
+              <Button type="button" size="sm" variant="ghost" onClick={() => setExportCols(new Set())}>
+                إلغاء التحديد
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {EXPORT_COLUMNS.map((col) => (
+                <label key={col.id} className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm cursor-pointer hover:bg-muted/40">
+                  <Checkbox
+                    checked={exportCols.has(col.id)}
+                    onCheckedChange={() => toggleExportCol(col.id)}
+                  />
+                  {col.label}
+                </label>
+              ))}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setExportOpen(false)}>إلغاء</Button>
+              <Button onClick={handleExportExcel} disabled={exportCols.size === 0}>
+                <Download className="h-4 w-4 ml-1" />
+                تصدير Excel
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
 

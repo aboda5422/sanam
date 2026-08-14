@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import logoFull from "@/assets/logo-full-light.png";
+import { pickAdminRole } from "@/lib/staff-access";
 import { staffEmailFromUsername } from "@/lib/admin-username";
 
 const REMEMBER_KEY = "sanam:admin-login-remember";
@@ -59,8 +60,8 @@ const AdminLoginPage = () => {
       .select("role")
       .eq("user_id", data.user.id);
 
-    const isAdmin = roles?.some(r => r.role === "store_admin" || r.role === "site_admin");
-    if (!isAdmin) {
+    const panelRole = pickAdminRole(roles);
+    if (!panelRole) {
       await supabase.auth.signOut();
       toast.error("ليس لديك صلاحية الوصول للوحة التحكم");
       setLoading(false);
@@ -72,6 +73,12 @@ const AdminLoginPage = () => {
     } else {
       localStorage.removeItem(REMEMBER_KEY);
     }
+
+    void supabase.rpc("log_admin_activity", {
+      p_action: "login",
+      p_entity_type: "auth",
+      p_summary: "تسجيل دخول إلى لوحة التحكم",
+    });
 
     toast.success("مرحباً بك في لوحة التحكم");
     navigate("/admin");

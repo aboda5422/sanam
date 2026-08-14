@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import type { LatLng } from "@/lib/geo";
 
 const DEFAULT_CENTER = { lat: 21.4225, lng: 39.8262 }; // Makkah
+const BRANCH_ZOOM = 16;
 
 type DeliveryZonesEditorProps = {
   /** When set, only that branch's zones are shown and new zones are linked to it. */
@@ -53,14 +54,17 @@ const DeliveryZonesEditor = ({
     branchCenter && Number.isFinite(branchCenter.lat) && Number.isFinite(branchCenter.lng)
       ? branchCenter
       : DEFAULT_CENTER;
-  const mapRef = useRef<HTMLDivElement>(null);
+  const mapHostRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<any>(null);
+  const branchMarkerRef = useRef<any>(null);
   const polygonsRef = useRef<Map<string, any>>(new Map());
   const draftPolygonRef = useRef<any>(null);
   const draftMarkersRef = useRef<any[]>([]);
-  const clickListenerRef = useRef<any>(null);
+  const clickListenerRef = useRef<any[]>([]);
+  const clickDomCleanupRef = useRef<(() => void) | null>(null);
   const pathListenersRef = useRef<any[]>([]);
   const drawingRef = useRef(false);
+  const lastAddAtRef = useRef(0);
   const draftPointsRef = useRef<LatLng[]>([]);
 
   const [mapReady, setMapReady] = useState(false);
@@ -102,14 +106,16 @@ const DeliveryZonesEditor = ({
   };
 
   const removeClickListener = () => {
-    if (clickListenerRef.current) {
+    clickListenerRef.current.forEach((listener) => {
       try {
-        window.google?.maps?.event?.removeListener(clickListenerRef.current);
+        window.google?.maps?.event?.removeListener(listener);
       } catch {
         /* ignore */
       }
-      clickListenerRef.current = null;
-    }
+    });
+    clickListenerRef.current = [];
+    clickDomCleanupRef.current?.();
+    clickDomCleanupRef.current = null;
   };
 
   const saveZone = useMutation({
@@ -225,14 +231,17 @@ const DeliveryZonesEditor = ({
     }
   }, []);
 
-  // Init map (no DrawingManager — removed in Maps API v3.65)
+  // Init map after the dialog finishes laying out. Use a nested host so Google Maps
+  // never reuses a previous Map's DOM node (common when switching branches).
   useEffect(() => {
     let cancelled = false;
     let resizeObserver: ResizeObserver | null = null;
+    const outer = mapHostRef.current;
 
     (async () => {
       setMapLoading(true);
       setMapError(null);
+      setMapReady(false);
 
       try {
         const ok = await loadGoogleMaps();
@@ -240,42 +249,83 @@ const DeliveryZonesEditor = ({
 
         if (!ok || !window.google?.maps) {
           setMapError("تعذر تحميل الخريطة. تحقق من الاتصال ثم أعد فتح الإعدادات.");
-          setMapReady(false);
           setMapLoading(false);
           return;
         }
 
-        if (!mapRef.current) {
-          setMapError("تعذر تهيئة الخريطة");
+        // Dialog zoom/grid can leave the container at 0×0 for a few frames.
+        let host = mapHostRef.current;
+        for (let i = 0; i < 40 && !host; i++) {
+          await new Promise((r) => requestAnimationFrame(r));
+          host = mapHostRef.current;
+        }
+        if (cancelled) return;
+        if (!host) {
+          setMapError("تعذر تهيئة الخريطة. أعد فتح النافذة.");
           setMapLoading(false);
           return;
         }
 
-        await waitForElementSize(mapRef.current);
-        if (cancelled || !mapRef.current) return;
+        await waitForElementSize(host, 6000);
+        if (cancelled || !mapHostRef.current) return;
+        host = mapHostRef.current;
 
-        const map = new window.google.maps.Map(mapRef.current, {
+        host.replaceChildren();
+        const inner = document.createElement("div");
+        inner.style.width = "100%";
+        inner.style.height = "100%";
+        inner.style.minHeight = "420px";
+        host.appendChild(inner);
+
+        const map = new window.google.maps.Map(inner, {
           center: mapCenter,
-          zoom: 12,
+          zoom: BRANCH_ZOOM,
           mapTypeControl: false,
           streetViewControl: false,
           fullscreenControl: false,
           gestureHandling: "greedy",
+          clickableIcons: false,
+          keyboardShortcuts: false,
         });
         mapInstance.current = map;
 
-        const refresh = () => {
-          triggerMapResize(map);
-          map.setCenter(mapCenter);
-        };
-        requestAnimationFrame(() => {
-          refresh();
-          setTimeout(refresh, 150);
-          setTimeout(refresh, 400);
+        if (branchMarkerRef.current) {
+          branchMarkerRef.current.setMap(null);
+        }
+        branchMarkerRef.current = new window.google.maps.Marker({
+          position: mapCenter,
+          map,
+          title: branchName || "موقع الفرع",
+          clickable: false,
+          label: {
+            text: "فرع",
+            color: "#fff",
+            fontSize: "11px",
+            fontWeight: "700",
+          },
+          zIndex: 50,
         });
 
-        resizeObserver = new ResizeObserver(() => triggerMapResize(map));
-        resizeObserver.observe(mapRef.current);
+        const focusBranch = () => {
+          triggerMapResize(map);
+          try {
+            map.setCenter(mapCenter);
+            map.setZoom(BRANCH_ZOOM);
+          } catch {
+            /* ignore */
+          }
+        };
+        requestAnimationFrame(() => {
+          focusBranch();
+          setTimeout(focusBranch, 150);
+          setTimeout(focusBranch, 450);
+        });
+        window.google.maps.event.addListenerOnce(map, "idle", focusBranch);
+
+        resizeObserver = new ResizeObserver(() => {
+          triggerMapResize(map);
+        });
+        resizeObserver.observe(host);
 
         if (!cancelled) {
           setMapReady(true);
@@ -297,15 +347,35 @@ const DeliveryZonesEditor = ({
       removeClickListener();
       clearPathListeners();
       clearDraftOverlays();
+      if (mapInstance.current && window.google?.maps?.event) {
+        try {
+          window.google.maps.event.clearInstanceListeners(mapInstance.current);
+        } catch {
+          /* ignore */
+        }
+      }
+      mapInstance.current = null;
+      if (branchMarkerRef.current) {
+        try {
+          branchMarkerRef.current.setMap(null);
+        } catch {
+          /* ignore */
+        }
+        branchMarkerRef.current = null;
+      }
+      outer?.replaceChildren();
     };
-  }, [mapCenter.lat, mapCenter.lng]);
+  }, [branchId, mapCenter.lat, mapCenter.lng]);
 
-  // Keep map centered on branch when branch changes and no zones yet
+  // Keep map centered on the branch so the admin can draw around it
   useEffect(() => {
-    if (!mapReady || !mapInstance.current || zones.length > 0) return;
+    if (!mapReady || !mapInstance.current) return;
     mapInstance.current.setCenter(mapCenter);
-    mapInstance.current.setZoom(12);
-  }, [mapReady, mapCenter.lat, mapCenter.lng, zones.length]);
+    mapInstance.current.setZoom(BRANCH_ZOOM);
+    if (branchMarkerRef.current) {
+      branchMarkerRef.current.setPosition(mapCenter);
+    }
+  }, [mapReady, mapCenter.lat, mapCenter.lng]);
 
   // Render saved polygons
   useEffect(() => {
@@ -393,7 +463,7 @@ const DeliveryZonesEditor = ({
     triggerMapResize(mapInstance.current);
     fitPolygonOnMap(mapInstance.current, zone.polygon);
     // Scroll map into view inside the dialog
-    mapRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    mapHostRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, []);
 
   const cancelEditing = () => {
@@ -421,7 +491,7 @@ const DeliveryZonesEditor = ({
       triggerMapResize(mapInstance.current);
       fitPolygonOnMap(mapInstance.current, zone.polygon);
     }
-    mapRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    mapHostRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     toast.message("اسحب نقاط المضلع على الخريطة ثم احفظ");
   };
 
@@ -481,20 +551,50 @@ const DeliveryZonesEditor = ({
     setDraftPath([]);
 
     triggerMapResize(mapInstance.current);
-    mapRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    mapHostRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
-    clickListenerRef.current = window.google.maps.event.addListener(
-      mapInstance.current,
-      "click",
-      (e: any) => {
-        if (!drawingRef.current || !e.latLng) return;
-        const point = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-        const next = [...draftPointsRef.current, point];
-        draftPointsRef.current = next;
-        setDraftPath(next);
-        renderDraftPreview(next);
-      }
+    const addPoint = (point: LatLng) => {
+      if (!drawingRef.current) return;
+      const now = Date.now();
+      const last = draftPointsRef.current[draftPointsRef.current.length - 1];
+      if (lastAddAtRef.current && now - lastAddAtRef.current < 160) return;
+      if (last && Math.abs(last.lat - point.lat) < 1e-6 && Math.abs(last.lng - point.lng) < 1e-6) return;
+      lastAddAtRef.current = now;
+      const next = [...draftPointsRef.current, point];
+      draftPointsRef.current = next;
+      setDraftPath(next);
+      renderDraftPreview(next);
+    };
+
+    const map = mapInstance.current;
+    clickListenerRef.current.push(
+      window.google.maps.event.addListener(map, "click", (e: any) => {
+        if (!e?.latLng) return;
+        addPoint({ lat: e.latLng.lat(), lng: e.latLng.lng() });
+      }),
     );
+
+    const div: HTMLElement | null = typeof map.getDiv === "function" ? map.getDiv() : null;
+    if (div) {
+      const onDomClick = (ev: MouseEvent) => {
+        if (!drawingRef.current || typeof map.getBounds !== "function") return;
+        const mapBounds = map.getBounds();
+        if (!mapBounds) return;
+        const rect = div.getBoundingClientRect();
+        if (rect.width < 8 || rect.height < 8) return;
+        const x = (ev.clientX - rect.left) / rect.width;
+        const y = (ev.clientY - rect.top) / rect.height;
+        if (x < 0 || x > 1 || y < 0 || y > 1) return;
+        const ne = mapBounds.getNorthEast();
+        const sw = mapBounds.getSouthWest();
+        addPoint({
+          lat: ne.lat() - y * (ne.lat() - sw.lat()),
+          lng: sw.lng() + x * (ne.lng() - sw.lng()),
+        });
+      };
+      div.addEventListener("click", onDomClick);
+      clickDomCleanupRef.current = () => div.removeEventListener("click", onDomClick);
+    }
 
     toast.message("انقر على الخريطة لإضافة نقاط الحدود");
   };
@@ -534,13 +634,7 @@ const DeliveryZonesEditor = ({
     deleteZone.mutate(zone.id);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </div>
-    );
-  }
+  const listLoading = isLoading;
 
   return (
     <div className="space-y-4">
@@ -557,6 +651,11 @@ const DeliveryZonesEditor = ({
         {!branchId && (
           <p className="mt-2 text-destructive text-xs font-medium">
             يجب اختيار فرع قبل رسم أو حفظ نطاق جغرافي.
+          </p>
+        )}
+        {branchId && !branchCenter && (
+          <p className="mt-2 text-amber-700 dark:text-amber-400 text-xs font-medium">
+            لم يُحفظ موقع هذا الفرع بعد — حدّده من صفحة الفروع ليظهر هنا مباشرة.
           </p>
         )}
       </div>
@@ -604,7 +703,11 @@ const DeliveryZonesEditor = ({
       )}
 
       <div className="relative rounded-xl overflow-hidden border">
-        <div ref={mapRef} className={`w-full bg-muted ${mapHeightClass}`} />
+        <div
+          ref={mapHostRef}
+          className={`w-full bg-muted ${mapHeightClass}`}
+          style={{ minHeight: 420 }}
+        />
         {mapLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-muted/90 text-sm text-muted-foreground gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -649,9 +752,14 @@ const DeliveryZonesEditor = ({
           <Badge variant="secondary">{zones.filter((z) => z.is_active).length} مفعّلة</Badge>
         </div>
 
-        {zones.length === 0 && (
+        {listLoading ? (
+          <p className="text-sm text-muted-foreground py-2 flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            جاري تحميل المناطق...
+          </p>
+        ) : zones.length === 0 ? (
           <p className="text-sm text-muted-foreground py-2">لا توجد مناطق بعد — ارسم منطقة على الخريطة.</p>
-        )}
+        ) : null}
 
         {zones.map((zone) => {
           const isEditing = editingId === zone.id;

@@ -13,12 +13,13 @@ import {
   Users,
   Megaphone,
   Mail,
-  Wallet as WalletIcon,
   Timer,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { allowedAdminPaths } from "@/lib/staff-access";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import logo from "@/assets/logo-full-light.png";
 import {
   Sidebar,
@@ -50,7 +51,6 @@ const operationItems = [
 
 const settingsItems = [
   { title: "الحسابات والمبيعات", url: "/admin/sales", icon: BarChart3 },
-  { title: "محافظ المناديب", url: "/admin/wallets", icon: WalletIcon },
   { title: "سجل المدفوعات", url: "/admin/payments", icon: Wallet },
   { title: "سجل البريد الإلكتروني", url: "/admin/email-logs", icon: Mail },
   { title: "الشعارات والإعلانات", url: "/admin/announcements", icon: Megaphone },
@@ -62,11 +62,15 @@ export function AdminSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const navigate = useNavigate();
+  const { role } = useAdminAuth();
 
   const isActive = (path: string) =>
     path === "/admin"
       ? location.pathname === "/admin"
       : location.pathname.startsWith(path);
+
+  const allowed = new Set(allowedAdminPaths(role));
+  const filterItems = (items: typeof mainItems) => items.filter((item) => allowed.has(item.url));
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -76,7 +80,9 @@ export function AdminSidebar() {
   const renderGroup = (
     label: string,
     items: typeof mainItems
-  ) => (
+  ) => {
+    if (items.length === 0) return null;
+    return (
     <SidebarGroup>
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarGroupContent>
@@ -102,7 +108,8 @@ export function AdminSidebar() {
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  );
+    );
+  };
 
   return (
     <Sidebar collapsible="icon" side="right" className="border-l-0 border-r">
@@ -117,15 +124,18 @@ export function AdminSidebar() {
               </div>
             </div>
           )}
-          {renderGroup("الرئيسية", mainItems)}
-          {renderGroup("العمليات", operationItems)}
-          {renderGroup("النظام", settingsItems)}
+          {renderGroup("الرئيسية", filterItems(mainItems))}
+          {renderGroup("العمليات", filterItems(operationItems))}
+          {renderGroup("النظام", filterItems(settingsItems))}
         </div>
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout}>
+            <SidebarMenuButton
+              onClick={handleLogout}
+              className="text-red-600 hover:bg-red-50 hover:text-red-700 active:bg-red-50 active:text-red-700"
+            >
               <LogOut className="ml-2 h-4 w-4" />
               {!collapsed && <span>تسجيل الخروج</span>}
             </SidebarMenuButton>

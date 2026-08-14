@@ -9,14 +9,16 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { pickAdminRole, type AdminPanelRole } from "@/lib/staff-access";
 
 export type AdminBranch = { id: string; name: string; slug: string; city: string | null };
 
 type AdminAuthContextValue = {
   loading: boolean;
   userId: string | null;
-  role: "site_admin" | "store_admin" | null;
+  role: AdminPanelRole | null;
   isSuperAdmin: boolean;
+  isSiteWide: boolean;
   branchIds: string[];
   branches: AdminBranch[];
   filterBranchId: string | null;
@@ -29,7 +31,7 @@ const AdminAuthContext = createContext<AdminAuthContextValue | null>(null);
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
-  const [role, setRole] = useState<"site_admin" | "store_admin" | null>(null);
+  const [role, setRole] = useState<AdminPanelRole | null>(null);
   const [branchIds, setBranchIds] = useState<string[]>([]);
   const [branches, setBranches] = useState<AdminBranch[]>([]);
   const [filterBranchId, setFilterBranchId] = useState<string | null>(null);
@@ -54,16 +56,14 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         .select("role")
         .eq("user_id", uid);
 
-      const isSuper = roles?.some((r) => r.role === "site_admin") ?? false;
-      const isStore = roles?.some((r) => r.role === "store_admin") ?? false;
-
-      if (!isSuper && !isStore) {
+      const panelRole = pickAdminRole(roles);
+      if (!panelRole) {
         setLoading(false);
         navigate("/admin/login");
         return;
       }
 
-      setRole(isSuper ? "site_admin" : "store_admin");
+      setRole(panelRole);
 
       const { data: allBranches } = await supabase
         .from("branches")
@@ -71,6 +71,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         .eq("is_active", true)
         .order("name");
 
+      const isSuper = panelRole === "site_admin";
       if (isSuper) {
         setBranchIds([]);
         setBranches((allBranches as AdminBranch[]) || []);
@@ -81,7 +82,8 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
           .eq("user_id", uid);
         const ids = (access || []).map((a: any) => a.branch_id as string);
         setBranchIds(ids);
-        setBranches(((allBranches as AdminBranch[]) || []).filter((b) => ids.includes(b.id)));
+        const list = (allBranches as AdminBranch[]) || [];
+        setBranches(ids.length ? list.filter((b) => ids.includes(b.id)) : list);
         if (ids.length === 1) setFilterBranchId(ids[0]);
       }
 
@@ -99,14 +101,15 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   }, [navigate]);
 
   const isSuperAdmin = role === "site_admin";
+  const isSiteWide = isSuperAdmin || ((role === "accountant" || role === "inventory" || role === "support") && branchIds.length === 0);
 
   const scopedBranchIds = useMemo(() => {
-    if (isSuperAdmin) {
+    if (isSiteWide) {
       return filterBranchId ? [filterBranchId] : null;
     }
     if (filterBranchId && branchIds.includes(filterBranchId)) return [filterBranchId];
     return branchIds.length ? branchIds : [];
-  }, [isSuperAdmin, filterBranchId, branchIds]);
+  }, [isSiteWide, filterBranchId, branchIds]);
 
   const setFilter = useCallback((id: string | null) => setFilterBranchId(id), []);
 
@@ -115,6 +118,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     userId,
     role,
     isSuperAdmin,
+    isSiteWide,
     branchIds,
     branches,
     filterBranchId,

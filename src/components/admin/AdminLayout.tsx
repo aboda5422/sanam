@@ -1,4 +1,5 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminAuthProvider, useAdminAuth } from "@/hooks/useAdminAuth";
@@ -6,6 +7,7 @@ import { AdminErrorBoundary } from "./AdminErrorBoundary";
 import { Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { PANEL_ROLE_BADGE, allowedAdminPaths, canAccessAdminPath } from "@/lib/staff-access";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -13,8 +15,17 @@ interface AdminLayoutProps {
 }
 
 const AdminShell = ({ children, title }: AdminLayoutProps) => {
-  const { loading, isSuperAdmin, branches, filterBranchId, setFilterBranchId, scopedBranchIds } =
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { loading, isSuperAdmin, isSiteWide, role, branches, filterBranchId, setFilterBranchId, scopedBranchIds } =
     useAdminAuth();
+
+  useEffect(() => {
+    if (loading || !role) return;
+    if (!canAccessAdminPath(role, location.pathname)) {
+      navigate(allowedAdminPaths(role)[0] || "/admin", { replace: true });
+    }
+  }, [loading, role, location.pathname, navigate]);
 
   if (loading) {
     return (
@@ -39,7 +50,7 @@ const AdminShell = ({ children, title }: AdminLayoutProps) => {
             <SidebarTrigger />
             {title && <h1 className="font-heading font-bold text-lg">{title}</h1>}
             <div className="mr-auto flex items-center gap-2">
-              {isSuperAdmin ? (
+              {isSuperAdmin || isSiteWide ? (
                 <Select
                   value={filterBranchId || "all"}
                   onValueChange={(v) => setFilterBranchId(v === "all" ? null : v)}
@@ -60,7 +71,7 @@ const AdminShell = ({ children, title }: AdminLayoutProps) => {
                 <Badge variant="secondary">{branchLabel}</Badge>
               )}
               <Badge variant={isSuperAdmin ? "default" : "outline"}>
-                {isSuperAdmin ? "أدمن عام" : "مدير فرع"}
+                {role ? PANEL_ROLE_BADGE[role] : "مستخدم"}
               </Badge>
             </div>
           </header>

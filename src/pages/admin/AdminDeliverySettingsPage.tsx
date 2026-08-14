@@ -25,6 +25,9 @@ type BranchRow = {
   lat?: number | null;
   lng?: number | null;
   is_active: boolean;
+  delivery_fee?: number | null;
+  free_delivery_threshold?: number | null;
+  min_order?: number | null;
   delivery_zones?: { id: string; name: string; is_active: boolean }[];
   branch_delivery_rates?: {
     id: string;
@@ -34,50 +37,88 @@ type BranchRow = {
   }[];
 };
 
-const useSetting = (key: string, defaultValue: any) => {
-  const queryClient = useQueryClient();
-  const { data, isLoading } = useQuery({
-    queryKey: ["store-settings", key],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("store_settings")
-        .select("value")
-        .eq("key", key)
-        .maybeSingle();
-      if (error) throw error;
-      return data?.value ?? defaultValue;
-    },
-  });
+const BranchFeeEditor = ({
+  branch,
+  saving,
+  onSave,
+}: {
+  branch: BranchRow;
+  saving: boolean;
+  onSave: (vals: { delivery_fee: number; free_delivery_threshold: number; min_order: number }) => void;
+}) => {
+  const [deliveryFee, setDeliveryFee] = useState(String(Number(branch.delivery_fee ?? 10)));
+  const [freeOver, setFreeOver] = useState(String(Number(branch.free_delivery_threshold ?? 100)));
+  const [minOrder, setMinOrder] = useState(String(Number(branch.min_order ?? 20)));
 
-  const mutation = useMutation({
-    mutationFn: async (value: any) => {
-      const { error } = await supabase
-        .from("store_settings")
-        .upsert({ key, value }, { onConflict: "key" });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["store-settings", key] });
-      toast.success("تم الحفظ بنجاح");
-    },
-    onError: () => toast.error("حدث خطأ أثناء الحفظ"),
-  });
+  const dirty =
+    Number(deliveryFee) !== Number(branch.delivery_fee ?? 10) ||
+    Number(freeOver) !== Number(branch.free_delivery_threshold ?? 100) ||
+    Number(minOrder) !== Number(branch.min_order ?? 20);
 
-  return { data: data ?? defaultValue, isLoading, save: mutation.mutate, saving: mutation.isPending };
+  return (
+    <div className="rounded-lg bg-muted/50 p-3 space-y-2">
+      <p className="text-xs font-semibold">رسوم الطلب لهذا الفرع</p>
+      <div className="grid gap-2 sm:grid-cols-3">
+        <div>
+          <Label className="text-[11px]">رسوم التوصيل (ر.س)</Label>
+          <Input
+            type="number"
+            min={0}
+            className="h-9"
+            value={deliveryFee}
+            onChange={(e) => setDeliveryFee(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label className="text-[11px]">توصيل مجاني فوق (ر.س)</Label>
+          <Input
+            type="number"
+            min={0}
+            className="h-9"
+            value={freeOver}
+            onChange={(e) => setFreeOver(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label className="text-[11px]">أقل طلب (ر.س)</Label>
+          <Input
+            type="number"
+            min={0}
+            className="h-9"
+            value={minOrder}
+            onChange={(e) => setMinOrder(e.target.value)}
+          />
+        </div>
+      </div>
+      <Button
+        type="button"
+        size="sm"
+        className="h-8 w-full"
+        disabled={!dirty || saving}
+        onClick={() =>
+          onSave({
+            delivery_fee: Number(deliveryFee) || 0,
+            free_delivery_threshold: Number(freeOver) || 0,
+            min_order: Number(minOrder) || 0,
+          })
+        }
+      >
+        {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin ml-1" /> : <Save className="h-3.5 w-3.5 ml-1" />}
+        حفظ رسوم الفرع
+      </Button>
+    </div>
+  );
 };
 
-const AdminDeliverySettingsPage = () => {
+const AdminDeliverySettingsPage = () => (
+  <AdminLayout title="إعدادات التوصيل">
+    <DeliverySettingsBody />
+  </AdminLayout>
+);
+
+const DeliverySettingsBody = () => {
   const queryClient = useQueryClient();
   const { isSuperAdmin, scopedBranchIds } = useAdminAuth();
-  const { data, isLoading, save, saving } = useSetting("delivery", {
-    delivery_fee: 10,
-    free_delivery_threshold: 100,
-    min_order: 20,
-    work_start: "08:00",
-    work_end: "23:00",
-  });
-  const [form, setForm] = useState<any>(null);
-  const d = form ?? data;
 
   const [zonesBranch, setZonesBranch] = useState<BranchRow | null>(null);
   const [ratesBranch, setRatesBranch] = useState<BranchRow | null>(null);
@@ -91,7 +132,7 @@ const AdminDeliverySettingsPage = () => {
       let q = supabase
         .from("branches")
         .select(
-          "id, name, city, lat, lng, is_active, delivery_zones(id, name, is_active), branch_delivery_rates(id, max_distance_km, fee, sort_order)",
+          "id, name, city, lat, lng, is_active, delivery_fee, free_delivery_threshold, min_order, delivery_zones(id, name, is_active), branch_delivery_rates(id, max_distance_km, fee, sort_order)",
         )
         .order("name");
       if (scopedBranchIds && scopedBranchIds.length > 0) {
@@ -159,6 +200,33 @@ const AdminDeliverySettingsPage = () => {
     onError: (e: any) => toast.error(e?.message || "تعذر حفظ الأسعار"),
   });
 
+  const saveFeesMutation = useMutation({
+    mutationFn: async ({
+      id,
+      delivery_fee,
+      free_delivery_threshold,
+      min_order,
+    }: {
+      id: string;
+      delivery_fee: number;
+      free_delivery_threshold: number;
+      min_order: number;
+    }) => {
+      const { error } = await supabase
+        .from("branches")
+        .update({ delivery_fee, free_delivery_threshold, min_order })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-branches-delivery"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-branches"] });
+      queryClient.invalidateQueries({ queryKey: ["active-branches"] });
+      toast.success("تم حفظ رسوم الفرع");
+    },
+    onError: (e: any) => toast.error(e?.message || "تعذر حفظ الرسوم"),
+  });
+
   const openRates = (branch: BranchRow) => {
     const rates = [...(branch.branch_delivery_rates || [])].sort(
       (a, b) => a.max_distance_km - b.max_distance_km,
@@ -180,107 +248,51 @@ const AdminDeliverySettingsPage = () => {
   };
 
   return (
-    <AdminLayout title="إعدادات التوصيل">
-      {isLoading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    <>
+      <div className="space-y-6 max-w-5xl">
+        <div>
+          <h2 className="font-semibold text-lg">التوصيل حسب الفرع</h2>
+          <p className="text-sm text-muted-foreground">
+            كل فرع يضبط رسومه، الحد الأدنى للطلب، شرائح المسافة، ومضلعات التوصيل
+          </p>
         </div>
-      ) : (
-        <div className="space-y-8 max-w-5xl">
-          <section className="space-y-4">
-            <div>
-              <h2 className="font-semibold text-lg">الإعدادات العامة</h2>
-              <p className="text-sm text-muted-foreground">رسوم افتراضية وأوقات العمل للمتجر</p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div>
-                <Label>رسوم التوصيل (ر.س)</Label>
-                <Input
-                  type="number"
-                  value={d.delivery_fee}
-                  onChange={(e) => setForm({ ...d, delivery_fee: Number(e.target.value) })}
-                />
-              </div>
-              <div>
-                <Label>توصيل مجاني فوق (ر.س)</Label>
-                <Input
-                  type="number"
-                  value={d.free_delivery_threshold}
-                  onChange={(e) => setForm({ ...d, free_delivery_threshold: Number(e.target.value) })}
-                />
-              </div>
-              <div>
-                <Label>أقل طلب (ر.س)</Label>
-                <Input
-                  type="number"
-                  value={d.min_order}
-                  onChange={(e) => setForm({ ...d, min_order: Number(e.target.value) })}
-                />
-              </div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <Label>بداية الدوام</Label>
-                <Input
-                  type="time"
-                  value={d.work_start}
-                  onChange={(e) => setForm({ ...d, work_start: e.target.value })}
-                  dir="ltr"
-                />
-              </div>
-              <div>
-                <Label>نهاية الدوام</Label>
-                <Input
-                  type="time"
-                  value={d.work_end}
-                  onChange={(e) => setForm({ ...d, work_end: e.target.value })}
-                  dir="ltr"
-                />
-              </div>
-            </div>
-            <Button onClick={() => save(form ?? d)} disabled={saving}>
-              {saving ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <Save className="h-4 w-4 ml-2" />}
-              حفظ الإعدادات العامة
-            </Button>
-          </section>
 
-          <section className="space-y-4 border-t pt-6">
-            <div>
-              <h2 className="font-semibold text-lg">التوصيل حسب الفرع</h2>
-              <p className="text-sm text-muted-foreground">
-                شرائح الأسعار حسب المسافة، النطاق الجغرافي، ومضلعات التوصيل لكل فرع
-              </p>
-            </div>
+        {branchesLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+            {visibleBranches.map((b) => {
+              const rates = [...(b.branch_delivery_rates || [])].sort(
+                (a, c) => a.max_distance_km - c.max_distance_km,
+              );
+              const zonesCount = b.delivery_zones?.length || 0;
+              return (
+                <div key={b.id} className="bg-card rounded-xl border p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="font-semibold">{b.name}</h3>
+                      {b.city && (
+                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <MapPin className="h-3.5 w-3.5" />
+                          {b.city}
+                        </p>
+                      )}
+                    </div>
+                    <Badge variant={b.is_active ? "default" : "secondary"}>
+                      {b.is_active ? "مفعّل" : "معطّل"}
+                    </Badge>
+                  </div>
 
-            {branchesLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-primary" />
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
-                {visibleBranches.map((b) => {
-                  const rates = [...(b.branch_delivery_rates || [])].sort(
-                    (a, c) => a.max_distance_km - c.max_distance_km,
-                  );
-                  const zonesCount = b.delivery_zones?.length || 0;
-                  return (
-                    <div key={b.id} className="bg-card rounded-xl border p-4 space-y-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <h3 className="font-semibold">{b.name}</h3>
-                          {b.city && (
-                            <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
-                              <MapPin className="h-3.5 w-3.5" />
-                              {b.city}
-                            </p>
-                          )}
-                        </div>
-                        <Badge variant={b.is_active ? "default" : "secondary"}>
-                          {b.is_active ? "مفعّل" : "معطّل"}
-                        </Badge>
-                      </div>
+                  <BranchFeeEditor
+                    key={`${b.id}-${b.delivery_fee}-${b.free_delivery_threshold}-${b.min_order}`}
+                    branch={b}
+                    saving={saveFeesMutation.isPending && saveFeesMutation.variables?.id === b.id}
+                    onSave={(vals) => saveFeesMutation.mutate({ id: b.id, ...vals })}
+                  />
 
-                      <div className="rounded-lg bg-muted/50 p-3 text-xs space-y-1">
+                  <div className="rounded-lg bg-muted/50 p-3 text-xs space-y-1">
                         <div className="flex items-center justify-between mb-1">
                           <p className="font-semibold">أسعار التوصيل حسب المسافة</p>
                           <Button
@@ -324,12 +336,13 @@ const AdminDeliverySettingsPage = () => {
                 })}
               </div>
             )}
-          </section>
-        </div>
-      )}
+      </div>
 
       <Dialog open={!!zonesBranch} onOpenChange={(open) => !open && setZonesBranch(null)}>
-        <DialogContent className="max-w-5xl max-h-[92vh] overflow-y-auto" dir="rtl">
+        <DialogContent
+          className="max-w-5xl max-h-[92vh] overflow-y-auto flex flex-col left-4 right-4 top-6 translate-x-0 translate-y-0 !transform-none data-[state=open]:zoom-in-100 data-[state=closed]:zoom-out-100"
+          dir="rtl"
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <MapIcon className="h-5 w-5 text-primary" />
@@ -442,7 +455,7 @@ const AdminDeliverySettingsPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+    </>
   );
 };
 

@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_activity_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_name: string | null
+          actor_role: string | null
+          branch_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          metadata: Json
+          summary: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_name?: string | null
+          actor_role?: string | null
+          branch_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          metadata?: Json
+          summary: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_name?: string | null
+          actor_role?: string | null
+          branch_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          metadata?: Json
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_activity_log_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       abandoned_carts: {
         Row: {
           converted: boolean
@@ -138,6 +188,13 @@ export type Database = {
           lng: number
           name: string
           phone: string | null
+          slug: string
+          city: string | null
+          work_start: string
+          work_end: string
+          delivery_fee: number
+          free_delivery_threshold: number
+          min_order: number
           updated_at: string
         }
         Insert: {
@@ -149,6 +206,13 @@ export type Database = {
           lng: number
           name: string
           phone?: string | null
+          slug?: string
+          city?: string | null
+          work_start?: string
+          work_end?: string
+          delivery_fee?: number
+          free_delivery_threshold?: number
+          min_order?: number
           updated_at?: string
         }
         Update: {
@@ -160,6 +224,13 @@ export type Database = {
           lng?: number
           name?: string
           phone?: string | null
+          slug?: string
+          city?: string | null
+          work_start?: string
+          work_end?: string
+          delivery_fee?: number
+          free_delivery_threshold?: number
+          min_order?: number
           updated_at?: string
         }
         Relationships: []
@@ -817,6 +888,8 @@ export type Database = {
           discount_percent: number | null
           full_name: string | null
           id: string
+          contact_email: string | null
+          id_number: string | null
           phone: string | null
           status: string
           updated_at: string
@@ -826,10 +899,12 @@ export type Database = {
           address?: string | null
           avatar_url?: string | null
           city?: string | null
+          contact_email?: string | null
           created_at?: string
           discount_percent?: number | null
           full_name?: string | null
           id?: string
+          id_number?: string | null
           phone?: string | null
           status?: string
           updated_at?: string
@@ -839,10 +914,12 @@ export type Database = {
           address?: string | null
           avatar_url?: string | null
           city?: string | null
+          contact_email?: string | null
           created_at?: string
           discount_percent?: number | null
           full_name?: string | null
           id?: string
+          id_number?: string | null
           phone?: string | null
           status?: string
           updated_at?: string
@@ -1064,6 +1141,34 @@ export type Database = {
         }
         Returns: Json
       }
+      log_admin_activity: {
+        Args: {
+          p_action: string
+          p_entity_type: string
+          p_summary: string
+          p_entity_id?: string
+          p_branch_id?: string
+          p_metadata?: Json
+        }
+        Returns: string
+      }
+      purge_admin_activity_log: {
+        Args: Record<string, never>
+        Returns: number
+      }
+      create_site_staff: {
+        Args: {
+          p_full_name: string
+          p_username: string
+          p_password: string
+          p_role: string
+          p_phone?: string
+          p_contact_email?: string
+          p_id_number?: string
+          p_branch_ids?: string[]
+        }
+        Returns: Json
+      }
       create_branch_manager: {
         Args: {
           p_full_name: string
@@ -1120,7 +1225,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "customer" | "driver" | "store_admin" | "site_admin"
+      app_role: "customer" | "driver" | "store_admin" | "site_admin" | "accountant" | "inventory" | "support"
       complaint_status: "open" | "in_progress" | "resolved"
       complaint_type: "complaint" | "inquiry"
       order_status:
@@ -1259,7 +1364,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["customer", "driver", "store_admin", "site_admin"],
+      app_role: ["customer", "driver", "store_admin", "site_admin", "accountant", "inventory", "support"],
       complaint_status: ["open", "in_progress", "resolved"],
       complaint_type: ["complaint", "inquiry"],
       order_status: [

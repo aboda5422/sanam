@@ -9,9 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Store, Bell, Shield, Save, Loader2, Users } from "lucide-react";
+import { Store, Bell, Shield, Save, Loader2, Users, ScrollText } from "lucide-react";
 import { toast } from "sonner";
 import AdminUsersSection from "@/components/admin/AdminUsersSection";
+import AdminActivityLogSection from "@/components/admin/AdminActivityLogSection";
 
 const useSetting = (key: string, defaultValue: any) => {
   const queryClient = useQueryClient();
@@ -159,7 +160,8 @@ const AdminSettingsPage = () => {
 
   const sections = [
     { key: "store", icon: Store, title: "بيانات المتجر", desc: "اسم المتجر، الشعار، بيانات التواصل", component: StoreInfoSection },
-    { key: "users", icon: Users, title: "المشرفين والصلاحيات", desc: "إضافة مشرفين وإدارة صلاحياتهم", component: AdminUsersSection },
+    { key: "users", icon: Users, title: "مستخدمو الموقع والصلاحيات", desc: "مدير، محاسب، مخزون، وشكاوى — بدون مدراء الفروع والمناديب", component: AdminUsersSection },
+    { key: "activity", icon: ScrollText, title: "سجل العمليات", desc: "متابعة إجراءات المدراء والمستخدمين — يُحذف بعد 48 ساعة", component: AdminActivityLogSection },
     { key: "notifications", icon: Bell, title: "الإشعارات", desc: "إعدادات التنبيهات والإشعارات الفورية", component: NotificationsSection },
     { key: "security", icon: Shield, title: "الأمان", desc: "إدارة الصلاحيات والمستخدمين", component: SecuritySection },
   ];
@@ -187,7 +189,7 @@ const AdminSettingsPage = () => {
       {sections.map(s => (
         <Dialog key={s.key} open={openSection === s.key} onOpenChange={open => !open && setOpenSection(null)}>
           <DialogContent
-            className="max-w-2xl max-h-[90vh] overflow-y-auto"
+            className={`${s.key === "activity" ? "max-w-4xl" : "max-w-2xl"} max-h-[90vh] overflow-y-auto`}
             dir="rtl"
           >
             <DialogHeader>

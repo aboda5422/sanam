@@ -1,0 +1,3 @@
+ALTER TABLE public.branches
+  ADD COLUMN IF NOT EXISTS work_start time NOT NULL DEFAULT '08:00',
+  ADD COLUMN IF NOT EXISTS work_end time NOT NULL DEFAULT '23:00';

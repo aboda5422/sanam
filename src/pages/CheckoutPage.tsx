@@ -25,11 +25,14 @@ import {
   feeForDistance,
   isValidNationalAddress,
   normalizeNationalAddress,
+  IMMEDIATE_DELIVERY_LABEL,
+  isBranchOpenNow,
+  immediateDeliveryClosedMessage,
 } from "@/lib/branch";
 import { applyCustomerDiscount } from "@/lib/customer-discount";
 
 const deliveryTimes = [
-  "الآن (في أقرب وقت)",
+  IMMEDIATE_DELIVERY_LABEL,
   "10:00 - 12:00 صباحاً",
   "12:00 - 2:00 ظهراً",
   "2:00 - 4:00 عصراً",
@@ -58,7 +61,7 @@ const CheckoutPage = () => {
   const [user, setUser] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("cash");
   const [processing, setProcessing] = useState(false);
-  const [deliveryFee, setDeliveryFee] = useState<number>(15);
+  const [deliveryFee, setDeliveryFee] = useState<number>(10);
   const [customerDiscountPercent, setCustomerDiscountPercent] = useState(0);
 
   // Online payment temporarily disabled while licensing is finalized with Moyasar
@@ -110,11 +113,11 @@ const CheckoutPage = () => {
   useEffect(() => {
     const run = async () => {
       if (!selectedBranch || !selectedAddress) {
-        setDeliveryFee(15);
+        setDeliveryFee(selectedBranch?.delivery_fee ?? 10);
         return;
       }
       if (!isLocationCovered(selectedAddress.lat, selectedAddress.lng, activeZones)) {
-        setDeliveryFee(15);
+        setDeliveryFee(selectedBranch.delivery_fee);
         return;
       }
       const rpcFee = await calculateDeliveryFeeRpc(
@@ -131,7 +134,7 @@ const CheckoutPage = () => {
         lat: selectedAddress.lat,
         lng: selectedAddress.lng,
       });
-      setDeliveryFee(feeForDistance(rates, km));
+      setDeliveryFee(feeForDistance(rates, km, selectedBranch.delivery_fee));
     };
     run();
   }, [selectedBranch, selectedAddress, activeZones, ratesByBranch]);
@@ -144,7 +147,9 @@ const CheckoutPage = () => {
         })
       : null;
 
-  const delivery = totalPrice >= 100 ? 0 : deliveryFee;
+  const freeDeliveryFrom = selectedBranch?.free_delivery_threshold ?? 100;
+  const minOrder = selectedBranch?.min_order ?? 20;
+  const delivery = totalPrice >= freeDeliveryFrom ? 0 : deliveryFee;
   const { percent: discountPercent, amount: discountAmount } = applyCustomerDiscount(
     totalPrice,
     customerDiscountPercent,
@@ -222,6 +227,24 @@ const CheckoutPage = () => {
     if (!selectedBranch) {
       toast({ title: "يرجى اختيار الفرع أولاً", variant: "destructive" });
       openPicker();
+      return;
+    }
+
+    if (totalPrice < minOrder) {
+      toast({
+        title: "الطلب أقل من الحد الأدنى",
+        description: `أقل طلب لهذا الفرع ${minOrder} ر.س`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (selectedTime === IMMEDIATE_DELIVERY_LABEL && !isBranchOpenNow(selectedBranch.work_start, selectedBranch.work_end)) {
+      toast({
+        title: "خارج وقت الدوام",
+        description: immediateDeliveryClosedMessage(selectedBranch.work_start, selectedBranch.work_end),
+        variant: "destructive",
+      });
       return;
     }
 
@@ -478,7 +501,24 @@ const CheckoutPage = () => {
                 {deliveryTimes.map((time) => (
                   <button
                     key={time}
-                    onClick={() => setSelectedTime(time)}
+                    onClick={() => {
+                      if (
+                        time === IMMEDIATE_DELIVERY_LABEL &&
+                        selectedBranch &&
+                        !isBranchOpenNow(selectedBranch.work_start, selectedBranch.work_end)
+                      ) {
+                        toast({
+                          title: "خارج وقت الدوام",
+                          description: immediateDeliveryClosedMessage(
+                            selectedBranch.work_start,
+                            selectedBranch.work_end,
+                          ),
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      setSelectedTime(time);
+                    }}
                     className={`p-3 rounded-lg border text-sm font-medium transition-all ${
                       selectedTime === time
                         ? "border-primary bg-primary/5 text-primary"
@@ -577,8 +617,9 @@ const CheckoutPage = () => {
                 <span className="text-primary">{total.toFixed(1)} ر.س</span>
               </div>
             </div>
-            <Button className="w-full mt-4" size="lg" onClick={handleSubmit} disabled={processing}>
+            <Button className="w-full mt-4" size="lg" onClick={handleSubmit} disabled={processing || totalPrice < minOrder}>
               {processing ? <><Loader2 className="h-4 w-4 ml-2 animate-spin" /> جاري المعالجة...</> :
+                totalPrice < minOrder ? `أقل طلب ${minOrder} ر.س` :
                 paymentMethod === "online" ? "متابعة للدفع" : "تأكيد الطلب"}
             </Button>
           </div>

@@ -46,7 +46,6 @@ import AdminCustomersPage from "./pages/admin/AdminCustomersPage";
 import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
 import AdminPaymentsPage from "./pages/admin/AdminPaymentsPage";
 import AdminEmailLogsPage from "./pages/admin/AdminEmailLogsPage";
-import AdminWalletsPage from "./pages/admin/AdminWalletsPage";
 // Driver pages
 import DriverLoginPage from "./pages/driver/DriverLoginPage";
 import DriverDashboard from "./pages/driver/DriverDashboard";
@@ -107,7 +106,7 @@ const App = () => (
             <Route path="/admin/payments" element={<AdminPaymentsPage />} />
             <Route path="/admin/email-logs" element={<AdminEmailLogsPage />} />
             <Route path="/admin/tracking" element={<Navigate to="/admin/drivers" replace />} />
-            <Route path="/admin/wallets" element={<AdminWalletsPage />} />
+            <Route path="/admin/wallets" element={<Navigate to="/admin/drivers" replace />} />
 
             {/* Driver Routes */}
             <Route path="/driver/login" element={<DriverLoginPage />} />
