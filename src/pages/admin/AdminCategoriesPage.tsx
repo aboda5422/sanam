@@ -109,7 +109,7 @@ const AdminCategoriesPage = () => {
       if (Array.isArray(value) && value.length > 0) {
         return value as CategorySection[];
       }
-      return null;
+      return defaultSections;
     },
   });
 

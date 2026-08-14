@@ -157,7 +157,7 @@ const OrderAssignment = () => {
       q = applyBranchFilter(q, scopedBranchIds);
       const { data, error } = await q;
       if (error) throw error;
-      return data;
+      return data || [];
     },
     refetchInterval: 5000,
   });
@@ -175,11 +175,11 @@ const OrderAssignment = () => {
         if (!ids.length) return [];
         const { data, error } = await supabase.from("drivers").select("id, full_name, phone, is_available, status").eq("status", "active").in("id", ids);
         if (error) throw error;
-        return data;
+        return data || [];
       }
       const { data, error } = await supabase.from("drivers").select("id, full_name, phone, is_available, status").eq("status", "active");
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
@@ -291,7 +291,7 @@ const WalletsTab = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("driver_wallet").select("*, drivers(phone, full_name, user_id)").order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
@@ -387,11 +387,11 @@ const AdminDriversPage = () => {
         if (!ids.length) return [];
         const { data, error } = await supabase.from("drivers").select("*").in("id", ids).order("created_at", { ascending: false });
         if (error) throw error;
-        return data;
+        return data || [];
       }
       const { data, error } = await supabase.from("drivers").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
@@ -400,7 +400,7 @@ const AdminDriversPage = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("driver_wallet").select("*");
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
@@ -413,7 +413,7 @@ const AdminDriversPage = () => {
         .not("driver_id", "is", null)
         .in("status", ["assigned", "preparing", "on_the_way"]);
       if (error) throw error;
-      return data;
+      return data || [];
     },
     refetchInterval: 8000,
   });

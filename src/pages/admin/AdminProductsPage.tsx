@@ -79,7 +79,8 @@ const AdminProductsPage = () => {
 
   const { scopedBranchIds, filterBranchId } = useAdminAuth();
   const { data: categories, refetch: refetchCategories } = useAllCategories(scopedBranchIds);
-  const { data: categorySections = [] } = useCategorySections();
+  const { data: categorySectionsData } = useCategorySections();
+  const categorySections = categorySectionsData ?? [];
   const categoryNameMap = new Map((categories || []).map((c: any) => [c.id, c.name]));
 
   const sectionSubs = useMemo(() => {

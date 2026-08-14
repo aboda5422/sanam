@@ -28,7 +28,7 @@ const RecentOrders = () => {
       q = applyBranchFilter(q, scopedBranchIds);
       const { data, error } = await q;
       if (error) throw error;
-      return data;
+      return data || [];
     },
     refetchInterval: 30000,
   });

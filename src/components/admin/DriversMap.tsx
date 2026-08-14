@@ -40,7 +40,7 @@ const DriversMap = () => {
       }
       const { data, error } = await q;
       if (error) throw error;
-      return data as DriverLocation[];
+      return (data || []) as DriverLocation[];
     },
     refetchInterval: 15000,
   });
@@ -52,7 +52,7 @@ const DriversMap = () => {
       q = applyBranchFilter(q, scopedBranchIds, "id");
       const { data, error } = await q;
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 

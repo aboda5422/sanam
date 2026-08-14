@@ -73,5 +73,6 @@ export const useCategorySections = () => {
       }
       return defaultCategorySections;
     },
+    select: (rows) => (Array.isArray(rows) ? rows : defaultCategorySections),
   });
 };

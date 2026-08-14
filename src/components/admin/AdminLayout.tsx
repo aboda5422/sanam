@@ -66,7 +66,7 @@ const AdminShell = ({ children, title }: AdminLayoutProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">كل الفروع</SelectItem>
-                    {branches.map((b) => (
+                    { (branches ?? []).map((b) => (
                       <SelectItem key={b.id} value={b.id}>
                         {b.name}
                       </SelectItem>
