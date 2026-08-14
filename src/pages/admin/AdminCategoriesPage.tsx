@@ -14,6 +14,8 @@ import { Search, Loader2, Plus, Pencil, Trash2, FolderInput } from "lucide-react
 import ImageUpload from "@/components/admin/ImageUpload";
 import { CATEGORY_SECTIONS_SETTING_KEY, invalidateCategoryQueries } from "@/hooks/useCategories";
 import { categorySections as defaultSections, type CategorySection } from "@/data/store-data";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { applyBranchFilter, writeBranchId } from "@/lib/branch-scope";
 
 type CategoryRow = {
   id: string;
@@ -61,6 +63,7 @@ const sortedSections = (list: CategorySection[]) =>
 
 const AdminCategoriesPage = () => {
   const queryClient = useQueryClient();
+  const { scopedBranchIds, filterBranchId } = useAdminAuth();
   const [search, setSearch] = useState("");
   const [searchScope, setSearchScope] = useState<"main" | "sub">("main");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -80,12 +83,14 @@ const AdminCategoriesPage = () => {
   const [moveTargetSection, setMoveTargetSection] = useState("");
 
   const { data: categories, isLoading: catsLoading } = useQuery({
-    queryKey: ["admin-categories"],
+    queryKey: ["admin-categories", scopedBranchIds],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from("categories")
-        .select("id, name, name_en, image, slug, section, is_active, sort_order")
+        .select("id, name, name_en, image, slug, section, is_active, sort_order, branch_id")
         .order("sort_order");
+      q = applyBranchFilter(q, scopedBranchIds);
+      const { data, error } = await q;
       if (error) throw error;
       return (data || []) as CategoryRow[];
     },
@@ -145,7 +150,7 @@ const AdminCategoriesPage = () => {
         .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name, "ar"));
       const desired = Math.max(1, Math.min(Number(subForm.sort_order) || siblings.length + 1, siblings.length + 1));
 
-      const payload = {
+      const payload: any = {
         name: subForm.name,
         name_en: subForm.name_en || null,
         slug: subForm.slug,
@@ -160,6 +165,9 @@ const AdminCategoriesPage = () => {
         const { error } = await supabase.from("categories").update(payload).eq("id", editingSubId);
         if (error) throw error;
       } else {
+        const bid = writeBranchId(filterBranchId, scopedBranchIds);
+        if (!bid) throw new Error("اختر فرعاً من أعلى الصفحة قبل إضافة قسم");
+        payload.branch_id = bid;
         const { data, error } = await supabase.from("categories").insert(payload).select("id").single();
         if (error) throw error;
         savedId = data.id;
@@ -180,7 +188,7 @@ const AdminCategoriesPage = () => {
       setEditingSubId(null);
       setSubForm(emptyCategoryForm);
     },
-    onError: () => toast.error("حدث خطأ"),
+    onError: (e: any) => toast.error(e?.message || "حدث خطأ"),
   });
 
   const saveMainMutation = useMutation({

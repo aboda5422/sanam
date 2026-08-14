@@ -1,3 +1,4 @@
+// @refresh reset
 import {
   createContext,
   useCallback,
@@ -29,6 +30,12 @@ type AdminAuthContextValue = {
 const AdminAuthContext = createContext<AdminAuthContextValue | null>(null);
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
+  const existing = useContext(AdminAuthContext);
+  if (existing) return <>{children}</>;
+  return <AdminAuthProviderInner>{children}</AdminAuthProviderInner>;
+}
+
+function AdminAuthProviderInner({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [role, setRole] = useState<AdminPanelRole | null>(null);
@@ -39,55 +46,58 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const check = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
-        setLoading(false);
-        navigate("/admin/login");
-        return;
-      }
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          navigate("/admin/login");
+          return;
+        }
 
-      const uid = session.user.id;
-      setUserId(uid);
+        const uid = session.user.id;
+        setUserId(uid);
 
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", uid);
-
-      const panelRole = pickAdminRole(roles);
-      if (!panelRole) {
-        setLoading(false);
-        navigate("/admin/login");
-        return;
-      }
-
-      setRole(panelRole);
-
-      const { data: allBranches } = await supabase
-        .from("branches")
-        .select("id, name, slug, city")
-        .eq("is_active", true)
-        .order("name");
-
-      const isSuper = panelRole === "site_admin";
-      if (isSuper) {
-        setBranchIds([]);
-        setBranches((allBranches as AdminBranch[]) || []);
-      } else {
-        const { data: access } = await supabase
-          .from("admin_branch_access" as any)
-          .select("branch_id")
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
           .eq("user_id", uid);
-        const ids = (access || []).map((a: any) => a.branch_id as string);
-        setBranchIds(ids);
-        const list = (allBranches as AdminBranch[]) || [];
-        setBranches(ids.length ? list.filter((b) => ids.includes(b.id)) : list);
-        if (ids.length === 1) setFilterBranchId(ids[0]);
-      }
 
-      setLoading(false);
+        const panelRole = pickAdminRole(roles);
+        if (!panelRole) {
+          navigate("/admin/login");
+          return;
+        }
+
+        setRole(panelRole);
+
+        const { data: allBranches } = await supabase
+          .from("branches")
+          .select("id, name, slug, city")
+          .eq("is_active", true)
+          .order("name");
+
+        const isSuper = panelRole === "site_admin";
+        if (isSuper) {
+          setBranchIds([]);
+          setBranches((allBranches as AdminBranch[]) || []);
+        } else {
+          const { data: access } = await supabase
+            .from("admin_branch_access" as any)
+            .select("branch_id")
+            .eq("user_id", uid);
+          const ids = (access || []).map((a: any) => a.branch_id as string);
+          setBranchIds(ids);
+          const list = (allBranches as AdminBranch[]) || [];
+          setBranches(ids.length ? list.filter((b) => ids.includes(b.id)) : list);
+          if (ids.length === 1) setFilterBranchId(ids[0]);
+        }
+      } catch (err) {
+        console.error("[admin-auth]", err);
+        navigate("/admin/login");
+      } finally {
+        setLoading(false);
+      }
     };
 
     const {

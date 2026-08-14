@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/contexts/CartContext";
 import { toLegacyProduct } from "@/types/product";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useBranch } from "@/contexts/BranchContext";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ interface NoteItem {
 
 const QuickOrderSheet = ({ open, onOpenChange }: QuickOrderSheetProps) => {
   const { t, lang } = useLanguage();
+  const { selectedBranch } = useBranch();
   const { addItem } = useCart();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -59,7 +61,7 @@ const QuickOrderSheet = ({ open, onOpenChange }: QuickOrderSheetProps) => {
     debounceRef.current = setTimeout(async () => {
       try {
         const { data, error } = await supabase.functions.invoke("ai-quick-order", {
-          body: { query: query.trim() },
+          body: { query: query.trim(), branch_id: selectedBranch?.id },
         });
         if (error) throw error;
         setResults(data?.matches || []);
@@ -73,7 +75,7 @@ const QuickOrderSheet = ({ open, onOpenChange }: QuickOrderSheetProps) => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query]);
+  }, [query, selectedBranch?.id]);
 
   const addToNote = (p: ProductMatch) => {
     setNote((prev) => {

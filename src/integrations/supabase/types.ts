@@ -76,6 +76,7 @@ export type Database = {
           total: number
           updated_at: string
           user_id: string | null
+          branch_id: string | null
         }
         Insert: {
           converted?: boolean
@@ -88,6 +89,7 @@ export type Database = {
           total?: number
           updated_at?: string
           user_id?: string | null
+          branch_id?: string | null
         }
         Update: {
           converted?: boolean
@@ -100,6 +102,7 @@ export type Database = {
           total?: number
           updated_at?: string
           user_id?: string | null
+          branch_id?: string | null
         }
         Relationships: []
       }
@@ -246,6 +249,7 @@ export type Database = {
           section: string | null
           slug: string
           sort_order: number
+          branch_id: string
           updated_at: string
         }
         Insert: {
@@ -258,6 +262,7 @@ export type Database = {
           section?: string | null
           slug: string
           sort_order?: number
+          branch_id?: string
           updated_at?: string
         }
         Update: {
@@ -270,6 +275,7 @@ export type Database = {
           section?: string | null
           slug?: string
           sort_order?: number
+          branch_id?: string
           updated_at?: string
         }
         Relationships: []
@@ -287,6 +293,7 @@ export type Database = {
           type: Database["public"]["Enums"]["complaint_type"]
           updated_at: string
           user_id: string
+          branch_id: string | null
         }
         Insert: {
           admin_reply?: string | null
@@ -300,6 +307,7 @@ export type Database = {
           type?: Database["public"]["Enums"]["complaint_type"]
           updated_at?: string
           user_id: string
+          branch_id?: string | null
         }
         Update: {
           admin_reply?: string | null
@@ -713,6 +721,7 @@ export type Database = {
           session_id: string
           user_agent: string | null
           user_id: string | null
+          branch_id: string | null
         }
         Insert: {
           created_at?: string
@@ -722,6 +731,7 @@ export type Database = {
           session_id: string
           user_agent?: string | null
           user_id?: string | null
+          branch_id?: string | null
         }
         Update: {
           created_at?: string
@@ -731,6 +741,7 @@ export type Database = {
           session_id?: string
           user_agent?: string | null
           user_id?: string | null
+          branch_id?: string | null
         }
         Relationships: []
       }
@@ -816,6 +827,7 @@ export type Database = {
           size_label: string | null
           sort_order: number
           stock_quantity: number
+          branch_id: string
           unit: string
           updated_at: string
         }
@@ -841,6 +853,7 @@ export type Database = {
           size_label?: string | null
           sort_order?: number
           stock_quantity?: number
+          branch_id: string
           unit?: string
           updated_at?: string
         }
@@ -866,6 +879,7 @@ export type Database = {
           size_label?: string | null
           sort_order?: number
           stock_quantity?: number
+          branch_id?: string
           unit?: string
           updated_at?: string
         }
@@ -1138,6 +1152,7 @@ export type Database = {
           p_phone?: string
           p_id_number?: string
           p_vehicle_type?: string
+          p_branch_id?: string
         }
         Returns: Json
       }

@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Truck, Circle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { applyBranchFilter, fetchDriverIdsForBranches } from "@/lib/branch-scope";
 
 interface DriverLocation {
   id: string;
@@ -23,13 +25,20 @@ const DriversMap = () => {
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const { scopedBranchIds } = useAdminAuth();
 
   const { data: drivers, isLoading } = useQuery({
-    queryKey: ["admin-drivers-locations"],
+    queryKey: ["admin-drivers-locations", scopedBranchIds],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const driverIds = await fetchDriverIdsForBranches(scopedBranchIds);
+      let q = supabase
         .from("drivers")
         .select("id, phone, full_name, is_available, current_lat, current_lng, vehicle_type");
+      if (driverIds) {
+        if (!driverIds.length) return [] as DriverLocation[];
+        q = q.in("id", driverIds);
+      }
+      const { data, error } = await q;
       if (error) throw error;
       return data as DriverLocation[];
     },
@@ -37,11 +46,11 @@ const DriversMap = () => {
   });
 
   const { data: branches } = useQuery({
-    queryKey: ["admin-branches"],
+    queryKey: ["admin-branches-map", scopedBranchIds],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("branches")
-        .select("id, name, lat, lng, is_active");
+      let q = supabase.from("branches").select("id, name, lat, lng, is_active");
+      q = applyBranchFilter(q, scopedBranchIds, "id");
+      const { data, error } = await q;
       if (error) throw error;
       return data;
     },
@@ -92,6 +101,13 @@ const DriversMap = () => {
       gestureHandling: "greedy",
     });
   }, [mapLoaded]);
+
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const branch = branches?.find((b) => b.lat && b.lng);
+    if (!map || !branch) return;
+    map.panTo({ lat: Number(branch.lat), lng: Number(branch.lng) });
+  }, [branches]);
 
   // Update markers when data changes
   const updateMarkers = useCallback(() => {

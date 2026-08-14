@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { MessageSquare, Plus, Clock, CheckCircle, Loader2, Image, X, Send } from "lucide-react";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { pickImage } from "@/lib/native-camera";
+import { useBranch } from "@/contexts/BranchContext";
 
 type ComplaintStatus = "open" | "in_progress" | "resolved";
 
@@ -27,6 +28,7 @@ const CustomerComplaintsPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { verify: verifyRecaptcha } = useRecaptcha();
+  const { selectedBranch } = useBranch();
   const [user, setUser] = useState<any>(null);
   const [showNew, setShowNew] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState("");
@@ -51,7 +53,7 @@ const CustomerComplaintsPage = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
-        .select("id, order_number, created_at, status")
+        .select("id, order_number, created_at, status, branch_id")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -116,13 +118,15 @@ const CustomerComplaintsPage = () => {
         imageUrls.push(urlData.publicUrl);
       }
 
+      const order = (orders || []).find((o: any) => o.id === selectedOrder);
       const { error } = await supabase.from("complaints").insert({
         user_id: user.id,
         order_id: selectedOrder || null,
         type,
         message,
         image_urls: imageUrls,
-      });
+        branch_id: order?.branch_id || selectedBranch?.id || null,
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {

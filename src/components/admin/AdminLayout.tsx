@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
@@ -13,6 +13,12 @@ interface AdminLayoutProps {
   children: ReactNode;
   title?: string;
 }
+
+type AdminShellContextValue = {
+  setTitle: (title?: string) => void;
+};
+
+const AdminShellContext = createContext<AdminShellContextValue | null>(null);
 
 const AdminShell = ({ children, title }: AdminLayoutProps) => {
   const location = useLocation();
@@ -75,7 +81,6 @@ const AdminShell = ({ children, title }: AdminLayoutProps) => {
               </Badge>
             </div>
           </header>
-          {/* dir=rtl keeps the content scrollbar on the left (toward the page start) */}
           <main className="flex-1 min-h-0 p-4 md:p-6 overflow-y-auto" dir="rtl">
             <AdminErrorBoundary>{children}</AdminErrorBoundary>
           </main>
@@ -85,10 +90,32 @@ const AdminShell = ({ children, title }: AdminLayoutProps) => {
   );
 };
 
-const AdminLayout = ({ children, title }: AdminLayoutProps) => (
-  <AdminAuthProvider>
-    <AdminShell title={title}>{children}</AdminShell>
-  </AdminAuthProvider>
-);
+/** Persistent chrome for authenticated admin routes (sidebar survives page crashes). */
+export function AdminAuthedShell({ children }: { children: ReactNode }) {
+  const [title, setTitle] = useState<string | undefined>();
+  return (
+    <AdminShellContext.Provider value={{ setTitle }}>
+      <AdminShell title={title}>{children}</AdminShell>
+    </AdminShellContext.Provider>
+  );
+}
+
+const AdminLayout = ({ children, title }: AdminLayoutProps) => {
+  const shell = useContext(AdminShellContext);
+
+  useEffect(() => {
+    if (!shell) return;
+    shell.setTitle(title);
+    return () => shell.setTitle(undefined);
+  }, [shell, title]);
+
+  if (shell) return <>{children}</>;
+
+  return (
+    <AdminAuthProvider>
+      <AdminShell title={title}>{children}</AdminShell>
+    </AdminAuthProvider>
+  );
+};
 
 export default AdminLayout;

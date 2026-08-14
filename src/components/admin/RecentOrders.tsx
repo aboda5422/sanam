@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { applyBranchFilter } from "@/lib/branch-scope";
 
 const statusLabels: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { label: "قيد الانتظار", variant: "secondary" },
@@ -14,14 +16,17 @@ const statusLabels: Record<string, { label: string; variant: "default" | "second
 };
 
 const RecentOrders = () => {
+  const { scopedBranchIds } = useAdminAuth();
   const { data: orders, isLoading } = useQuery({
-    queryKey: ["admin-recent-orders"],
+    queryKey: ["admin-recent-orders", scopedBranchIds],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from("orders")
         .select("id, order_number, customer_name, total, status, created_at, payment_method")
         .order("created_at", { ascending: false })
         .limit(10);
+      q = applyBranchFilter(q, scopedBranchIds);
+      const { data, error } = await q;
       if (error) throw error;
       return data;
     },

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { trackPageView } from "@/lib/analytics";
+import { useBranch } from "@/contexts/BranchContext";
 
 const SESSION_KEY = "bz_session_id";
 
@@ -16,6 +17,7 @@ export const getSessionId = (): string => {
 
 export const usePageTracking = () => {
   const location = useLocation();
+  const { selectedBranch } = useBranch();
 
   useEffect(() => {
     // Skip admin/driver internal routes
@@ -38,11 +40,12 @@ export const usePageTracking = () => {
           path: location.pathname,
           referrer: document.referrer || null,
           user_agent: navigator.userAgent.slice(0, 200),
+          branch_id: selectedBranch?.id || null,
         });
       } catch {
         // silent fail - tracking should never break the app
       }
     };
     track();
-  }, [location.pathname, location.search]);
+  }, [location.pathname, location.search, selectedBranch?.id]);
 };

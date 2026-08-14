@@ -26,6 +26,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 const STATUS_META: Record<string, { label: string; variant: "default" | "destructive" | "secondary" }> = {
   active: { label: "مفعّل", variant: "default" },
@@ -124,6 +125,7 @@ const customerExportValue = (c: CustomerProfile, col: ExportColumnId): string | 
 };
 
 const AdminCustomersPage = () => {
+  const { scopedBranchIds } = useAdminAuth();
   const [customers, setCustomers] = useState<CustomerProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -156,15 +158,28 @@ const AdminCustomersPage = () => {
       .select("user_id, role")
       .in("role", ["store_admin", "site_admin", "driver", "accountant", "inventory", "support"]);
     const staffIds = new Set((staffRoles || []).map((r) => r.user_id));
-    const customerProfiles = profiles.filter((p) => !staffIds.has(p.user_id));
+    let customerProfiles = profiles.filter((p) => !staffIds.has(p.user_id));
 
     const { data: orders } = await supabase
       .from("orders")
-      .select("user_id, total, national_address, created_at");
+      .select("user_id, total, national_address, created_at, branch_id");
+
+    const scopedOrders = (orders || []).filter((o) => {
+      if (!o.user_id) return false;
+      if (scopedBranchIds && scopedBranchIds.length > 0) {
+        return o.branch_id && scopedBranchIds.includes(o.branch_id);
+      }
+      return true;
+    });
+
+    if (scopedBranchIds && scopedBranchIds.length > 0) {
+      const allowed = new Set(scopedOrders.map((o) => o.user_id as string));
+      customerProfiles = customerProfiles.filter((p) => allowed.has(p.user_id));
+    }
 
     const orderStats: Record<string, { count: number; total: number }> = {};
     const nationalByUser = new Map<string, { address: string; at: number }>();
-    orders?.forEach(o => {
+    scopedOrders.forEach(o => {
       if (!o.user_id) return;
       if (!orderStats[o.user_id]) orderStats[o.user_id] = { count: 0, total: 0 };
       orderStats[o.user_id].count++;
@@ -197,7 +212,7 @@ const AdminCustomersPage = () => {
     setLoading(false);
   };
 
-  useEffect(() => { fetchCustomers(); }, []);
+  useEffect(() => { fetchCustomers(); }, [scopedBranchIds]);
 
   const filtered = customers.filter(c => {
     const matchSearch = !search ||

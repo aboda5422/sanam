@@ -15,6 +15,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { applyBranchFilter, writeBranchId } from "@/lib/branch-scope";
 
 interface Announcement {
   id: string;
@@ -27,6 +29,7 @@ interface Announcement {
 }
 
 const AdminAnnouncementsPage = () => {
+  const { scopedBranchIds, filterBranchId } = useAdminAuth();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -35,15 +38,14 @@ const AdminAnnouncementsPage = () => {
 
   const fetchAnnouncements = async () => {
     setLoading(true);
-    const { data } = await (supabase as any)
-      .from("announcements")
-      .select("*")
-      .order("sort_order", { ascending: true });
+    let q = (supabase as any).from("announcements").select("*").order("sort_order", { ascending: true });
+    q = applyBranchFilter(q, scopedBranchIds);
+    const { data } = await q;
     setAnnouncements(data || []);
     setLoading(false);
   };
 
-  useEffect(() => { fetchAnnouncements(); }, []);
+  useEffect(() => { fetchAnnouncements(); }, [scopedBranchIds]);
 
   const handleSave = async () => {
     if (!form.title.trim()) { toast.error("العنوان مطلوب"); return; }
@@ -56,9 +58,11 @@ const AdminAnnouncementsPage = () => {
       if (error) { toast.error("فشل التحديث"); return; }
       toast.success("تم تحديث الشعار");
     } else {
+      const bid = writeBranchId(filterBranchId, scopedBranchIds);
+      if (!bid) { toast.error("اختر فرعاً من أعلى الصفحة قبل إضافة شعار"); return; }
       const { error } = await (supabase as any)
         .from("announcements")
-        .insert({ ...form, sort_order: announcements.length });
+        .insert({ ...form, sort_order: announcements.length, branch_id: bid });
       if (error) { toast.error("فشل الإضافة"); return; }
       toast.success("تم إضافة الشعار");
     }

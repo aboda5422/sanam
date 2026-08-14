@@ -18,6 +18,8 @@ import { ImageIcon, ScanBarcode } from "lucide-react";
 import { useAllCategories, useCategorySections } from "@/hooks/useCategories";
 import ImageUpload from "@/components/admin/ImageUpload";
 import ProductsBulkTools from "@/components/admin/ProductsBulkTools";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { applyBranchFilter, writeBranchId } from "@/lib/branch-scope";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -75,7 +77,8 @@ const AdminProductsPage = () => {
   const [moveSectionId, setMoveSectionId] = useState("");
   const [offerSectionId, setOfferSectionId] = useState("");
 
-  const { data: categories, refetch: refetchCategories } = useAllCategories();
+  const { scopedBranchIds, filterBranchId } = useAdminAuth();
+  const { data: categories, refetch: refetchCategories } = useAllCategories(scopedBranchIds);
   const { data: categorySections = [] } = useCategorySections();
   const categoryNameMap = new Map((categories || []).map((c: any) => [c.id, c.name]));
 
@@ -183,18 +186,19 @@ const AdminProductsPage = () => {
     (categories || []).find((c) => c.id === categoryId)?.section || "";
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ["admin-products"],
+    queryKey: ["admin-products", scopedBranchIds],
     queryFn: async () => {
-      // Fetch ALL products in chunks (Supabase max is 1000 per request)
       const PAGE_SIZE = 1000;
       let all: any[] = [];
       let from = 0;
       while (true) {
-        const { data, error } = await supabase
+        let q = supabase
           .from("products")
-          .select("id, name, name_en, price, original_price, image, is_active, is_featured, extra_label, unit, category_id, description, barcode, stock_quantity, cost_price")
-          .order("sort_order")
+          .select("id, name, name_en, price, original_price, image, is_active, is_featured, extra_label, unit, category_id, description, barcode, stock_quantity, cost_price, branch_id")
+          .order("id")
           .range(from, from + PAGE_SIZE - 1);
+        q = applyBranchFilter(q, scopedBranchIds);
+        const { data, error } = await q;
         if (error) throw error;
         if (!data || data.length === 0) break;
         all = all.concat(data);
@@ -211,7 +215,7 @@ const AdminProductsPage = () => {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const payload = {
+      const payload: any = {
         name: form.name, name_en: form.name_en || null, price: Number(form.price),
         original_price: form.original_price ? Number(form.original_price) : null,
         image: form.image || null, unit: form.unit, description: form.description || null,
@@ -224,6 +228,9 @@ const AdminProductsPage = () => {
         const { error } = await supabase.from("products").update(payload).eq("id", editingId);
         if (error) throw error;
       } else {
+        const bid = writeBranchId(filterBranchId, scopedBranchIds);
+        if (!bid) throw new Error("اختر فرعاً من أعلى الصفحة قبل إضافة منتج");
+        payload.branch_id = bid;
         const { error } = await supabase.from("products").insert(payload);
         if (error) throw error;
       }
@@ -233,7 +240,7 @@ const AdminProductsPage = () => {
       toast.success(editingId ? "تم التحديث" : "تمت الإضافة");
       setDialogOpen(false); setEditingId(null); setForm(emptyForm);
     },
-    onError: () => toast.error("حدث خطأ"),
+    onError: (e: any) => toast.error(e?.message || "حدث خطأ"),
   });
 
   const deleteMutation = useMutation({
@@ -1088,6 +1095,8 @@ const AdminProductsPage = () => {
       <ProductsBulkTools
         categories={categories}
         productsCount={products?.length || 0}
+        scopedBranchIds={scopedBranchIds}
+        writeBranchId={writeBranchId(filterBranchId, scopedBranchIds)}
       />
 
       {/* Add/Edit Dialog */}

@@ -15,6 +15,8 @@ import {
   Loader2, Star, Plus, Truck, Users, Wallet, MapPin, Search,
   UserPlus, Ban, CheckCircle, Trash2, ArrowLeftRight, Eye, Phone, Mail
 } from "lucide-react";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { applyBranchFilter, writeBranchId } from "@/lib/branch-scope";
 import DriversMap from "@/components/admin/DriversMap";
 
 /* ─── KPI Cards ─── */
@@ -53,6 +55,7 @@ const KPICards = ({ drivers, wallets }: { drivers: any[]; wallets: any[] }) => {
 /* ─── Add Driver Dialog ─── */
 const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) => {
   const qc = useQueryClient();
+  const { scopedBranchIds, filterBranchId } = useAdminAuth();
   const [form, setForm] = useState({
     username: "",
     password: "",
@@ -70,6 +73,8 @@ const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: 
       if (form.password.trim().length < 6) {
         throw new Error("كلمة المرور يجب ألا تقل عن 6 أحرف");
       }
+      const bid = writeBranchId(filterBranchId, scopedBranchIds);
+      if (!bid) throw new Error("اختر فرعاً من أعلى الصفحة قبل إضافة مندوب");
       const { data, error } = await supabase.rpc("create_driver", {
         p_full_name: form.full_name.trim(),
         p_username: form.username.trim(),
@@ -77,6 +82,7 @@ const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: 
         p_phone: form.phone.trim() || undefined,
         p_id_number: form.id_number.trim() || undefined,
         p_vehicle_type: form.vehicle_type,
+        p_branch_id: bid,
       });
       if (error) throw error;
       const payload = data as { success?: boolean } | null;
@@ -142,11 +148,14 @@ const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: 
 /* ─── Order Assignment Section ─── */
 const OrderAssignment = () => {
   const qc = useQueryClient();
+  const { scopedBranchIds } = useAdminAuth();
 
   const { data: pendingOrders } = useQuery({
-    queryKey: ["pending-orders-for-assign"],
+    queryKey: ["pending-orders-for-assign", scopedBranchIds],
     queryFn: async () => {
-      const { data, error } = await supabase.from("orders").select("*").in("status", ["pending", "assigned"]).order("created_at", { ascending: false });
+      let q = supabase.from("orders").select("*").in("status", ["pending", "assigned"]).order("created_at", { ascending: false });
+      q = applyBranchFilter(q, scopedBranchIds);
+      const { data, error } = await q;
       if (error) throw error;
       return data;
     },
@@ -154,8 +163,20 @@ const OrderAssignment = () => {
   });
 
   const { data: activeDrivers } = useQuery({
-    queryKey: ["active-drivers-for-assign"],
+    queryKey: ["active-drivers-for-assign", scopedBranchIds],
     queryFn: async () => {
+      if (scopedBranchIds && scopedBranchIds.length > 0) {
+        const { data: links, error: le } = await supabase
+          .from("driver_branches" as any)
+          .select("driver_id")
+          .in("branch_id", scopedBranchIds);
+        if (le) throw le;
+        const ids = [...new Set((links || []).map((r: any) => r.driver_id))];
+        if (!ids.length) return [];
+        const { data, error } = await supabase.from("drivers").select("id, full_name, phone, is_available, status").eq("status", "active").in("id", ids);
+        if (error) throw error;
+        return data;
+      }
       const { data, error } = await supabase.from("drivers").select("id, full_name, phone, is_available, status").eq("status", "active");
       if (error) throw error;
       return data;
@@ -351,10 +372,23 @@ const AdminDriversPage = () => {
   const [addOpen, setAddOpen] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState<any>(null);
   const qc = useQueryClient();
+  const { scopedBranchIds } = useAdminAuth();
 
   const { data: drivers, isLoading } = useQuery({
-    queryKey: ["admin-drivers"],
+    queryKey: ["admin-drivers", scopedBranchIds],
     queryFn: async () => {
+      if (scopedBranchIds && scopedBranchIds.length > 0) {
+        const { data: links, error: le } = await supabase
+          .from("driver_branches" as any)
+          .select("driver_id")
+          .in("branch_id", scopedBranchIds);
+        if (le) throw le;
+        const ids = [...new Set((links || []).map((r: any) => r.driver_id))];
+        if (!ids.length) return [];
+        const { data, error } = await supabase.from("drivers").select("*").in("id", ids).order("created_at", { ascending: false });
+        if (error) throw error;
+        return data;
+      }
       const { data, error } = await supabase.from("drivers").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       return data;

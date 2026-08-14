@@ -58,7 +58,7 @@ const settingsItems = [
 ];
 
 export function AdminSidebar() {
-  const { state } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const navigate = useNavigate();
@@ -98,6 +98,9 @@ export function AdminSidebar() {
                   end={item.url === "/admin"}
                   className="hover:bg-muted/50"
                   activeClassName="bg-primary/10 text-primary font-medium"
+                  onClick={() => {
+                    if (isMobile) setOpenMobile(false);
+                  }}
                 >
                   <item.icon className="ml-2 h-4 w-4" />
                   {!collapsed && <span>{item.title}</span>}

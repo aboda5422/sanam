@@ -12,7 +12,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { applyBranchFilter } from "@/lib/branch-scope";
 import {
   downloadProductsTemplate,
   parseAndValidateProductsFile,
@@ -24,11 +24,13 @@ import {
 type Props = {
   categories: CategoryOption[] | undefined;
   productsCount: number;
+  scopedBranchIds?: string[] | null;
+  writeBranchId?: string | null;
 };
 
 const BATCH_SIZE = 50;
 
-const ProductsBulkTools = ({ categories, productsCount }: Props) => {
+const ProductsBulkTools = ({ categories, productsCount, scopedBranchIds, writeBranchId: targetBranchId }: Props) => {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -90,10 +92,12 @@ const ProductsBulkTools = ({ categories, productsCount }: Props) => {
       let ids: string[] = [];
       let from = 0;
       while (true) {
-        const { data, error } = await supabase
+        let q = supabase
           .from("products")
           .select("id")
           .range(from, from + PAGE - 1);
+        q = applyBranchFilter(q, scopedBranchIds);
+        const { data, error } = await q;
         if (error) throw error;
         if (!data?.length) break;
         ids = ids.concat(data.map((p) => p.id));
@@ -163,7 +167,12 @@ const ProductsBulkTools = ({ categories, productsCount }: Props) => {
       setImportProgress({ done: 0, total: items.length });
 
       for (let i = 0; i < items.length; i += BATCH_SIZE) {
-        const chunk = items.slice(i, i + BATCH_SIZE).map(toInsertPayload);
+        const chunk = items.slice(i, i + BATCH_SIZE).map((row) => {
+          const payload: any = toInsertPayload(row);
+          if (targetBranchId) payload.branch_id = targetBranchId;
+          return payload;
+        });
+        if (!targetBranchId) throw new Error("اختر فرعاً من أعلى الصفحة قبل رفع المنتجات");
         const { error } = await supabase.from("products").insert(chunk);
         if (error) {
           throw new Error(error.message);

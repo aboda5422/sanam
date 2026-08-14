@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import { Product } from "@/data/store-data";
 import { supabase } from "@/integrations/supabase/client";
 import { getSessionId } from "@/hooks/usePageTracking";
+import { useBranch } from "@/contexts/BranchContext";
 
 export interface CartItem {
   product: Product;
@@ -26,6 +27,16 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { selectedBranch } = useBranch();
+  const branchIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const id = selectedBranch?.id || null;
+    if (branchIdRef.current && id && branchIdRef.current !== id) {
+      setItems([]);
+    }
+    branchIdRef.current = id;
+  }, [selectedBranch?.id]);
 
   const addItem = useCallback((product: Product, quantity = 1) => {
     setItems((prev) => {
@@ -73,6 +84,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           items: items.map((i) => ({ id: i.product.id, name: i.product.name, qty: i.quantity, price: i.product.price })),
           total: totalPrice,
           items_count: totalItems,
+          branch_id: selectedBranch?.id || null,
         };
         await supabase.from("abandoned_carts").upsert(payload, { onConflict: "session_id" });
       } catch {
@@ -82,7 +94,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       if (syncTimer.current) clearTimeout(syncTimer.current);
     };
-  }, [items, totalItems, totalPrice]);
+  }, [items, totalItems, totalPrice, selectedBranch?.id]);
 
   const markCheckoutReached = useCallback(async () => {
     try {

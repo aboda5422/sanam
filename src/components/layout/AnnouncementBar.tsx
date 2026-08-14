@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useBranch } from "@/contexts/BranchContext";
 
 interface AnnouncementData {
   id: string;
@@ -31,18 +32,25 @@ const AnnouncementBar = () => {
   const [announcements, setAnnouncements] = useState<AnnouncementData[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const { t } = useLanguage();
+  const { selectedBranch } = useBranch();
 
   useEffect(() => {
     const fetch = async () => {
+      if (!selectedBranch?.id) {
+        setAnnouncements([]);
+        return;
+      }
       const { data } = await (supabase as any)
         .from("announcements")
         .select("id, title, content, bg_color")
         .eq("is_active", true)
+        .eq("branch_id", selectedBranch.id)
         .order("sort_order", { ascending: true });
       if (data?.length) setAnnouncements(data);
+      else setAnnouncements([]);
     };
     fetch();
-  }, []);
+  }, [selectedBranch?.id]);
 
   // Reset the status-bar band color when the announcement is hidden/unmounted
   useEffect(() => {

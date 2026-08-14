@@ -66,20 +66,21 @@ const Header = () => {
 
   // Search products from DB
   useEffect(() => {
-    if (!searchQuery.trim()) { setSearchResults([]); setSearchLoading(false); return; }
+    if (!searchQuery.trim() || !selectedBranch?.id) { setSearchResults([]); setSearchLoading(false); return; }
     setSearchLoading(true);
     const timeout = setTimeout(async () => {
       const { data } = await supabase
         .from("products")
         .select("id, name, name_en, price, image")
         .eq("is_active", true)
+        .eq("branch_id", selectedBranch.id)
         .or(`name.ilike.%${searchQuery}%,name_en.ilike.%${searchQuery}%`)
         .limit(8);
       setSearchResults(data || []);
       setSearchLoading(false);
     }, 300);
     return () => clearTimeout(timeout);
-  }, [searchQuery]);
+  }, [searchQuery, selectedBranch?.id]);
 
   // Close search on click outside
   useEffect(() => {

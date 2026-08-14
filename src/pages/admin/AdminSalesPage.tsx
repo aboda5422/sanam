@@ -16,9 +16,13 @@ import {
 import { format, subDays, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import { ar } from "date-fns/locale";
 
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { applyBranchFilter } from "@/lib/branch-scope";
+
 type DateFilter = "today" | "week" | "month" | "custom";
 
 const AdminSalesPage = () => {
+  const { scopedBranchIds } = useAdminAuth();
   const [dateFilter, setDateFilter] = useState<DateFilter>("month");
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
@@ -27,12 +31,14 @@ const AdminSalesPage = () => {
   const [paymentFilter, setPaymentFilter] = useState("all");
 
   const { data: orders, isLoading } = useQuery({
-    queryKey: ["admin-sales-orders"],
+    queryKey: ["admin-sales-orders", scopedBranchIds],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from("orders")
         .select("id, order_number, total, subtotal, delivery_fee, status, payment_method, created_at, collected_amount, customer_name, customer_phone, driver_id, drivers(full_name)")
         .order("created_at", { ascending: false });
+      q = applyBranchFilter(q, scopedBranchIds);
+      const { data, error } = await q;
       if (error) throw error;
       return data;
     },

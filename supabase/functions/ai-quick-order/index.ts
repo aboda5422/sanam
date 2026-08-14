@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { query } = await req.json();
+    const { query, branch_id } = await req.json();
     if (!query || typeof query !== "string" || query.trim().length < 2) {
       return new Response(JSON.stringify({ matches: [] }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -37,12 +37,15 @@ Deno.serve(async (req) => {
       orParts.push(`name_en.ilike.%${safe}%`);
     }
 
-    const { data: candidates, error } = await supabase
+    let productQuery = supabase
       .from("products")
       .select("id, name, name_en, price, image, unit, category_id, is_active")
       .eq("is_active", true)
       .or(orParts.join(","))
       .limit(40);
+    if (branch_id) productQuery = productQuery.eq("branch_id", branch_id);
+
+    const { data: candidates, error } = await productQuery;
 
     if (error) throw error;
 

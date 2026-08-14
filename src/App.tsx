@@ -1,11 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { BranchProvider } from "@/contexts/BranchContext";
+import { AdminAuthProvider } from "@/hooks/useAdminAuth";
+import { AdminAuthedShell } from "@/components/admin/AdminLayout";
 import BranchPickerDialog from "@/components/branch/BranchPickerDialog";
 import Index from "./pages/Index";
 import CategoryPage from "./pages/CategoryPage";
@@ -57,15 +59,23 @@ import DriverProfilePage from "./pages/driver/DriverProfilePage";
 
 const queryClient = new QueryClient();
 
+const AdminAuthedLayout = () => (
+  <AdminAuthProvider>
+    <AdminAuthedShell>
+      <Outlet />
+    </AdminAuthedShell>
+  </AdminAuthProvider>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LanguageProvider>
-      <CartProvider>
         <Toaster />
         <Sonner />
         <BrowserRouter>
           <BranchProvider>
+          <CartProvider>
           <ScrollToTop />
           <RouteTracker />
           <BranchPickerDialog />
@@ -91,6 +101,7 @@ const App = () => (
 
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route element={<AdminAuthedLayout />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/orders" element={<AdminOrdersPage />} />
             <Route path="/admin/products" element={<AdminProductsPage />} />
@@ -107,6 +118,7 @@ const App = () => (
             <Route path="/admin/email-logs" element={<AdminEmailLogsPage />} />
             <Route path="/admin/tracking" element={<Navigate to="/admin/drivers" replace />} />
             <Route path="/admin/wallets" element={<Navigate to="/admin/drivers" replace />} />
+            </Route>
 
             {/* Driver Routes */}
             <Route path="/driver/login" element={<DriverLoginPage />} />
@@ -121,9 +133,9 @@ const App = () => (
           </Routes>
           <MobileBottomNav />
           <MobileSwipeNavigation />
+          </CartProvider>
           </BranchProvider>
         </BrowserRouter>
-      </CartProvider>
       </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>

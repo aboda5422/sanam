@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { MessageSquare, Clock, CheckCircle, Loader2 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { applyBranchFilter } from "@/lib/branch-scope";
 
 type Complaint = Database["public"]["Tables"]["complaints"]["Row"];
 type ComplaintStatus = Database["public"]["Enums"]["complaint_status"];
@@ -22,17 +24,17 @@ const statusMap: Record<ComplaintStatus, { label: string; color: string; icon: t
 
 const AdminComplaintsPage = () => {
   const queryClient = useQueryClient();
+  const { scopedBranchIds } = useAdminAuth();
   const [selected, setSelected] = useState<Complaint | null>(null);
   const [reply, setReply] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
 
   const { data: complaints, isLoading } = useQuery({
-    queryKey: ["admin-complaints"],
+    queryKey: ["admin-complaints", scopedBranchIds],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("complaints")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let q = supabase.from("complaints").select("*").order("created_at", { ascending: false });
+      q = applyBranchFilter(q, scopedBranchIds);
+      const { data, error } = await q;
       if (error) throw error;
       return data as Complaint[];
     },

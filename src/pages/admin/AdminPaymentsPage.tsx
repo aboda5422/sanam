@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Wallet, TrendingUp, Undo2, AlertCircle } from "lucide-react";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 const paymentStatusMap: Record<string, { label: string; className: string }> = {
   pending: { label: "معلّق", className: "bg-yellow-100 text-yellow-800 border-yellow-300" },
@@ -24,6 +25,7 @@ const methodLabel = (m: string) => {
 };
 
 const AdminPaymentsPage = () => {
+  const { scopedBranchIds } = useAdminAuth();
   const today = new Date().toISOString().slice(0, 10);
   const monthAgo = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
   const [from, setFrom] = useState(monthAgo);
@@ -31,15 +33,18 @@ const AdminPaymentsPage = () => {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const { data: payments, isLoading } = useQuery({
-    queryKey: ["admin-payments", from, to, statusFilter],
+    queryKey: ["admin-payments", from, to, statusFilter, scopedBranchIds],
     queryFn: async () => {
       let q = supabase
         .from("payments")
-        .select("*, orders(order_number, customer_name, customer_phone)")
+        .select("*, orders!inner(order_number, customer_name, customer_phone, branch_id)")
         .gte("created_at", `${from}T00:00:00`)
         .lte("created_at", `${to}T23:59:59`)
         .order("created_at", { ascending: false });
       if (statusFilter !== "all") q = q.eq("status", statusFilter as any);
+      if (scopedBranchIds && scopedBranchIds.length > 0) {
+        q = q.in("orders.branch_id", scopedBranchIds);
+      }
       const { data, error } = await q;
       if (error) throw error;
       return data;

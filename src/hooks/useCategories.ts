@@ -2,6 +2,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Category } from "@/types/product";
 import { categorySections as defaultCategorySections, type CategorySection } from "@/data/store-data";
+import { useBranch } from "@/contexts/BranchContext";
+import { applyBranchFilter } from "@/lib/branch-scope";
 
 /** Keep storefront + admin product category lists in sync after CRUD. */
 export const CATEGORY_QUERY_KEYS = ["categories", "all-categories", "admin-categories"] as const;
@@ -15,13 +17,17 @@ export function invalidateCategoryQueries(queryClient: ReturnType<typeof useQuer
 }
 
 export const useCategories = () => {
+  const { selectedBranch } = useBranch();
+  const branchId = selectedBranch?.id;
   return useQuery<Category[]>({
-    queryKey: ["categories"],
+    queryKey: ["categories", branchId],
+    enabled: !!branchId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("categories")
-        .select("id, name, name_en, image, slug, section, is_active, sort_order")
+        .select("id, name, name_en, image, slug, section, is_active, sort_order, branch_id")
         .eq("is_active", true)
+        .eq("branch_id", branchId!)
         .order("sort_order");
       if (error) throw error;
       return data || [];
@@ -29,14 +35,16 @@ export const useCategories = () => {
   });
 };
 
-export const useAllCategories = () => {
+export const useAllCategories = (scopedBranchIds?: string[] | null) => {
   return useQuery<Category[]>({
-    queryKey: ["all-categories"],
+    queryKey: ["all-categories", scopedBranchIds],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from("categories")
-        .select("id, name, name_en, image, slug, section, is_active, sort_order")
+        .select("id, name, name_en, image, slug, section, is_active, sort_order, branch_id")
         .order("sort_order");
+      q = applyBranchFilter(q, scopedBranchIds);
+      const { data, error } = await q;
       if (error) throw error;
       return data || [];
     },

@@ -7,6 +7,7 @@ export interface Product {
   original_price: number | null;
   image: string | null;
   category_id: string | null;
+  branch_id?: string;
   unit: string;
   description: string | null;
   is_active: boolean;
@@ -30,6 +31,7 @@ export interface Category {
   image: string | null;
   slug: string;
   section?: string | null;
+  branch_id?: string;
   is_active: boolean;
   sort_order: number;
 }
