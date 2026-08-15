@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Search, Loader2, Eye, XCircle, Undo2 } from "lucide-react";
+import { Search, Loader2, Eye, XCircle, Undo2, MapPin } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { mapsLinkFromCoords, parseMapsCoords } from "@/lib/maps-link";
 
 const statusMap: Record<string, { label: string; color: string }> = {
   pending: { label: "بانتظار", color: "bg-yellow-100 text-yellow-800" },
@@ -28,6 +29,23 @@ const paymentStatusMap: Record<string, { label: string; className: string }> = {
   refunded: { label: "مسترد", className: "bg-purple-100 text-purple-800 border-purple-300" },
   cancelled: { label: "ملغي", className: "bg-gray-100 text-gray-800 border-gray-300" },
 };
+
+function orderDeliveryCoords(order: {
+  delivery_lat?: number | null;
+  delivery_lng?: number | null;
+  delivery_address?: string | null;
+}) {
+  if (Number.isFinite(order.delivery_lat) && Number.isFinite(order.delivery_lng)) {
+    return { lat: Number(order.delivery_lat), lng: Number(order.delivery_lng) };
+  }
+  const addr = order.delivery_address || "";
+  const fromText = addr.match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
+  if (fromText) {
+    const parsed = parseMapsCoords(`${fromText[1]},${fromText[2]}`);
+    if (parsed) return parsed;
+  }
+  return null;
+}
 
 const AdminOrdersContent = () => {
   const { scopedBranchIds, isSuperAdmin } = useAdminAuth();
@@ -236,7 +254,33 @@ const AdminOrdersContent = () => {
               <div className="grid grid-cols-2 gap-2">
                 <div><span className="text-muted-foreground">العميل:</span> {selectedOrder.customer_name}</div>
                 <div><span className="text-muted-foreground">الهاتف:</span> {selectedOrder.customer_phone}</div>
-                <div><span className="text-muted-foreground">العنوان:</span> {selectedOrder.delivery_address || "—"}</div>
+                <div className="flex flex-col items-start gap-1">
+                  <span className="text-muted-foreground">العنوان:</span>
+                  {(() => {
+                    const coords = orderDeliveryCoords(selectedOrder);
+                    const addr = selectedOrder.delivery_address || "";
+                    const coordOnly = /موقع محدد:/.test(addr);
+                    return (
+                      <>
+                        {!coordOnly && addr ? <span>{addr}</span> : null}
+                        {coords ? (
+                          <Button asChild size="sm" variant="outline" className="gap-1.5 h-8">
+                            <a
+                              href={mapsLinkFromCoords(coords.lat, coords.lng)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <MapPin className="h-3.5 w-3.5" />
+                              فتح على الخريطة
+                            </a>
+                          </Button>
+                        ) : (
+                          !addr && <span>—</span>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
                 <div><span className="text-muted-foreground">الدفع:</span> {selectedOrder.payment_method}</div>
               </div>
               {selectedOrder.notes && (

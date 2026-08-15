@@ -25,11 +25,17 @@ import {
   feeForDistance,
   isValidNationalAddress,
   normalizeNationalAddress,
+  addressHasCoords,
   IMMEDIATE_DELIVERY_LABEL,
   isBranchOpenNow,
   immediateDeliveryClosedMessage,
+  formatAddressLabel,
+  notifyAddressesChanged,
+  NATIONAL_ADDRESS_LOOKUP_ENABLED,
+  type CustomerAddressPayload,
 } from "@/lib/branch";
 import { applyCustomerDiscount } from "@/lib/customer-discount";
+import { splitInclusiveVat } from "@/lib/vat";
 
 const deliveryTimes = [
   IMMEDIATE_DELIVERY_LABEL,
@@ -57,7 +63,7 @@ const CheckoutPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [showMapPicker, setShowMapPicker] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState<{ label: string; address: string; lat: number; lng: number; id?: string } | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<CustomerAddressPayload | null>(null);
   const [user, setUser] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("cash");
   const [processing, setProcessing] = useState(false);
@@ -83,13 +89,14 @@ const CheckoutPage = () => {
         // Auto-select default delivery address
         const { data: defaultAddr } = await supabase
           .from("user_addresses")
-          .select("id, label, address, lat, lng")
+          .select("id, label, address, lat, lng, national_address")
           .eq("user_id", session.user.id)
           .eq("is_default", true)
           .maybeSingle();
         if (defaultAddr) {
-          // Keep selecting it; coverage is re-checked when zones load / on submit
-          setSelectedAddress(defaultAddr as any);
+          setSelectedAddress(defaultAddr as CustomerAddressPayload);
+          const na = (defaultAddr as any).national_address;
+          if (na) setNationalAddress(normalizeNationalAddress(na));
         }
       }
     };
@@ -99,7 +106,8 @@ const CheckoutPage = () => {
   // If a saved/default address falls outside active zones, clear it once zones are known
   useEffect(() => {
     if (!selectedAddress || activeZones.length === 0) return;
-    if (!isLocationCovered(selectedAddress.lat, selectedAddress.lng, activeZones)) {
+    if (!addressHasCoords(selectedAddress)) return;
+    if (!isLocationCovered(selectedAddress.lat!, selectedAddress.lng!, activeZones)) {
       setSelectedAddress(null);
       toast({
         title: "خارج نطاق التوصيل",
@@ -112,18 +120,18 @@ const CheckoutPage = () => {
   // Recalculate delivery fee from distance tiers / RPC when address or branch changes
   useEffect(() => {
     const run = async () => {
-      if (!selectedBranch || !selectedAddress) {
+      if (!selectedBranch || !selectedAddress || !addressHasCoords(selectedAddress)) {
         setDeliveryFee(selectedBranch?.delivery_fee ?? 10);
         return;
       }
-      if (!isLocationCovered(selectedAddress.lat, selectedAddress.lng, activeZones)) {
+      if (!isLocationCovered(selectedAddress.lat!, selectedAddress.lng!, activeZones)) {
         setDeliveryFee(selectedBranch.delivery_fee);
         return;
       }
       const rpcFee = await calculateDeliveryFeeRpc(
         selectedBranch.id,
-        selectedAddress.lat,
-        selectedAddress.lng
+        selectedAddress.lat!,
+        selectedAddress.lng!
       );
       if (rpcFee != null) {
         setDeliveryFee(rpcFee);
@@ -131,8 +139,8 @@ const CheckoutPage = () => {
       }
       const rates = ratesByBranch[selectedBranch.id] || [];
       const km = distanceFromBranch(selectedBranch, {
-        lat: selectedAddress.lat,
-        lng: selectedAddress.lng,
+        lat: selectedAddress.lat!,
+        lng: selectedAddress.lng!,
       });
       setDeliveryFee(feeForDistance(rates, km, selectedBranch.delivery_fee));
     };
@@ -140,10 +148,10 @@ const CheckoutPage = () => {
   }, [selectedBranch, selectedAddress, activeZones, ratesByBranch]);
 
   const distanceKm =
-    selectedBranch && selectedAddress
+    selectedBranch && selectedAddress && addressHasCoords(selectedAddress)
       ? distanceFromBranch(selectedBranch, {
-          lat: selectedAddress.lat,
-          lng: selectedAddress.lng,
+          lat: selectedAddress.lat!,
+          lng: selectedAddress.lng!,
         })
       : null;
 
@@ -155,6 +163,7 @@ const CheckoutPage = () => {
     customerDiscountPercent,
   );
   const total = totalPrice - discountAmount + delivery;
+  const { exclusive: netSubtotal, vat: vatAmount } = splitInclusiveVat(totalPrice);
 
   if (!selectedBranch) {
     return (
@@ -194,33 +203,40 @@ const CheckoutPage = () => {
     );
   }
 
-  const handleAddressSelected = async (addr: { label: string; address: string; lat: number; lng: number; id?: string }) => {
-    if (!isLocationCovered(addr.lat, addr.lng, activeZones)) {
+  const handleAddressSelected = async (addr: CustomerAddressPayload) => {
+    if (addressHasCoords(addr) && !isLocationCovered(addr.lat!, addr.lng!, activeZones)) {
       toast({ title: "خارج نطاق التوصيل", description: OUT_OF_SERVICE_MESSAGE, variant: "destructive" });
       return;
     }
     setSelectedAddress(addr);
+    if (addr.national_address) setNationalAddress(addr.national_address);
     setShowMapPicker(false);
 
-    // Save address if user is logged in and it's new
     if (user && !addr.id) {
+      const { count } = await supabase
+        .from("user_addresses")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id);
       await supabase.from("user_addresses").insert({
         user_id: user.id,
         label: addr.label,
         address: addr.address,
         lat: addr.lat,
         lng: addr.lng,
-        is_default: false,
+        national_address: addr.national_address || null,
+        is_default: (count || 0) === 0,
       });
+      notifyAddressesChanged();
     }
   };
 
-  const handleSelectSavedAddress = (addr: { id: string; label: string; address: string; lat: number; lng: number }) => {
-    if (!isLocationCovered(addr.lat, addr.lng, activeZones)) {
+  const handleSelectSavedAddress = (addr: CustomerAddressPayload & { id: string }) => {
+    if (addressHasCoords(addr) && !isLocationCovered(addr.lat!, addr.lng!, activeZones)) {
       toast({ title: "خارج نطاق التوصيل", description: OUT_OF_SERVICE_MESSAGE, variant: "destructive" });
       return;
     }
     setSelectedAddress(addr);
+    if (addr.national_address) setNationalAddress(normalizeNationalAddress(addr.national_address));
   };
 
   const handleSubmit = async () => {
@@ -248,12 +264,25 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (!name || !phone || !selectedAddress || !selectedTime) {
-      toast({ title: "يرجى تعبئة جميع الحقول واختيار العنوان", variant: "destructive" });
+    const national = normalizeNationalAddress(nationalAddress || selectedAddress?.national_address || "");
+    const hasNational = isValidNationalAddress(national);
+    const hasCoords = selectedAddress ? addressHasCoords(selectedAddress) : false;
+
+    if (!name || !phone || !selectedTime) {
+      toast({ title: "يرجى تعبئة الاسم والجوال ووقت التوصيل", variant: "destructive" });
       return;
     }
 
-    if (!isValidNationalAddress(nationalAddress)) {
+    if (!hasNational && !hasCoords) {
+      toast({
+        title: "أضف عنوان التوصيل",
+        description: "يكفي العنوان الوطني المختصر أو الموقع على الخريطة",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (national && !hasNational) {
       toast({
         title: "العنوان الوطني المختصر غير صحيح",
         description: "مثال: ANCAW32154",
@@ -268,28 +297,30 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (!isLocationCovered(selectedAddress.lat, selectedAddress.lng, activeZones)) {
+    if (hasCoords && !isLocationCovered(selectedAddress!.lat!, selectedAddress!.lng!, activeZones)) {
       toast({ title: "خارج نطاق التوصيل", description: OUT_OF_SERVICE_MESSAGE, variant: "destructive" });
       return;
     }
 
     setProcessing(true);
 
-    const covered = await checkDeliveryCoverageRpc(
-      selectedAddress.lat,
-      selectedAddress.lng,
-      selectedBranch.id
-    );
+    const covered = hasCoords
+      ? await checkDeliveryCoverageRpc(
+          selectedAddress!.lat!,
+          selectedAddress!.lng!,
+          selectedBranch.id
+        )
+      : true;
     if (!covered) {
       setProcessing(false);
       toast({ title: "خارج نطاق التوصيل", description: OUT_OF_SERVICE_MESSAGE, variant: "destructive" });
       return;
     }
 
-    const passed = await verifyRecaptcha("order");
-    if (!passed) {
+    const recaptcha = await verifyRecaptcha("order");
+    if (!recaptcha.ok) {
       setProcessing(false);
-      toast({ title: "تم رفض الطلب", description: "فشل التحقق الأمني، يرجى المحاولة مرة أخرى", variant: "destructive" });
+      toast({ title: "تعذر إكمال التحقق", description: recaptcha.message, variant: "destructive" });
       return;
     }
 
@@ -299,9 +330,9 @@ const CheckoutPage = () => {
         user_id: user.id,
         customer_name: name,
         customer_phone: phone,
-        delivery_address: selectedAddress.address,
-        delivery_lat: selectedAddress.lat,
-        delivery_lng: selectedAddress.lng,
+        delivery_address: selectedAddress?.address || (hasNational ? `العنوان الوطني: ${national}` : ""),
+        delivery_lat: hasCoords ? selectedAddress!.lat : null,
+        delivery_lng: hasCoords ? selectedAddress!.lng : null,
         subtotal: totalPrice,
         discount_percent: discountPercent,
         discount_amount: discountAmount,
@@ -310,7 +341,7 @@ const CheckoutPage = () => {
         status: "pending",
         payment_method: paymentMethod === "cash" ? "cash" : "online",
         branch_id: selectedBranch.id,
-        national_address: normalizeNationalAddress(nationalAddress),
+        national_address: hasNational ? national : null,
         notes: `وقت التوصيل: ${selectedTime} | الفرع: ${selectedBranch.name}`,
       } as any)
       .select()
@@ -439,6 +470,7 @@ const CheckoutPage = () => {
                   تغيير الفرع
                 </Button>
               </div>
+              {NATIONAL_ADDRESS_LOOKUP_ENABLED && (
               <div>
                 <Label htmlFor="national-address">العنوان الوطني المختصر</Label>
                 <Input
@@ -451,9 +483,10 @@ const CheckoutPage = () => {
                   maxLength={12}
                 />
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  الرمز المختصر من العنوان الوطني السعودي (مثال: ANCAW32154)
+                  اختياري إذا حددت الموقع على الخريطة، ومطلوب إذا لم تحدد الخريطة. مثال: ANCAW32154
                 </p>
               </div>
+              )}
             </div>
 
             {/* Address selection */}
@@ -466,8 +499,11 @@ const CheckoutPage = () => {
               {selectedAddress && !showMapPicker ? (
                 <div className="space-y-3">
                   <div className="p-4 rounded-xl border-2 border-primary bg-primary/5">
-                    <p className="font-semibold text-sm">{selectedAddress.label === "home" ? "🏠 المنزل" : "💼 العمل"}</p>
+                    <p className="font-semibold text-sm">{formatAddressLabel(selectedAddress.label)}</p>
                     <p className="text-sm text-muted-foreground mt-1">{selectedAddress.address}</p>
+                    {selectedAddress.national_address && (
+                      <p className="text-xs font-mono mt-1" dir="ltr">{selectedAddress.national_address}</p>
+                    )}
                   </div>
                   <Button variant="outline" size="sm" onClick={() => { setSelectedAddress(null); setShowMapPicker(false); }}>
                     تغيير العنوان
@@ -595,12 +631,16 @@ const CheckoutPage = () => {
             <div className="border-t pt-3 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">المجموع</span>
-                <span>{totalPrice.toFixed(1)} ر.س</span>
+                <span>{netSubtotal.toFixed(2)} ر.س</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">ضريبة القيمة المضافة (15%)</span>
+                <span>{vatAmount.toFixed(2)} ر.س</span>
               </div>
               {discountAmount > 0 && (
                 <div className="flex justify-between text-green-600">
                   <span>خصم العميل ({discountPercent}%)</span>
-                  <span>−{discountAmount.toFixed(1)} ر.س</span>
+                  <span>−{discountAmount.toFixed(2)} ر.س</span>
                 </div>
               )}
               <div className="flex justify-between">
@@ -614,7 +654,7 @@ const CheckoutPage = () => {
               </div>
               <div className="flex justify-between font-heading font-bold text-lg pt-2 border-t">
                 <span>الإجمالي</span>
-                <span className="text-primary">{total.toFixed(1)} ر.س</span>
+                <span className="text-primary">{total.toFixed(2)} ر.س</span>
               </div>
             </div>
             <Button className="w-full mt-4" size="lg" onClick={handleSubmit} disabled={processing || totalPrice < minOrder}>

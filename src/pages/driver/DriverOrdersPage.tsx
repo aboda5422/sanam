@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Package, MapPin, Clock, User } from "lucide-react";
+import { Package, MapPin, Clock, User, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { useDriverNotifications } from "@/hooks/useDriverNotifications";
+import { fetchDriverBranchIds } from "@/lib/branch-scope";
 import DriverLayout from "@/components/driver/DriverLayout";
 
 const DriverOrdersPage = () => {
@@ -16,20 +18,26 @@ const DriverOrdersPage = () => {
   const defaultTab = searchParams.get("tab") || "available";
   const [availableOrders, setAvailableOrders] = useState<any[]>([]);
   const [myOrders, setMyOrders] = useState<any[]>([]);
+  const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const { toast } = useToast();
   useDriverNotifications(driverId);
 
   const fetchOrders = async () => {
     if (!driverId) return;
 
-    // Available (pending) orders
-    const { data: pending } = await supabase
-      .from("orders")
-      .select("*")
-      .eq("status", "pending")
-      .order("created_at", { ascending: false });
-
-    setAvailableOrders(pending || []);
+    const branchIds = await fetchDriverBranchIds(driverId);
+    if (!branchIds.length) {
+      setAvailableOrders([]);
+    } else {
+      const { data: pending } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("status", "pending")
+        .is("driver_id", null)
+        .in("branch_id", branchIds)
+        .order("created_at", { ascending: false });
+      setAvailableOrders(pending || []);
+    }
 
     // My active orders
     const { data: mine } = await supabase
@@ -56,16 +64,30 @@ const DriverOrdersPage = () => {
   }, [driverId]);
 
   const acceptOrder = async (orderId: string) => {
-    if (!driverId) return;
+    if (!driverId) {
+      toast({ title: "تعذر القبول", description: "حساب المندوب غير جاهز بعد، أعد المحاولة", variant: "destructive" });
+      return;
+    }
+    if (acceptingId) return;
+    setAcceptingId(orderId);
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("orders")
       .update({ driver_id: driverId, status: "assigned", assigned_at: new Date().toISOString() })
       .eq("id", orderId)
-      .eq("status", "pending");
+      .eq("status", "pending")
+      .is("driver_id", null)
+      .select("id");
 
-    if (error) {
-      toast({ title: "خطأ", description: "لم يتم قبول الطلب، قد يكون تم قبوله من مندوب آخر", variant: "destructive" });
+    setAcceptingId(null);
+
+    if (error || !data?.length) {
+      toast({
+        title: "لم يتم قبول الطلب",
+        description: error?.message || "قد يكون الطلب قبل من مندوب آخر أو ليس من فرعك",
+        variant: "destructive",
+      });
+      fetchOrders();
       return;
     }
 
@@ -81,10 +103,10 @@ const DriverOrdersPage = () => {
   };
 
   const statusColors: Record<string, string> = {
-    pending: "bg-orange-100 text-orange-800",
-    assigned: "bg-blue-100 text-blue-800",
-    preparing: "bg-yellow-100 text-yellow-800",
-    on_the_way: "bg-primary/10 text-primary",
+    pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    assigned: "bg-blue-100 text-blue-800 border-blue-200",
+    preparing: "bg-orange-100 text-orange-800 border-orange-200",
+    on_the_way: "bg-indigo-100 text-indigo-800 border-indigo-200",
   };
 
   const formatTime = (date: string) => {
@@ -92,13 +114,13 @@ const DriverOrdersPage = () => {
   };
 
   const OrderCard = ({ order, showAccept = false }: { order: any; showAccept?: boolean }) => (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:border-primary/40 transition-colors">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="font-bold">طلب #{order.order_number}</span>
-          <span className={`text-xs px-2 py-0.5 rounded-full ${statusColors[order.status] || ""}`}>
+          <span className="font-heading font-bold">طلب #{order.order_number}</span>
+          <Badge variant="outline" className={`text-[10px] ${statusColors[order.status] || ""}`}>
             {statusLabels[order.status] || order.status}
-          </span>
+          </Badge>
         </div>
 
         {order.customer_name && (
@@ -125,8 +147,13 @@ const DriverOrdersPage = () => {
           </div>
           <div className="flex gap-2">
             {showAccept && (
-              <Button size="sm" onClick={() => acceptOrder(order.id)}>
-                قبول الطلب
+              <Button
+                type="button"
+                size="sm"
+                disabled={acceptingId === order.id}
+                onClick={() => acceptOrder(order.id)}
+              >
+                {acceptingId === order.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "قبول الطلب"}
               </Button>
             )}
             <Button size="sm" variant="outline" asChild>
@@ -142,7 +169,7 @@ const DriverOrdersPage = () => {
     return (
       <DriverLayout title="الطلبات">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </DriverLayout>
     );
@@ -150,7 +177,7 @@ const DriverOrdersPage = () => {
 
   return (
     <DriverLayout title="الطلبات">
-      <div className="p-4 max-w-lg mx-auto">
+      <div className="p-4 md:p-6 max-w-lg mx-auto">
         <Tabs defaultValue={defaultTab} dir="rtl">
           <TabsList className="w-full mb-4">
             <TabsTrigger value="available" className="flex-1">

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, MapPin, LogOut, Menu, Globe, Search } from "lucide-react";
+import { ShoppingCart, User, MapPin, LogOut, Menu, Globe, Search, ChevronDown } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -18,6 +18,7 @@ import logoFullLight from "@/assets/logo-full-light.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BRAND } from "@/lib/brand";
 import { useBranch } from "@/contexts/BranchContext";
+import { ADDRESSES_CHANGED_EVENT, formatAddressLabel } from "@/lib/branch";
 
 const Header = () => {
   const { uniqueItems } = useCart();
@@ -44,24 +45,42 @@ const Header = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) loadDefaultAddress(session.user.id);
+      else setDefaultAddress(null);
     });
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) loadDefaultAddress(session.user.id);
     });
-    return () => subscription.unsubscribe();
+    const onAddressesChanged = () => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) loadDefaultAddress(session.user.id);
+        else setDefaultAddress(null);
+      });
+    };
+    window.addEventListener(ADDRESSES_CHANGED_EVENT, onAddressesChanged);
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener(ADDRESSES_CHANGED_EVENT, onAddressesChanged);
+    };
   }, []);
 
   const loadDefaultAddress = async (userId: string) => {
     const { data } = await supabase
       .from("user_addresses")
-      .select("label, address")
+      .select("label, is_default")
       .eq("user_id", userId)
-      .eq("is_default", true)
-      .maybeSingle();
-    if (data) {
-      setDefaultAddress(data.label === "home" ? "🏠 " + data.address : "💼 " + data.address);
+      .order("created_at", { ascending: false });
+    const rows = data || [];
+    if (rows.length === 0) {
+      setDefaultAddress(null);
+      return;
     }
+    if (rows.length === 1) {
+      setDefaultAddress(formatAddressLabel(rows[0].label));
+      return;
+    }
+    const chosen = rows.find((a) => a.is_default);
+    setDefaultAddress(chosen ? formatAddressLabel(chosen.label) : null);
   };
 
   // Search products from DB
@@ -157,6 +176,20 @@ const Header = () => {
                   </Link>
                 )}
 
+                {/* Branch */}
+                <button
+                  type="button"
+                  onClick={() => openPicker()}
+                  className="flex items-center gap-2 w-full p-3 bg-muted/50 rounded-xl text-sm"
+                >
+                  <MapPin className="h-5 w-5 text-primary" />
+                  <span className="text-muted-foreground">{t("الفرع:", "Branch:")}</span>
+                  <span className="font-semibold truncate max-w-[160px]">
+                    {selectedBranch?.name || t("اختر الفرع", "Choose branch")}
+                  </span>
+                  <ChevronDown className="h-4 w-4 mr-auto text-primary" />
+                </button>
+
                 {/* Delivery */}
                 <button onClick={handleDeliveryClick} className="flex items-center gap-2 w-full p-3 bg-muted/50 rounded-xl text-sm">
                   <MapPin className="h-5 w-5 text-primary" />
@@ -223,13 +256,15 @@ const Header = () => {
         {/* Selected branch */}
         <button
           type="button"
-          onClick={openPicker}
-          className="hidden sm:flex items-center gap-1.5 text-sm bg-primary/10 hover:bg-primary/15 text-primary rounded-full px-3 py-1.5 transition-colors max-w-[180px]"
+          onClick={() => openPicker()}
+          className="hidden sm:flex items-center gap-1.5 text-sm bg-primary/10 hover:bg-primary/15 text-primary rounded-full px-3 py-1.5 transition-colors max-w-[200px]"
+          title={t("تبديل الفرع", "Switch branch")}
         >
           <MapPin className="h-4 w-4 shrink-0" />
           <span className="font-semibold truncate">
             {selectedBranch?.name || t("اختر الفرع", "Choose branch")}
           </span>
+          <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-80" />
         </button>
 
         {/* Delivery address - desktop only */}
@@ -352,20 +387,24 @@ const Header = () => {
                     </span>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent
+                  align="end"
+                  className="w-48"
+                  dir={lang === "ar" ? "rtl" : "ltr"}
+                >
                   <DropdownMenuItem
-                    className="cursor-pointer"
+                    className="cursor-pointer gap-2"
                     onClick={() => navigate("/profile")}
                   >
-                    <User className="h-4 w-4 ml-2" />
+                    <User className="h-4 w-4" />
                     {t("حسابي", "My Account")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    className="cursor-pointer text-destructive focus:text-destructive"
+                    className="cursor-pointer gap-2 text-destructive focus:text-destructive"
                     onClick={handleLogout}
                   >
-                    <LogOut className="h-4 w-4 ml-2" />
+                    <LogOut className="h-4 w-4" />
                     {t("تسجيل الخروج", "Sign out")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>

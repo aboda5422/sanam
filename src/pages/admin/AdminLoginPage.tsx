@@ -74,11 +74,12 @@ const AdminLoginPage = () => {
       localStorage.removeItem(REMEMBER_KEY);
     }
 
-    void supabase.rpc("log_admin_activity", {
+    const { error: logError } = await supabase.rpc("log_admin_activity", {
       p_action: "login",
       p_entity_type: "auth",
       p_summary: "تسجيل دخول إلى لوحة التحكم",
     });
+    if (logError) console.warn("activity log login", logError.message);
 
     toast.success("مرحباً بك في لوحة التحكم");
     navigate("/admin");

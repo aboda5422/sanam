@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
-import { Wallet, Truck, Star, Calendar } from "lucide-react";
+import { Wallet, Truck, Star, Calendar, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import DriverLayout from "@/components/driver/DriverLayout";
+
+function riyadhYmd(iso?: string | null) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("en-CA", { timeZone: "Asia/Riyadh" });
+}
 
 const DriverEarningsPage = () => {
   const { loading: authLoading, driverId } = useDriverAuth();
@@ -11,6 +16,8 @@ const DriverEarningsPage = () => {
   const [todayCollections, setTodayCollections] = useState(0);
   const [weekCollections, setWeekCollections] = useState(0);
   const [monthCollections, setMonthCollections] = useState(0);
+  const [totalCollections, setTotalCollections] = useState(0);
+  const [totalDeliveries, setTotalDeliveries] = useState(0);
 
   useEffect(() => {
     if (!driverId) return;
@@ -26,26 +33,32 @@ const DriverEarningsPage = () => {
 
       const { data: orders } = await supabase
         .from("orders")
-        .select("collected_amount, delivered_at")
+        .select("collected_amount, delivered_at, total")
         .eq("driver_id", driverId)
         .eq("status", "delivered");
 
-      if (!orders) return;
-
+      const rows = orders || [];
       const now = new Date();
-      const todayStr = now.toISOString().split("T")[0];
-      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const todayStr = now.toLocaleDateString("en-CA", { timeZone: "Asia/Riyadh" });
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      const collected = (o: { collected_amount?: number; total?: number }) => {
+        const c = Number(o.collected_amount || 0);
+        return c > 0 ? c : 0;
+      };
 
       setTodayCollections(
-        orders.filter((o) => o.delivered_at?.startsWith(todayStr)).reduce((s, o) => s + Number(o.collected_amount || 0), 0)
+        rows.filter((o) => riyadhYmd(o.delivered_at) === todayStr).reduce((s, o) => s + collected(o), 0)
       );
       setWeekCollections(
-        orders.filter((o) => o.delivered_at && o.delivered_at >= weekAgo).reduce((s, o) => s + Number(o.collected_amount || 0), 0)
+        rows.filter((o) => o.delivered_at && new Date(o.delivered_at) >= weekAgo).reduce((s, o) => s + collected(o), 0)
       );
       setMonthCollections(
-        orders.filter((o) => o.delivered_at && o.delivered_at >= monthStart).reduce((s, o) => s + Number(o.collected_amount || 0), 0)
+        rows.filter((o) => o.delivered_at && new Date(o.delivered_at) >= monthStart).reduce((s, o) => s + collected(o), 0)
       );
+      setTotalCollections(rows.reduce((s, o) => s + collected(o), 0));
+      setTotalDeliveries(rows.length);
     };
 
     fetchData();
@@ -55,7 +68,7 @@ const DriverEarningsPage = () => {
     return (
       <DriverLayout title="التحصيلات">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </DriverLayout>
     );
@@ -63,7 +76,7 @@ const DriverEarningsPage = () => {
 
   return (
     <DriverLayout title="التحصيلات والإحصائيات">
-      <div className="p-4 max-w-lg mx-auto space-y-4">
+      <div className="p-4 md:p-6 max-w-lg mx-auto space-y-4">
         {/* Collections Cards */}
         <div className="grid grid-cols-3 gap-3">
           <Card>
@@ -100,7 +113,7 @@ const DriverEarningsPage = () => {
               </div>
               <div className="flex-1">
                 <p className="text-sm text-muted-foreground">إجمالي التحصيلات</p>
-                <p className="font-bold text-lg">{Number(driver?.total_earnings || 0).toFixed(2)} ر.س</p>
+                <p className="font-bold text-lg">{totalCollections.toFixed(2)} ر.س</p>
               </div>
             </div>
 
@@ -110,7 +123,7 @@ const DriverEarningsPage = () => {
               </div>
               <div className="flex-1">
                 <p className="text-sm text-muted-foreground">عدد التوصيلات</p>
-                <p className="font-bold text-lg">{driver?.total_deliveries || 0} توصيلة</p>
+                <p className="font-bold text-lg">{totalDeliveries} توصيلة</p>
               </div>
             </div>
 

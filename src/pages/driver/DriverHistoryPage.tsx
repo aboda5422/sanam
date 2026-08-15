@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { CheckCircle, XCircle, Calendar } from "lucide-react";
+import { CheckCircle, XCircle, Calendar, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import DriverLayout from "@/components/driver/DriverLayout";
@@ -34,7 +35,7 @@ const DriverHistoryPage = () => {
     return (
       <DriverLayout title="السجل">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </DriverLayout>
     );
@@ -42,7 +43,7 @@ const DriverHistoryPage = () => {
 
   return (
     <DriverLayout title="سجل الطلبات">
-      <div className="p-4 max-w-lg mx-auto space-y-3">
+      <div className="p-4 md:p-6 max-w-lg mx-auto space-y-3">
         {orders.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center text-muted-foreground">
@@ -55,15 +56,15 @@ const DriverHistoryPage = () => {
             <Card key={order.id}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold text-sm">طلب #{order.order_number}</span>
+                  <span className="font-heading font-bold text-sm">طلب #{order.order_number}</span>
                   {order.status === "delivered" ? (
-                    <span className="flex items-center gap-1 text-xs text-green-600">
-                      <CheckCircle className="h-3.5 w-3.5" /> تم التسليم
-                    </span>
+                    <Badge variant="outline" className="text-[10px] bg-green-100 text-green-800 border-green-200 gap-1">
+                      <CheckCircle className="h-3 w-3" /> تم التسليم
+                    </Badge>
                   ) : (
-                    <span className="flex items-center gap-1 text-xs text-destructive">
-                      <XCircle className="h-3.5 w-3.5" /> ملغي
-                    </span>
+                    <Badge variant="outline" className="text-[10px] bg-red-100 text-red-800 border-red-200 gap-1">
+                      <XCircle className="h-3 w-3" /> ملغي
+                    </Badge>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mb-1">{formatDate(order.created_at)}</p>

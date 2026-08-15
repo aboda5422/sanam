@@ -13,6 +13,8 @@ import { Store, Bell, Shield, Save, Loader2, Users, ScrollText } from "lucide-re
 import { toast } from "sonner";
 import AdminUsersSection from "@/components/admin/AdminUsersSection";
 import AdminActivityLogSection from "@/components/admin/AdminActivityLogSection";
+import { DEFAULT_NOTIFICATION_PREFS } from "@/hooks/useAdminNotifications";
+import { playNotificationSound, unlockNotificationAudio } from "@/lib/notification-sound";
 
 const useSetting = (key: string, defaultValue: any) => {
   const queryClient = useQueryClient();
@@ -81,14 +83,7 @@ const StoreInfoSection = () => {
 
 // ─── Notifications Section ───
 const NotificationsSection = () => {
-  const { data, isLoading, save, saving } = useSetting("notifications", {
-    order_new: true,
-    order_status: true,
-    driver_assigned: true,
-    low_stock: true,
-    new_complaint: true,
-    sound_enabled: true,
-  });
+  const { data, isLoading, save, saving } = useSetting("notifications", DEFAULT_NOTIFICATION_PREFS);
   const [form, setForm] = useState<any>(null);
   const d = form ?? data;
 
@@ -108,7 +103,23 @@ const NotificationsSection = () => {
       {items.map(item => (
         <div key={item.key} className="flex items-center justify-between py-2 border-b last:border-0">
           <span className="text-sm">{item.label}</span>
-          <Switch checked={d[item.key]} onCheckedChange={v => setForm({ ...d, [item.key]: v })} />
+          <div className="flex items-center gap-2">
+            {item.key === "sound_enabled" && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  unlockNotificationAudio();
+                  if (!d.sound_enabled) return;
+                  playNotificationSound();
+                }}
+              >
+                تجربة
+              </Button>
+            )}
+            <Switch checked={d[item.key]} onCheckedChange={v => setForm({ ...d, [item.key]: v })} />
+          </div>
         </div>
       ))}
       <Button onClick={() => save(form ?? d)} disabled={saving}>
@@ -163,7 +174,7 @@ const AdminSettingsPage = () => {
     { key: "users", icon: Users, title: "مستخدمو الموقع والصلاحيات", desc: "مدير، محاسب، مخزون، وشكاوى — بدون مدراء الفروع والمناديب", component: AdminUsersSection },
     { key: "activity", icon: ScrollText, title: "سجل العمليات", desc: "متابعة إجراءات المدراء والمستخدمين — يُحذف بعد 48 ساعة", component: AdminActivityLogSection },
     { key: "notifications", icon: Bell, title: "الإشعارات", desc: "إعدادات التنبيهات والإشعارات الفورية", component: NotificationsSection },
-    { key: "security", icon: Shield, title: "الأمان", desc: "إدارة الصلاحيات والمستخدمين", component: SecuritySection },
+    { key: "security", icon: Shield, title: "الأمان", desc: "تأكيد البريد، محاولات الدخول، مدة الجلسة، والشراء بدون حساب", component: SecuritySection },
   ];
 
   return (
@@ -191,6 +202,15 @@ const AdminSettingsPage = () => {
           <DialogContent
             className={`${s.key === "activity" ? "max-w-4xl" : "max-w-2xl"} max-h-[90vh] overflow-y-auto`}
             dir="rtl"
+            onPointerDownOutside={(e) => {
+              if (document.querySelector("[data-add-staff-dialog]")) e.preventDefault();
+            }}
+            onFocusOutside={(e) => {
+              if (document.querySelector("[data-add-staff-dialog]")) e.preventDefault();
+            }}
+            onInteractOutside={(e) => {
+              if (document.querySelector("[data-add-staff-dialog]")) e.preventDefault();
+            }}
           >
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">

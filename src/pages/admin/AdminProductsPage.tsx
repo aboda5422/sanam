@@ -53,7 +53,7 @@ const AdminProductsPage = () => {
   const [categoryIdsFilter, setCategoryIdsFilter] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [featuredFilter, setFeaturedFilter] = useState("all");
-  const [priceRange, setPriceRange] = useState<"all" | "low" | "mid" | "high">("all");
+  const [stockFilter, setStockFilter] = useState<"all" | "low" | "out">("all");
   const [offerFilter, setOfferFilter] = useState<"all" | "has_offer" | "no_offer">("all");
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE_UI = 50;
@@ -506,17 +506,17 @@ const AdminProductsPage = () => {
         : offerFilter === "has_offer"
           ? productOnOffer
           : !productOnOffer;
-    let matchPrice = true;
-    if (priceRange === "low") matchPrice = p.price < 10;
-    else if (priceRange === "mid") matchPrice = p.price >= 10 && p.price <= 50;
-    else if (priceRange === "high") matchPrice = p.price > 50;
-    return matchSearch && matchCat && matchStatus && matchFeatured && matchOffer && matchPrice;
+    let matchStock = true;
+    const qty = Number(p.stock_quantity ?? 0);
+    if (stockFilter === "low") matchStock = qty > 0 && qty < 5;
+    else if (stockFilter === "out") matchStock = qty <= 0;
+    return matchSearch && matchCat && matchStatus && matchFeatured && matchOffer && matchStock;
   });
 
   // Reset to page 1 whenever filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, sectionFilter, categoryIdsFilter, statusFilter, featuredFilter, priceRange, offerFilter]);
+  }, [search, sectionFilter, categoryIdsFilter, statusFilter, featuredFilter, stockFilter, offerFilter]);
 
   const totalPages = Math.max(1, Math.ceil((filtered?.length || 0) / PAGE_SIZE_UI));
   const safePage = Math.min(currentPage, totalPages);
@@ -726,23 +726,20 @@ const AdminProductsPage = () => {
             <SelectItem value="not_featured">لا يوجد تمييز</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={priceRange} onValueChange={(v: any) => setPriceRange(v)}>
-          <SelectTrigger className="w-[130px]">
+        <Select value={stockFilter} onValueChange={(v: "all" | "low" | "out") => setStockFilter(v)}>
+          <SelectTrigger className="w-[150px]">
             <span className="truncate">
-              {priceRange === "all"
-                ? "السعر"
-                : priceRange === "low"
-                  ? "أقل من 10 ر.س"
-                  : priceRange === "mid"
-                    ? "10 - 50 ر.س"
-                    : "أكثر من 50 ر.س"}
+              {stockFilter === "all"
+                ? "المخزون"
+                : stockFilter === "low"
+                  ? "منخفض المخزون"
+                  : "نفد المخزون"}
             </span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">الكل</SelectItem>
-            <SelectItem value="low">أقل من 10 ر.س</SelectItem>
-            <SelectItem value="mid">10 - 50 ر.س</SelectItem>
-            <SelectItem value="high">أكثر من 50 ر.س</SelectItem>
+            <SelectItem value="low">منخفض المخزون (أقل من 5)</SelectItem>
+            <SelectItem value="out">نفد المخزون</SelectItem>
           </SelectContent>
         </Select>
         <Button
@@ -758,7 +755,7 @@ const AdminProductsPage = () => {
             statusFilter === "all" &&
             offerFilter === "all" &&
             featuredFilter === "all" &&
-            priceRange === "all"
+            stockFilter === "all"
           }
           onClick={() => {
             setSearch("");
@@ -768,7 +765,7 @@ const AdminProductsPage = () => {
             setStatusFilter("all");
             setOfferFilter("all");
             setFeaturedFilter("all");
-            setPriceRange("all");
+            setStockFilter("all");
             setCurrentPage(1);
           }}
         >

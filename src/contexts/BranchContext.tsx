@@ -160,7 +160,8 @@ export function BranchProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const openPicker = useCallback((cityFilter?: string | null) => {
-    setPickerCityFilter(cityFilter?.trim() || null);
+    const filter = typeof cityFilter === "string" ? cityFilter.trim() || null : null;
+    setPickerCityFilter(filter);
     setPickerOpenState(true);
   }, []);
 

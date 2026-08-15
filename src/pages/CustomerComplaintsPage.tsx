@@ -104,8 +104,8 @@ const CustomerComplaintsPage = () => {
       if (!user) throw new Error("Not logged in");
 
       // reCAPTCHA v3 check
-      const passed = await verifyRecaptcha("complaint");
-      if (!passed) throw new Error("recaptcha_failed");
+      const recaptcha = await verifyRecaptcha("complaint");
+      if (!recaptcha.ok) throw new Error(recaptcha.message);
 
       // Upload images
       const imageUrls: string[] = [];
@@ -138,7 +138,7 @@ const CustomerComplaintsPage = () => {
       setImages([]);
       setPreviews([]);
     },
-    onError: () => toast.error("حدث خطأ أثناء الإرسال"),
+    onError: (e: Error) => toast.error(e?.message || "حدث خطأ أثناء الإرسال"),
   });
 
   return (

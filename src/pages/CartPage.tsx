@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useBranch } from "@/contexts/BranchContext";
+import { splitInclusiveVat } from "@/lib/vat";
 
 const CartPage = () => {
   const { items, updateQuantity, removeItem, clearCart, totalPrice } = useCart();
@@ -12,6 +13,7 @@ const CartPage = () => {
   const freeFrom = selectedBranch?.free_delivery_threshold ?? 100;
   const baseFee = selectedBranch?.delivery_fee ?? 10;
   const delivery = totalPrice >= freeFrom ? 0 : baseFee;
+  const { exclusive: netSubtotal, vat: vatAmount } = splitInclusiveVat(totalPrice);
 
   if (items.length === 0) {
     return (
@@ -72,8 +74,12 @@ const CartPage = () => {
             <h3 className="font-heading font-bold text-lg mb-4">ملخص الطلب</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">المنتجات</span>
-                <span>{totalPrice.toFixed(1)} ر.س</span>
+                <span className="text-muted-foreground">المجموع</span>
+                <span>{netSubtotal.toFixed(2)} ر.س</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">ضريبة القيمة المضافة (15%)</span>
+                <span>{vatAmount.toFixed(2)} ر.س</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">التوصيل</span>
@@ -81,7 +87,7 @@ const CartPage = () => {
               </div>
               <div className="border-t pt-2 mt-2 flex justify-between font-heading font-bold text-lg">
                 <span>الإجمالي</span>
-                <span className="text-primary">{(totalPrice + delivery).toFixed(1)} ر.س</span>
+                <span className="text-primary">{(totalPrice + delivery).toFixed(2)} ر.س</span>
               </div>
             </div>
             <Link to="/checkout">

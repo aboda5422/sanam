@@ -44,15 +44,22 @@ Deno.serve(async (req) => {
     const minScore = MIN_SCORES[action as string] ?? MIN_SCORES.default
     const ok = !!result.success && (typeof result.score !== 'number' || result.score >= minScore)
 
+    // Always HTTP 200 so the client can read score / hostname / error-codes.
     return new Response(
       JSON.stringify({
         success: ok,
         score: result.score,
         action: result.action,
         hostname: result.hostname,
-        errorCodes: result['error-codes'],
+        errorCodes: result['error-codes'] || [],
+        error: ok
+          ? null
+          : (!result.success
+            ? 'google_rejected'
+            : 'low_score'),
+        minScore,
       }),
-      { status: ok ? 200 : 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (e) {
     return new Response(JSON.stringify({ success: false, error: String(e) }), {

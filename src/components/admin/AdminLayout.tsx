@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { PANEL_ROLE_BADGE, allowedAdminPaths, canAccessAdminPath } from "@/lib/staff-access";
+import { useAdminNotifications } from "@/hooks/useAdminNotifications";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -25,6 +26,7 @@ const AdminShell = ({ children, title }: AdminLayoutProps) => {
   const navigate = useNavigate();
   const { loading, isSuperAdmin, isSiteWide, role, branches, filterBranchId, setFilterBranchId, scopedBranchIds } =
     useAdminAuth();
+  useAdminNotifications();
 
   useEffect(() => {
     if (loading || !role) return;

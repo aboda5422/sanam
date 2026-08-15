@@ -1,16 +1,27 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, MapPin, Phone, User, Package, Navigation } from "lucide-react";
+import { MapPin, Phone, User, Navigation, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
+import DriverLayout from "@/components/driver/DriverLayout";
 
-const statusFlow: Record<string, { next: string; label: string; color: string }> = {
-  assigned: { next: "preparing", label: "بدء التجهيز", color: "bg-yellow-500 hover:bg-yellow-600" },
-  preparing: { next: "on_the_way", label: "انطلق للتوصيل", color: "bg-blue-500 hover:bg-blue-600" },
-  on_the_way: { next: "delivered", label: "تم التسليم ✓", color: "bg-green-500 hover:bg-green-600" },
+const statusFlow: Record<string, { next: string; label: string }> = {
+  assigned: { next: "preparing", label: "بدء التجهيز" },
+  preparing: { next: "on_the_way", label: "انطلق للتوصيل" },
+  on_the_way: { next: "delivered", label: "تم التسليم" },
+};
+
+const statusBadgeClass: Record<string, string> = {
+  pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  assigned: "bg-blue-100 text-blue-800 border-blue-200",
+  preparing: "bg-orange-100 text-orange-800 border-orange-200",
+  on_the_way: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  delivered: "bg-green-100 text-green-800 border-green-200",
+  cancelled: "bg-red-100 text-red-800 border-red-200",
 };
 
 const statusLabels: Record<string, string> = {
@@ -121,26 +132,33 @@ const DriverOrderDetailPage = () => {
     if (!order || !statusFlow[order.status]) return;
 
     const nextStatus = statusFlow[order.status].next;
-    const update: any = { status: nextStatus };
-    if (nextStatus === "delivered") update.delivered_at = new Date().toISOString();
 
-    const { error } = await supabase.from("orders").update(update).eq("id", order.id);
+    if (nextStatus === "delivered") {
+      const { error } = await supabase.rpc("complete_driver_delivery" as any, { p_order_id: order.id });
+      if (error) {
+        toast({ title: "خطأ", description: error.message, variant: "destructive" });
+        return;
+      }
+      setOrder({
+        ...order,
+        status: "delivered",
+        delivered_at: new Date().toISOString(),
+        collected_amount: order.payment_method === "cash" ? Number(order.total) : Number(order.collected_amount || 0),
+      });
+      toast({ title: "تم التسليم", description: order.payment_method === "cash" ? "سُجّل التحصيل النقدي" : statusLabels.delivered });
+      setTimeout(() => navigate("/driver"), 1500);
+      return;
+    }
+
+    const { error } = await supabase.from("orders").update({ status: nextStatus }).eq("id", order.id);
 
     if (error) {
       toast({ title: "خطأ", description: error.message, variant: "destructive" });
       return;
     }
 
-    setOrder({ ...order, ...update });
+    setOrder({ ...order, status: nextStatus });
     toast({ title: "تم تحديث الحالة", description: statusLabels[nextStatus] });
-
-    if (nextStatus === "delivered") {
-      if (driverId) {
-        await supabase.rpc("increment_driver_deliveries" as any, { driver_id_param: driverId });
-      }
-      // Navigate back to dashboard after delivery
-      setTimeout(() => navigate("/driver"), 1500);
-    }
   };
 
   const openGoogleMaps = () => {
@@ -153,28 +171,28 @@ const DriverOrderDetailPage = () => {
 
   if (!order) {
     return (
-      <div className="min-h-screen flex items-center justify-center" dir="rtl">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>
+      <DriverLayout title="تفاصيل الطلب" backTo="/driver/orders">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </DriverLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
-      <header className="sticky top-0 z-40 bg-primary text-primary-foreground shadow-md">
-        <div className="flex items-center h-14 px-4">
-          <button onClick={() => navigate(-1)} className="ml-3">
-            <ArrowRight className="h-5 w-5" />
-          </button>
-          <h1 className="font-heading font-bold text-lg">طلب #{order.order_number}</h1>
-          <span className="mr-auto text-sm opacity-90">{statusLabels[order.status]}</span>
-        </div>
-      </header>
+    <DriverLayout
+      title={`طلب #${order.order_number}`}
+      backTo="/driver/orders"
+      headerExtra={
+        <Badge variant="outline" className={`text-[10px] ${statusBadgeClass[order.status] || ""}`}>
+          {statusLabels[order.status]}
+        </Badge>
+      }
+    >
+      <div className="max-w-lg mx-auto">
+        <div className="h-56 w-full bg-muted border-b" ref={(el) => { if (el && !mapRef) setMapRef(el); }} />
 
-      <div className="max-w-lg mx-auto pb-6">
-        <div className="h-56 w-full bg-muted" ref={(el) => { if (el && !mapRef) setMapRef(el); }} />
-
-        <div className="p-4 space-y-3">
+        <div className="p-4 md:p-6 space-y-3">
           <Card>
             <CardContent className="p-4 space-y-2">
               <h3 className="font-heading font-bold text-sm">بيانات العميل</h3>
@@ -256,17 +274,14 @@ const DriverOrderDetailPage = () => {
               </Button>
             )}
             {statusFlow[order.status] && (
-              <Button
-                className={`flex-1 text-white ${statusFlow[order.status].color}`}
-                onClick={updateStatus}
-              >
+              <Button className="flex-1" onClick={updateStatus}>
                 {statusFlow[order.status].label}
               </Button>
             )}
           </div>
         </div>
       </div>
-    </div>
+    </DriverLayout>
   );
 };
 

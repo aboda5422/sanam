@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Trash2, UserPlus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2, Plus, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { STAFF_ROLE_META, type StaffRole } from "@/lib/staff-access";
@@ -34,6 +35,7 @@ const AdminUsersSection = () => {
   const [idNumber, setIdNumber] = useState("");
   const [scope, setScope] = useState<"all" | "branches">(isSuperAdmin ? "all" : "branches");
   const [selectedBranchIds, setSelectedBranchIds] = useState<string[]>([]);
+  const [addOpen, setAddOpen] = useState(false);
 
   const { data: allBranches = [] } = useQuery({
     queryKey: ["admin-branches-lite"],
@@ -141,6 +143,7 @@ const AdminUsersSection = () => {
       setContactEmail("");
       setIdNumber("");
       setSelectedBranchIds([]);
+      setAddOpen(false);
       queryClient.invalidateQueries({ queryKey: ["site-staff-users"] });
       queryClient.invalidateQueries({ queryKey: ["admin-branch-access"] });
     },
@@ -170,90 +173,6 @@ const AdminUsersSection = () => {
       <p className="text-sm text-muted-foreground">
         مستخدمو لوحة الموقع فقط. مدراء الفروع يُضافون من صفحة الفروع، والمناديب من إدارة المناديب.
       </p>
-
-      <div className="rounded-xl border p-4 space-y-3">
-        <p className="font-medium text-sm flex items-center gap-2">
-          <UserPlus className="h-4 w-4 text-primary" />
-          إضافة مستخدم
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <Label>الاسم الكامل *</Label>
-            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} />
-          </div>
-          <div>
-            <Label>اسم المستخدم *</Label>
-            <Input dir="ltr" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="off" />
-          </div>
-          <div>
-            <Label>كلمة المرور *</Label>
-            <Input dir="ltr" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
-          </div>
-          <div>
-            <Label>الصلاحية *</Label>
-            <Select value={role} onValueChange={(v) => setRole(v as StaffRole)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {isSuperAdmin && <SelectItem value="site_admin">مدير الموقع</SelectItem>}
-                <SelectItem value="accountant">محاسب</SelectItem>
-                <SelectItem value="inventory">مخزون</SelectItem>
-                <SelectItem value="support">شكاوى العملاء</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>الجوال</Label>
-            <Input dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} />
-          </div>
-          <div>
-            <Label>البريد الإلكتروني</Label>
-            <Input dir="ltr" type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
-          </div>
-          <div className="sm:col-span-2">
-            <Label>رقم الهوية</Label>
-            <Input dir="ltr" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} />
-          </div>
-        </div>
-
-        {role !== "site_admin" && (
-          <div className="space-y-2">
-            <Label>نطاق الصلاحية</Label>
-            {isSuperAdmin && (
-              <div className="flex gap-2">
-                <Button type="button" size="sm" variant={scope === "all" ? "default" : "outline"} onClick={() => setScope("all")}>
-                  الموقع كاملاً
-                </Button>
-                <Button type="button" size="sm" variant={scope === "branches" ? "default" : "outline"} onClick={() => setScope("branches")}>
-                  فرع معيّن
-                </Button>
-              </div>
-            )}
-            {(!isSuperAdmin || scope === "branches") && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto border rounded-lg p-2">
-                {assignableBranches.map((b) => (
-                  <label key={b.id} className="flex items-center gap-2 text-sm">
-                    <Checkbox
-                      checked={selectedBranchIds.includes(b.id)}
-                      onCheckedChange={(v) =>
-                        setSelectedBranchIds((prev) => (v ? [...prev, b.id] : prev.filter((id) => id !== b.id)))
-                      }
-                    />
-                    {b.name}
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        <Button
-          onClick={() => createMutation.mutate()}
-          disabled={createMutation.isPending || !fullName.trim() || !username.trim() || !password.trim()}
-        >
-          {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin ml-1" /> : <UserPlus className="h-4 w-4 ml-1" />}
-          إضافة المستخدم
-        </Button>
-      </div>
 
       <div className="space-y-2">
         {visibleStaff.length === 0 ? (
@@ -297,6 +216,111 @@ const AdminUsersSection = () => {
           })
         )}
       </div>
+
+      <button
+        type="button"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+        onClick={() => setAddOpen(true)}
+      >
+        إضافة مستخدم
+        <Plus className="h-4 w-4" />
+      </button>
+
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent
+          data-add-staff-dialog=""
+          className="max-w-lg max-h-[90vh] overflow-y-auto"
+          dir="rtl"
+          onPointerDownOutside={(e) => e.stopPropagation()}
+          onInteractOutside={(e) => e.stopPropagation()}
+        >
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="h-4 w-4 text-primary" />
+              إضافة مستخدم
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label>الاسم الكامل *</Label>
+                <Input value={fullName} onChange={(e) => setFullName(e.target.value)} />
+              </div>
+              <div>
+                <Label>اسم المستخدم *</Label>
+                <Input dir="ltr" value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="off" />
+              </div>
+              <div>
+                <Label>كلمة المرور *</Label>
+                <Input dir="ltr" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
+              </div>
+              <div>
+                <Label>الصلاحية *</Label>
+                <Select value={role} onValueChange={(v) => setRole(v as StaffRole)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {isSuperAdmin && <SelectItem value="site_admin">مدير الموقع</SelectItem>}
+                    <SelectItem value="accountant">محاسب</SelectItem>
+                    <SelectItem value="inventory">مخزون</SelectItem>
+                    <SelectItem value="support">شكاوى العملاء</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>الجوال</Label>
+                <Input dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              </div>
+              <div>
+                <Label>البريد الإلكتروني</Label>
+                <Input dir="ltr" type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+              </div>
+              <div className="sm:col-span-2">
+                <Label>رقم الهوية</Label>
+                <Input dir="ltr" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} />
+              </div>
+            </div>
+
+            {role !== "site_admin" && (
+              <div className="space-y-2">
+                <Label>نطاق الصلاحية</Label>
+                {isSuperAdmin && (
+                  <div className="flex gap-2">
+                    <Button type="button" size="sm" variant={scope === "all" ? "default" : "outline"} onClick={() => setScope("all")}>
+                      الموقع كاملاً
+                    </Button>
+                    <Button type="button" size="sm" variant={scope === "branches" ? "default" : "outline"} onClick={() => setScope("branches")}>
+                      فرع معيّن
+                    </Button>
+                  </div>
+                )}
+                {(!isSuperAdmin || scope === "branches") && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto border rounded-lg p-2">
+                    {assignableBranches.map((b) => (
+                      <label key={b.id} className="flex items-center gap-2 text-sm">
+                        <Checkbox
+                          checked={selectedBranchIds.includes(b.id)}
+                          onCheckedChange={(v) =>
+                            setSelectedBranchIds((prev) => (v ? [...prev, b.id] : prev.filter((id) => id !== b.id)))
+                          }
+                        />
+                        {b.name}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <Button
+              onClick={() => createMutation.mutate()}
+              disabled={createMutation.isPending || !fullName.trim() || !username.trim() || !password.trim()}
+            >
+              {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin ml-1" /> : <UserPlus className="h-4 w-4 ml-1" />}
+              إضافة المستخدم
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

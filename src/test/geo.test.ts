@@ -1,5 +1,34 @@
 import { describe, expect, it } from "vitest";
 import { pointInPolygon, isPointInAnyPolygon } from "@/lib/geo";
+import {
+  inferCityFromNationalAddress,
+  isValidNationalAddress,
+  normalizeNationalAddress,
+} from "@/lib/branch";
+
+describe("national short address", () => {
+  it("accepts SPL-style short codes", () => {
+    expect(isValidNationalAddress("ANCAW32154")).toBe(true);
+    expect(isValidNationalAddress("RRRD2929")).toBe(true);
+    expect(isValidNationalAddress("abcd1234")).toBe(true);
+  });
+
+  it("rejects empty or malformed values", () => {
+    expect(isValidNationalAddress("")).toBe(false);
+    expect(isValidNationalAddress("1234")).toBe(false);
+    expect(isValidNationalAddress("HOME")).toBe(false);
+  });
+
+  it("normalizes spacing and case", () => {
+    expect(normalizeNationalAddress("  ancaw 32154 ")).toBe("ANCAW32154");
+  });
+
+  it("infers Makkah from MEKD prefix", () => {
+    const city = inferCityFromNationalAddress("MEKD2885");
+    expect(city?.name).toBe("مكة المكرمة");
+    expect(city?.lat).toBeCloseTo(21.3891, 3);
+  });
+});
 
 const MAKKAH = [
   { lat: 21.55, lng: 39.70 },

@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Package, Clock, CheckCircle, TrendingUp, MapPin, Wallet } from "lucide-react";
+import { Package, Clock, CheckCircle, MapPin, Wallet, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { useDriverGPS } from "@/hooks/useDriverGPS";
 import { useDriverNotifications } from "@/hooks/useDriverNotifications";
+import { fetchDriverBranchIds } from "@/lib/branch-scope";
 import DriverLayout from "@/components/driver/DriverLayout";
 
 const motivationalMessages = [
@@ -70,12 +72,18 @@ const DriverDashboard = () => {
 
       setActiveOrders(active.slice(0, 3));
 
-      const { count } = await supabase
-        .from("orders")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
-
-      setStats((prev) => ({ ...prev, pending: count || 0 }));
+      const branchIds = await fetchDriverBranchIds(driverId);
+      let pendingCount = 0;
+      if (branchIds.length) {
+        const { count } = await supabase
+          .from("orders")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "pending")
+          .is("driver_id", null)
+          .in("branch_id", branchIds);
+        pendingCount = count || 0;
+      }
+      setStats((prev) => ({ ...prev, pending: pendingCount }));
     };
 
     fetchData();
@@ -146,9 +154,9 @@ const DriverDashboard = () => {
   };
 
   const statusColors: Record<string, string> = {
-    assigned: "bg-blue-100 text-blue-800",
-    preparing: "bg-yellow-100 text-yellow-800",
-    on_the_way: "bg-primary/10 text-primary",
+    assigned: "bg-blue-100 text-blue-800 border-blue-200",
+    preparing: "bg-orange-100 text-orange-800 border-orange-200",
+    on_the_way: "bg-indigo-100 text-indigo-800 border-indigo-200",
   };
 
   const statusLabels: Record<string, string> = {
@@ -159,26 +167,31 @@ const DriverDashboard = () => {
 
   if (authLoading) {
     return (
-      <DriverLayout title="لوحة التحكم">
+      <DriverLayout title="الرئيسية">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </DriverLayout>
     );
   }
 
+  const statTiles = [
+    { to: "/driver/orders?tab=available", icon: Package, value: stats.pending, label: "طلبات جديدة", iconClass: "bg-blue-50 text-blue-600" },
+    { to: "/driver/orders?tab=mine", icon: Clock, value: stats.active, label: "قيد التوصيل", iconClass: "bg-amber-50 text-amber-600" },
+    { to: "/driver/history", icon: CheckCircle, value: stats.delivered, label: "تم التسليم اليوم", iconClass: "bg-emerald-50 text-emerald-600" },
+    { to: "/driver/earnings", icon: Wallet, value: stats.collections.toFixed(0), label: "تحصيلات اليوم (ر.س)", iconClass: "bg-primary/10 text-primary" },
+  ];
+
   return (
-    <DriverLayout title="لوحة التحكم">
-      <div className="p-4 space-y-4 max-w-lg mx-auto">
-        {/* Driver Welcome */}
+    <DriverLayout title="الرئيسية">
+      <div className="p-4 md:p-6 space-y-4 max-w-lg mx-auto">
         {driverName && (
-          <div className="text-center py-2">
+          <div className="rounded-xl border bg-card p-4 text-center">
             <h2 className="font-heading font-bold text-lg">مرحباً، {driverName}</h2>
-            <p className="text-sm text-muted-foreground">{motivation}</p>
+            <p className="text-sm text-muted-foreground mt-1">{motivation}</p>
           </div>
         )}
 
-        {/* Availability Toggle */}
         <Card>
           <CardContent className="flex items-center justify-between p-4">
             <div>
@@ -191,58 +204,36 @@ const DriverDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Stats Grid - Clickable */}
         <div className="grid grid-cols-2 gap-3">
-          <Link to="/driver/orders?tab=available">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-4 text-center">
-                <Package className="h-6 w-6 text-blue-500 mx-auto mb-1" />
-                <p className="text-2xl font-bold">{stats.pending}</p>
-                <p className="text-xs text-muted-foreground">طلبات جديدة</p>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link to="/driver/orders?tab=mine">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-4 text-center">
-                <Clock className="h-6 w-6 text-yellow-500 mx-auto mb-1" />
-                <p className="text-2xl font-bold">{stats.active}</p>
-                <p className="text-xs text-muted-foreground">قيد التوصيل</p>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link to="/driver/history">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-4 text-center">
-                <CheckCircle className="h-6 w-6 text-green-500 mx-auto mb-1" />
-                <p className="text-2xl font-bold">{stats.delivered}</p>
-                <p className="text-xs text-muted-foreground">تم التسليم اليوم</p>
-              </CardContent>
-            </Card>
-          </Link>
-          <Link to="/driver/earnings">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-4 text-center">
-                <Wallet className="h-6 w-6 text-primary mx-auto mb-1" />
-                <p className="text-2xl font-bold">{stats.collections.toFixed(0)}</p>
-                <p className="text-xs text-muted-foreground">تحصيلات اليوم (ر.س)</p>
-              </CardContent>
-            </Card>
-          </Link>
+          {statTiles.map((tile) => {
+            const Icon = tile.icon;
+            return (
+              <Link key={tile.to} to={tile.to}>
+                <Card className="hover:border-primary/40 transition-colors h-full">
+                  <CardContent className="p-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${tile.iconClass}`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <p className="text-2xl font-heading font-bold">{tile.value}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{tile.label}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
         </div>
 
-        {/* Active Orders */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <h2 className="font-heading font-bold">الطلبات النشطة</h2>
-            <Link to="/driver/orders" className="text-sm text-primary hover:underline">
+            <Link to="/driver/orders" className="text-sm text-primary font-medium hover:underline">
               عرض الكل
             </Link>
           </div>
 
           {activeOrders.length === 0 ? (
             <Card>
-              <CardContent className="p-6 text-center text-muted-foreground">
+              <CardContent className="p-8 text-center text-muted-foreground">
                 <Package className="h-10 w-10 mx-auto mb-2 opacity-40" />
                 <p className="text-sm">لا توجد طلبات نشطة حالياً</p>
               </CardContent>
@@ -251,16 +242,16 @@ const DriverDashboard = () => {
             <div className="space-y-2">
               {activeOrders.map((order) => (
                 <Link key={order.id} to={`/driver/order/${order.id}`}>
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-3">
+                  <Card className="hover:border-primary/40 transition-colors">
+                    <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-sm">طلب #{order.order_number}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${statusColors[order.status] || ""}`}>
+                        <span className="font-heading font-bold text-sm">طلب #{order.order_number}</span>
+                        <Badge variant="outline" className={`text-[10px] ${statusColors[order.status] || ""}`}>
                           {statusLabels[order.status] || order.status}
-                        </span>
+                        </Badge>
                       </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <MapPin className="h-3 w-3" />
+                        <MapPin className="h-3 w-3 shrink-0" />
                         <span className="truncate">{order.delivery_address || "عنوان غير محدد"}</span>
                       </div>
                       <p className="text-sm font-semibold mt-1">{Number(order.total).toFixed(2)} ر.س</p>
@@ -272,7 +263,6 @@ const DriverDashboard = () => {
           )}
         </div>
 
-        {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3">
           <Button asChild variant="outline" className="h-12">
             <Link to="/driver/orders">عرض الطلبات المتاحة</Link>

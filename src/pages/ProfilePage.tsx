@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Package, MapPin, Phone, Mail, Save, Loader2, ChevronLeft, AlertTriangle, ShoppingCart, Settings, Trash2, ShieldAlert, LogOut, Plus } from "lucide-react";
+import { User, Package, MapPin, Mail, Save, Loader2, AlertTriangle, ShoppingCart, Settings, Trash2, ShieldAlert, LogOut, Plus, Pencil, X, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,8 @@ import Footer from "@/components/layout/Footer";
 import AddressMapPicker from "@/components/address/AddressMapPicker";
 import SavedAddresses from "@/components/address/SavedAddresses";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { notifyAddressesChanged } from "@/lib/branch";
+import { translateError } from "@/lib/error-messages";
 
 const statusMap: Record<string, { label: string; labelEn: string; color: string }> = {
   pending: { label: "قيد الانتظار", labelEn: "Pending", color: "bg-yellow-100 text-yellow-800" },
@@ -35,6 +37,7 @@ const ProfilePage = () => {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [form, setForm] = useState({ full_name: "", phone: "", address: "", city: "مكة المكرمة" });
+  const [editingProfile, setEditingProfile] = useState(false);
   const [cancelOrderId, setCancelOrderId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelling, setCancelling] = useState(false);
@@ -44,6 +47,11 @@ const ProfilePage = () => {
   const [deleteConfirmed, setDeleteConfirmed] = useState(false);
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [addressesRefreshKey, setAddressesRefreshKey] = useState(0);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [savingPassword, setSavingPassword] = useState(false);
 
   const handleStartDelete = async () => {
     setDeleteOpen(true);
@@ -92,6 +100,52 @@ const ProfilePage = () => {
     navigate("/auth", { replace: true });
   };
 
+  const needsCurrentPassword = Boolean(
+    user?.identities?.some((i: { provider?: string }) => i.provider === "email") ||
+      user?.app_metadata?.provider === "email" ||
+      (Array.isArray(user?.app_metadata?.providers) && user.app_metadata.providers.includes("email"))
+  );
+
+  const handleChangePassword = async () => {
+    if (newPassword.length < 6) {
+      toast.error(t("يجب أن تكون كلمة المرور 6 أحرف على الأقل", "Password must be at least 6 characters"));
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error(t("كلمتا المرور غير متطابقتين", "Passwords do not match"));
+      return;
+    }
+    if (needsCurrentPassword && !currentPassword) {
+      toast.error(t("أدخل كلمة المرور الحالية", "Enter your current password"));
+      return;
+    }
+    if (!user?.email) {
+      toast.error(t("لا يمكن تغيير كلمة المرور لهذا الحساب", "Password cannot be changed for this account"));
+      return;
+    }
+    setSavingPassword(true);
+    try {
+      if (needsCurrentPassword) {
+        const { error: reauth } = await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: currentPassword,
+        });
+        if (reauth) throw reauth;
+      }
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      toast.success(t("تم تحديث كلمة المرور بنجاح", "Password updated successfully"));
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setShowPasswordForm(false);
+    } catch (e: any) {
+      toast.error(translateError(e?.message || String(e)));
+    } finally {
+      setSavingPassword(false);
+    }
+  };
+
   useEffect(() => {
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -127,9 +181,9 @@ const ProfilePage = () => {
     if (error) {
       toast.error("فشل الحفظ: " + error.message);
     } else {
+      setProfile((p: any) => ({ ...(p || {}), ...form }));
+      setEditingProfile(false);
       toast.success(t("تم حفظ البيانات بنجاح", "Profile saved successfully"));
-      // Navigate to addresses tab after saving profile
-      setActiveTab("addresses");
     }
     setSaving(false);
   };
@@ -195,7 +249,19 @@ const ProfilePage = () => {
           <TabsContent value="profile">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg text-start">{t("البيانات الشخصية", "Personal Info")}</CardTitle>
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle className="text-lg text-start">{t("البيانات الشخصية", "Personal Info")}</CardTitle>
+                  {!editingProfile && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingProfile(true)}
+                      className="shrink-0 rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-primary transition-colors"
+                      aria-label={t("تعديل", "Edit")}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent className="space-y-4" dir={lang === "ar" ? "rtl" : "ltr"}>
                 <div>
@@ -207,50 +273,109 @@ const ProfilePage = () => {
                     </span>
                   </div>
                 </div>
-                <div>
-                  <Label className="text-start block">{t("الاسم الكامل", "Full Name")}</Label>
-                  <Input
-                    value={form.full_name}
-                    onChange={(e) => setForm((f) => ({ ...f, full_name: e.target.value }))}
-                    className="mt-1 text-start"
-                    dir={lang === "ar" ? "rtl" : "ltr"}
-                  />
-                </div>
-                <div>
-                  <Label className="text-start block">{t("رقم الجوال", "Phone")}</Label>
-                  <Input
-                    value={form.phone}
-                    onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                    placeholder="05xxxxxxxx"
-                    dir="ltr"
-                    className={`mt-1 ${lang === "ar" ? "text-right" : "text-left"}`}
-                  />
-                </div>
-                <div>
-                  <Label className="text-start block">{t("المدينة", "City")}</Label>
-                  <select
-                    dir={lang === "ar" ? "rtl" : "ltr"}
-                    value={form.city === "Makkah" || form.city === "مكة المكرمة" ? "مكة المكرمة" : form.city === "Riyadh" || form.city === "الرياض" ? "الرياض" : form.city}
-                    onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-                    className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-start"
-                  >
-                    <option value="مكة المكرمة">{t("مكة المكرمة", "Makkah")}</option>
-                    <option value="الرياض">{t("الرياض", "Riyadh")}</option>
-                  </select>
-                </div>
-                <Button onClick={handleSave} disabled={saving} className="w-full gap-2">
-                  {saving ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      {t("جاري الحفظ...", "Saving...")}
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-4 w-4" />
-                      {t("حفظ البيانات", "Save")}
-                    </>
-                  )}
-                </Button>
+
+                {editingProfile ? (
+                  <>
+                    <div>
+                      <Label className="text-start block">{t("الاسم الكامل", "Full Name")}</Label>
+                      <Input
+                        value={form.full_name}
+                        onChange={(e) => setForm((f) => ({ ...f, full_name: e.target.value }))}
+                        className="mt-1 text-start"
+                        dir={lang === "ar" ? "rtl" : "ltr"}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-start block">{t("رقم الجوال", "Phone")}</Label>
+                      <Input
+                        value={form.phone}
+                        onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                        placeholder="05xxxxxxxx"
+                        dir="ltr"
+                        className={`mt-1 ${lang === "ar" ? "text-right" : "text-left"}`}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-start block">{t("المدينة", "City")}</Label>
+                      <select
+                        dir={lang === "ar" ? "rtl" : "ltr"}
+                        value={form.city === "Makkah" || form.city === "مكة المكرمة" ? "مكة المكرمة" : form.city === "Riyadh" || form.city === "الرياض" ? "الرياض" : form.city}
+                        onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+                        className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-start"
+                      >
+                        <option value="مكة المكرمة">{t("مكة المكرمة", "Makkah")}</option>
+                        <option value="الرياض">{t("الرياض", "Riyadh")}</option>
+                      </select>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button onClick={handleSave} disabled={saving} className="flex-1 gap-2">
+                        {saving ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            {t("جاري الحفظ...", "Saving...")}
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4" />
+                            {t("حفظ البيانات", "Save")}
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={saving}
+                        className="gap-2"
+                        onClick={() => {
+                          setForm({
+                            full_name: profile?.full_name || user?.user_metadata?.full_name || "",
+                            phone: profile?.phone || "",
+                            address: profile?.address || "",
+                            city: profile?.city || "مكة المكرمة",
+                          });
+                          setEditingProfile(false);
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                        {t("إلغاء", "Cancel")}
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {[
+                      { key: "full_name", label: t("الاسم الكامل", "Full Name"), value: form.full_name },
+                      { key: "phone", label: t("رقم الجوال", "Phone"), value: form.phone, ltr: true },
+                      {
+                        key: "city",
+                        label: t("المدينة", "City"),
+                        value:
+                          form.city === "Riyadh" || form.city === "الرياض"
+                            ? t("الرياض", "Riyadh")
+                            : form.city === "Makkah" || form.city === "مكة المكرمة" || !form.city
+                              ? t("مكة المكرمة", "Makkah")
+                              : form.city,
+                      },
+                    ].map((row) => (
+                      <div key={row.key} className="min-w-0 text-start">
+                        <p className="text-xs text-muted-foreground">{row.label}</p>
+                        <p className="mt-0.5 text-sm font-medium">
+                          {row.value?.trim() ? (
+                            row.ltr ? (
+                              <span dir="ltr" className="inline-block">
+                                {row.value}
+                              </span>
+                            ) : (
+                              row.value
+                            )
+                          ) : (
+                            t("غير محدد", "Not set")
+                          )}
+                        </p>
+                      </div>
+                    ))}
+                  </>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -285,12 +410,18 @@ const ProfilePage = () => {
                     <AddressMapPicker
                       onAddressSelected={async (addr) => {
                         if (!user) return;
+                        const { count } = await supabase
+                          .from("user_addresses")
+                          .select("id", { count: "exact", head: true })
+                          .eq("user_id", user.id);
                         const { error } = await supabase.from("user_addresses").insert({
                           user_id: user.id,
                           label: addr.label,
                           address: addr.address,
                           lat: addr.lat,
                           lng: addr.lng,
+                          national_address: addr.national_address || null,
+                          is_default: (count || 0) === 0,
                         });
                         if (error) {
                           toast.error(t("فشل حفظ العنوان", "Failed to save address"));
@@ -298,6 +429,7 @@ const ProfilePage = () => {
                           toast.success(t("تم حفظ العنوان بنجاح! يمكنك الآن التسوق", "Address saved! You can now start shopping"));
                           setShowAddAddress(false);
                           setAddressesRefreshKey((k) => k + 1);
+                          notifyAddressesChanged();
                         }
                       }}
                     />
@@ -434,18 +566,90 @@ const ProfilePage = () => {
                     <Settings className="h-5 w-5 text-primary" />
                     {t("الإعدادات", "Settings")}
                   </CardTitle>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 text-sm text-destructive hover:opacity-80 transition-opacity"
-                    aria-label={t("تسجيل الخروج", "Sign out")}
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span>{t("تسجيل الخروج", "Sign out")}</span>
-                  </button>
+                  <div className="flex flex-wrap items-center justify-end gap-3 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordForm((v) => !v)}
+                      className="flex items-center gap-2 text-sm text-primary hover:opacity-80 transition-opacity"
+                    >
+                      <KeyRound className="h-4 w-4" />
+                      <span>{t("تعديل كلمة المرور", "Change password")}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 text-sm text-destructive hover:opacity-80 transition-opacity"
+                      aria-label={t("تسجيل الخروج", "Sign out")}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>{t("تسجيل الخروج", "Sign out")}</span>
+                    </button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
+                {showPasswordForm && (
+                  <div className="rounded-xl border p-4 space-y-3">
+                    <h3 className="font-bold text-sm">{t("تعديل كلمة المرور", "Change password")}</h3>
+                    {needsCurrentPassword && (
+                      <div>
+                        <Label>{t("كلمة المرور الحالية", "Current password")}</Label>
+                        <Input
+                          type="password"
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          className="mt-1"
+                          dir="ltr"
+                          autoComplete="current-password"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <Label>{t("كلمة المرور الجديدة", "New password")}</Label>
+                      <Input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="mt-1"
+                        dir="ltr"
+                        autoComplete="new-password"
+                        minLength={6}
+                      />
+                    </div>
+                    <div>
+                      <Label>{t("تأكيد كلمة المرور", "Confirm password")}</Label>
+                      <Input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="mt-1"
+                        dir="ltr"
+                        autoComplete="new-password"
+                        minLength={6}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button onClick={handleChangePassword} disabled={savingPassword} className="flex-1 gap-2">
+                        {savingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
+                        {t("حفظ كلمة المرور", "Save password")}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={savingPassword}
+                        onClick={() => {
+                          setShowPasswordForm(false);
+                          setCurrentPassword("");
+                          setNewPassword("");
+                          setConfirmPassword("");
+                        }}
+                      >
+                        {t("إلغاء", "Cancel")}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="border border-destructive/30 bg-destructive/5 rounded-xl p-4 space-y-3">
                   <div className="flex items-start gap-3">
                     <ShieldAlert className="h-5 w-5 text-destructive shrink-0 mt-0.5" />

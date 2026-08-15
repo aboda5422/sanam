@@ -13,7 +13,8 @@ const errorMap: Record<string, string> = {
   "Token has expired or is invalid": "رابط التفعيل منتهي أو غير صالح",
   "User not found": "المستخدم غير موجود",
   "Network error": "خطأ في الاتصال بالإنترنت",
-  "Failed to fetch": "خطأ في الاتصال بالخادم",
+  "Error sending confirmation email": "تعذر إرسال بريد التفعيل من الخادم. يمكنك المحاولة لاحقاً أو التواصل مع الدعم، أو سجّل الدخول إذا كان الحساب قد أُنشئ.",
+  "error sending confirmation email": "تعذر إرسال بريد التفعيل من الخادم. يمكنك المحاولة لاحقاً أو التواصل مع الدعم.",
 };
 
 export function translateError(message: string): string {

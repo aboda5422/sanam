@@ -12,6 +12,16 @@ export function applyBranchFilter<T extends { in: (column: string, values: strin
   return query;
 }
 
+/** Branch ids assigned to a driver. Empty if none. */
+export async function fetchDriverBranchIds(driverId: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("driver_branches" as any)
+    .select("branch_id")
+    .eq("driver_id", driverId);
+  if (error) throw error;
+  return [...new Set(((data || []) as { branch_id: string }[]).map((r) => r.branch_id).filter(Boolean))];
+}
+
 /** Driver ids assigned to the scoped branches. null = no filter (all branches). */
 export async function fetchDriverIdsForBranches(
   scopedBranchIds: string[] | null | undefined,

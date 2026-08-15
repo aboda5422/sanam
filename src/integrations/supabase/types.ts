@@ -1029,8 +1029,9 @@ export type Database = {
           id: string
           is_default: boolean
           label: string
-          lat: number
-          lng: number
+          lat: number | null
+          lng: number | null
+          national_address: string | null
           updated_at: string
           user_id: string
         }
@@ -1040,8 +1041,9 @@ export type Database = {
           id?: string
           is_default?: boolean
           label?: string
-          lat: number
-          lng: number
+          lat?: number | null
+          lng?: number | null
+          national_address?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1051,8 +1053,9 @@ export type Database = {
           id?: string
           is_default?: boolean
           label?: string
-          lat?: number
-          lng?: number
+          lat?: number | null
+          lng?: number | null
+          national_address?: string | null
           updated_at?: string
           user_id?: string
         }

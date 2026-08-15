@@ -54,7 +54,7 @@ const AdminActivityLogSection = () => {
   const { isSuperAdmin, isSiteWide, branches, filterBranchId, scopedBranchIds } = useAdminAuth();
   const [search, setSearch] = useState("");
   const [entity, setEntity] = useState("all");
-  const [localBranch, setLocalBranch] = useState<string>("layout");
+  const [localBranch, setLocalBranch] = useState<string>("all");
 
   const branchFilter = localBranch === "layout"
     ? filterBranchId
@@ -71,7 +71,7 @@ const AdminActivityLogSection = () => {
         .select("id, created_at, actor_name, actor_role, action, entity_type, branch_id, summary")
         .order("created_at", { ascending: false })
         .limit(400);
-      if (branchFilter) q = q.eq("branch_id", branchFilter);
+      if (branchFilter) q = q.or(`branch_id.eq.${branchFilter},branch_id.is.null`);
       const { data, error } = await q;
       if (error) throw error;
       return (data || []) as ActivityRow[];
@@ -97,6 +97,7 @@ const AdminActivityLogSection = () => {
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
         عمليات المدراء والمستخدمين خلال آخر 48 ساعة. تُحذف السجلات الأقدم تلقائياً.
+        رفع الكتالوج من السيرفر لا يُسجَّل هنا؛ تظهر عمليات الدخول وتعديلات اللوحة بعد تنفيذها.
       </p>
 
       <div className="grid gap-2 sm:grid-cols-3">
@@ -142,6 +143,7 @@ const AdminActivityLogSection = () => {
         <div className="text-center text-sm text-muted-foreground py-10 space-y-2">
           <ScrollText className="h-8 w-8 mx-auto opacity-40" />
           <p>لا توجد عمليات مسجّلة بعد</p>
+          <p className="text-xs">سجّل دخولاً جديداً أو عدّل منتجاً/قسماً من اللوحة ليظهر السجل.</p>
         </div>
       ) : (
         <div className="space-y-2 max-h-[55vh] overflow-y-auto">

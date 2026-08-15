@@ -47,7 +47,9 @@ const BranchPickerDialog = () => {
 
   const title = pickerCityFilter
     ? t(`فروع ${pickerCityFilter}`, `${pickerCityFilter} branches`)
-    : t("اختر فرعك", "Choose your branch");
+    : selectedBranch
+      ? t("تبديل الفرع", "Switch branch")
+      : t("اختر فرعك", "Choose your branch");
 
   return (
     <Dialog
@@ -74,10 +76,12 @@ const BranchPickerDialog = () => {
             {title}
           </DialogTitle>
           <DialogDescription className="text-center">
-            {t(
-              "سنعرض لك المنتجات ونطاق التوصيل الخاص بالفرع الذي تختاره",
-              "We'll show products and delivery coverage for your selected branch"
-            )}
+            {selectedBranch
+              ? t("يمكنك التبديل إلى فرع آخر في أي وقت", "You can switch to another branch at any time")
+              : t(
+                  "سنعرض لك المنتجات ونطاق التوصيل الخاص بالفرع الذي تختاره",
+                  "We'll show products and delivery coverage for your selected branch"
+                )}
           </DialogDescription>
         </DialogHeader>
 

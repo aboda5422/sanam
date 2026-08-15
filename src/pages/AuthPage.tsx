@@ -11,6 +11,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { Capacitor } from "@capacitor/core";
+import { openBlankOAuthPopup, openOAuthWindow } from "@/lib/google-web-auth";
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -100,19 +101,50 @@ const AuthPage = () => {
       return;
     }
 
-    // Web: Supabase Google OAuth
+    // Web: open a real window on click (before await) so Cursor preview / iframes
+    // are not used to host accounts.google.com (Google blocks that, so no accounts appear).
+    const popup = openBlankOAuthPopup();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
+    const redirectTo = `${window.location.origin}/auth`;
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth`,
-        queryParams: { access_type: "online", prompt: "select_account" },
+        redirectTo,
+        skipBrowserRedirect: true,
+        queryParams: { access_type: "online", prompt: "select_account", hl: "ar" },
       },
     });
-    if (error) {
-      toast({ title: "خطأ", description: error.message || "فشل تسجيل الدخول عبر Google", variant: "destructive" });
+    if (error || !data?.url) {
+      try {
+        popup?.close();
+      } catch {
+        /* ignore */
+      }
+      toast({ title: "خطأ", description: error?.message || "فشل تسجيل الدخول عبر Google", variant: "destructive" });
       setLoading(false);
+      return;
     }
+    const opened = openOAuthWindow(data.url, popup);
+    setLoading(false);
+    if (!opened) return;
+    const started = Date.now();
+    const tick = window.setInterval(async () => {
+      if (opened.closed || Date.now() - started > 120_000) {
+        window.clearInterval(tick);
+        return;
+      }
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (sessionData.session) {
+        window.clearInterval(tick);
+        try {
+          opened.close();
+        } catch {
+          /* ignore */
+        }
+        toast({ title: "تم تسجيل الدخول بنجاح", description: "مرحباً بك في سنام" });
+        navigate("/", { replace: true });
+      }
+    }, 800);
   };
 
   const handleApple = async () => {
@@ -188,9 +220,9 @@ const AuthPage = () => {
     try {
       // reCAPTCHA v3 — silent bot check
       const action = isLogin ? "login" : "signup";
-      const passed = await verifyRecaptcha(action);
-      if (!passed) {
-        toast({ title: "تم رفض الطلب", description: "فشل التحقق الأمني، يرجى المحاولة مرة أخرى", variant: "destructive" });
+      const recaptcha = await verifyRecaptcha(action);
+      if (!recaptcha.ok) {
+        toast({ title: "تعذر إكمال التحقق", description: recaptcha.message, variant: "destructive" });
         setLoading(false);
         return;
       }
@@ -213,27 +245,48 @@ const AuthPage = () => {
           setLoading(false);
           return;
         }
-        const { data: signUpData, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { full_name: fullName, phone },
-            emailRedirectTo: window.location.origin,
-          },
+        const { data: created, error: createError } = await supabase.functions.invoke("register-customer", {
+          body: { email, password, full_name: fullName, phone },
         });
-        if (error) throw error;
-        // Send welcome email (fire-and-forget — don't block UX)
-        supabase.functions
-          .invoke("send-transactional-email", {
-            body: {
-              templateName: "welcome",
-              recipientEmail: email,
-              idempotencyKey: `welcome-${signUpData.user?.id ?? email}`,
-              templateData: { customerName: fullName },
+        if (created?.success) {
+          const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+          if (signInError) throw signInError;
+          supabase.functions
+            .invoke("send-transactional-email", {
+              body: {
+                templateName: "welcome",
+                recipientEmail: email,
+                idempotencyKey: `welcome-${created?.user_id ?? email}`,
+                templateData: { customerName: fullName },
+              },
+            })
+            .catch((err) => console.warn("Welcome email failed:", err));
+          toast({ title: "تم التسجيل بنجاح", description: "يمكنك البدء بالتسوق الآن" });
+          navigate("/");
+        } else if (created?.error) {
+          throw new Error(created.error);
+        } else {
+          const { data: signUpData, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: { full_name: fullName, phone },
+              emailRedirectTo: window.location.origin,
             },
-          })
-          .catch((err) => console.warn("Welcome email failed:", err));
-        toast({ title: "تم التسجيل بنجاح", description: "تم إرسال رابط التفعيل إلى بريدك الإلكتروني" });
+          });
+          if (error) throw error;
+          supabase.functions
+            .invoke("send-transactional-email", {
+              body: {
+                templateName: "welcome",
+                recipientEmail: email,
+                idempotencyKey: `welcome-${signUpData.user?.id ?? email}`,
+                templateData: { customerName: fullName },
+              },
+            })
+            .catch((err) => console.warn("Welcome email failed:", err));
+          toast({ title: "تم التسجيل بنجاح", description: "تم إرسال رابط التفعيل إلى بريدك الإلكتروني" });
+        }
       }
     } catch (error: any) {
       toast({ title: "خطأ", description: translateError(error.message), variant: "destructive" });
