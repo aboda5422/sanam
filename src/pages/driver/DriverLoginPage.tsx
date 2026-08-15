@@ -1,21 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { staffEmailFromUsername } from "@/lib/admin-username";
 import logoFull from "@/assets/logo-full-light.png";
 
+const REMEMBER_KEY = "sanam:driver-login-remember";
+
+type Remembered = { email: string; password: string };
+
+const loadRemembered = (): Remembered | null => {
+  try {
+    const raw = localStorage.getItem(REMEMBER_KEY);
+    if (!raw) return null;
+    const v = JSON.parse(raw);
+    if (typeof v?.email === "string" && typeof v?.password === "string") return v;
+  } catch {}
+  return null;
+};
+
 const DriverLoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const remembered = loadRemembered();
+  const [email, setEmail] = useState(remembered?.email || "");
+  const [password, setPassword] = useState(remembered?.password || "");
+  const [rememberLogin, setRememberLogin] = useState(!!remembered);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!rememberLogin) {
+      localStorage.removeItem(REMEMBER_KEY);
+    }
+  }, [rememberLogin]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +60,12 @@ const DriverLoginPage = () => {
       if (!isDriver) {
         await supabase.auth.signOut();
         throw new Error("هذا الحساب غير مسجل كمندوب توصيل");
+      }
+
+      if (rememberLogin) {
+        localStorage.setItem(REMEMBER_KEY, JSON.stringify({ email, password }));
+      } else {
+        localStorage.removeItem(REMEMBER_KEY);
       }
 
       toast({ title: "مرحباً بك", description: "تم تسجيل الدخول بنجاح" });
@@ -91,6 +120,14 @@ const DriverLoginPage = () => {
                 autoComplete="current-password"
               />
             </div>
+            <label htmlFor="driver-remember-login" className="flex items-center gap-2 cursor-pointer select-none">
+              <Checkbox
+                id="driver-remember-login"
+                checked={rememberLogin}
+                onCheckedChange={(v) => setRememberLogin(v === true)}
+              />
+              <span className="text-sm text-muted-foreground">حفظ تسجيل الدخول</span>
+            </label>
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <Truck className="h-4 w-4 ml-2" />}
               {loading ? "جاري الدخول..." : "تسجيل الدخول"}

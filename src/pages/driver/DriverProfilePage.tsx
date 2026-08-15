@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Phone, Mail, Loader2, Pencil, Save, X, Car } from "lucide-react";
+import { LogOut, Phone, Mail, Loader2, Pencil, Save, X, Car, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ const DriverProfilePage = () => {
   const [savedPhone, setSavedPhone] = useState("");
   const [savedVehicle, setSavedVehicle] = useState("car");
   const [email, setEmail] = useState("");
+  const [joinedAt, setJoinedAt] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -35,7 +36,7 @@ const DriverProfilePage = () => {
     const fetch = async () => {
       const { data: driver } = await supabase
         .from("drivers")
-        .select("phone, vehicle_type")
+        .select("phone, vehicle_type, created_at")
         .eq("id", driverId)
         .single();
 
@@ -46,6 +47,7 @@ const DriverProfilePage = () => {
         setVehicleType(v);
         setSavedPhone(p);
         setSavedVehicle(v);
+        setJoinedAt(driver.created_at || null);
       }
 
       const { data: { user } } = await supabase.auth.getUser();
@@ -181,6 +183,17 @@ const DriverProfilePage = () => {
                   <div className="mt-1 flex items-center gap-2 rounded-md bg-muted p-2.5 text-sm">
                     <Car className="h-4 w-4 shrink-0 text-muted-foreground" />
                     <span>{VEHICLE_LABELS[vehicleType] || vehicleType}</span>
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-sm">تاريخ الانضمام</Label>
+                  <div className="mt-1 flex items-center gap-2 rounded-md bg-muted p-2.5 text-sm">
+                    <Calendar className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span>
+                      {joinedAt
+                        ? new Date(joinedAt).toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" })
+                        : "—"}
+                    </span>
                   </div>
                 </div>
               </>

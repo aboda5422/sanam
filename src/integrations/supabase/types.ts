@@ -429,6 +429,9 @@ export type Database = {
           id: string
           id_number: string | null
           is_available: boolean
+          pay_type: string
+          per_delivery_fee: number
+          unpaid_delivery_pay: number
           phone: string | null
           rating: number | null
           status: string
@@ -448,6 +451,9 @@ export type Database = {
           id?: string
           id_number?: string | null
           is_available?: boolean
+          pay_type?: string
+          per_delivery_fee?: number
+          unpaid_delivery_pay?: number
           phone?: string | null
           rating?: number | null
           status?: string
@@ -467,6 +473,9 @@ export type Database = {
           id?: string
           id_number?: string | null
           is_available?: boolean
+          pay_type?: string
+          per_delivery_fee?: number
+          unpaid_delivery_pay?: number
           phone?: string | null
           rating?: number | null
           status?: string
@@ -611,6 +620,7 @@ export type Database = {
           assigned_at: string | null
           branch_id: string | null
           collected_amount: number
+          cash_settled_at: string | null
           created_at: string
           customer_name: string | null
           customer_phone: string | null
@@ -638,6 +648,7 @@ export type Database = {
           assigned_at?: string | null
           branch_id?: string | null
           collected_amount?: number
+          cash_settled_at?: string | null
           created_at?: string
           customer_name?: string | null
           customer_phone?: string | null
@@ -665,6 +676,7 @@ export type Database = {
           assigned_at?: string | null
           branch_id?: string | null
           collected_amount?: number
+          cash_settled_at?: string | null
           created_at?: string
           customer_name?: string | null
           customer_phone?: string | null
@@ -1156,7 +1168,25 @@ export type Database = {
           p_id_number?: string
           p_vehicle_type?: string
           p_branch_id?: string
+          p_pay_type?: string
+          p_per_delivery_fee?: number
         }
+        Returns: Json
+      }
+      complete_driver_delivery: {
+        Args: { p_order_id: string }
+        Returns: Json
+      }
+      settle_driver_pay: {
+        Args: { p_driver_id: string }
+        Returns: Json
+      }
+      settle_driver_wallet: {
+        Args: { p_driver_id: string; p_method?: string }
+        Returns: Json
+      }
+      update_driver_pay: {
+        Args: { p_driver_id: string; p_pay_type: string; p_per_delivery_fee?: number }
         Returns: Json
       }
       log_admin_activity: {

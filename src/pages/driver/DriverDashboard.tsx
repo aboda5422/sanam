@@ -27,6 +27,7 @@ const DriverDashboard = () => {
   const [isAvailable, setIsAvailable] = useState(false);
   const [driverName, setDriverName] = useState("");
   const [stats, setStats] = useState({ pending: 0, active: 0, delivered: 0, collections: 0 });
+  const [unpaidPay, setUnpaidPay] = useState<number | null>(null);
   const [activeOrders, setActiveOrders] = useState<any[]>([]);
   const [locationWarningShown, setLocationWarningShown] = useState(false);
   const { toast } = useToast();
@@ -43,13 +44,14 @@ const DriverDashboard = () => {
     const fetchData = async () => {
       const { data: driver } = await supabase
         .from("drivers")
-        .select("is_available, total_earnings, full_name")
+        .select("is_available, total_earnings, full_name, pay_type, unpaid_delivery_pay")
         .eq("id", driverId)
         .single();
 
       if (driver) {
         setIsAvailable(driver.is_available);
         setDriverName(driver.full_name || "");
+        setUnpaidPay(driver.pay_type === "per_order" ? Number(driver.unpaid_delivery_pay || 0) : null);
       }
 
       const today = new Date().toISOString().split("T")[0];
@@ -190,6 +192,20 @@ const DriverDashboard = () => {
             <h2 className="font-heading font-bold text-lg">مرحباً، {driverName}</h2>
             <p className="text-sm text-muted-foreground mt-1">{motivation}</p>
           </div>
+        )}
+
+        {unpaidPay !== null && (
+          <Link to="/driver/earnings">
+            <Card className="hover:border-primary/40 transition-colors">
+              <CardContent className="p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">أجر التوصيل المستحق</p>
+                  <p className="font-heading font-bold text-lg">{unpaidPay.toFixed(2)} ر.س</p>
+                </div>
+                <Wallet className="h-5 w-5 text-primary" />
+              </CardContent>
+            </Card>
+          </Link>
         )}
 
         <Card>

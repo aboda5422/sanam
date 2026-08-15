@@ -4,6 +4,7 @@ import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { translateError } from "@/lib/error-messages";
@@ -13,18 +14,40 @@ import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { Capacitor } from "@capacitor/core";
 import { openBlankOAuthPopup, openOAuthWindow } from "@/lib/google-web-auth";
 
+const REMEMBER_KEY = "sanam:customer-login-remember";
+
+type Remembered = { email: string; password: string };
+
+const loadRemembered = (): Remembered | null => {
+  try {
+    const raw = localStorage.getItem(REMEMBER_KEY);
+    if (!raw) return null;
+    const v = JSON.parse(raw);
+    if (typeof v?.email === "string" && typeof v?.password === "string") return v;
+  } catch {}
+  return null;
+};
+
 const AuthPage = () => {
+  const remembered = loadRemembered();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const isIOS = Capacitor.isNativePlatform() && Capacitor.getPlatform() === "ios";
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(remembered?.email || "");
+  const [password, setPassword] = useState(remembered?.password || "");
+  const [rememberLogin, setRememberLogin] = useState(!!remembered);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
   const { verify: verifyRecaptcha } = useRecaptcha();
+
+  useEffect(() => {
+    if (!rememberLogin) {
+      localStorage.removeItem(REMEMBER_KEY);
+    }
+  }, [rememberLogin]);
 
   // After Google OAuth redirect, session is set then we go home
   useEffect(() => {
@@ -230,6 +253,11 @@ const AuthPage = () => {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        if (rememberLogin) {
+          localStorage.setItem(REMEMBER_KEY, JSON.stringify({ email, password }));
+        } else {
+          localStorage.removeItem(REMEMBER_KEY);
+        }
         toast({ title: "تم تسجيل الدخول بنجاح", description: "مرحباً بك في سنام" });
         navigate("/");
       } else {
@@ -355,9 +383,19 @@ const AuthPage = () => {
               </div>
 
               {isLogin && (
-                <Link to="/forgot-password" className="block text-xs text-primary hover:underline">
-                  نسيت كلمة المرور؟
-                </Link>
+                <div className="flex items-center justify-between gap-3">
+                  <label htmlFor="remember-login" className="flex items-center gap-2 cursor-pointer select-none">
+                    <Checkbox
+                      id="remember-login"
+                      checked={rememberLogin}
+                      onCheckedChange={(v) => setRememberLogin(v === true)}
+                    />
+                    <span className="text-xs text-muted-foreground">حفظ تسجيل الدخول</span>
+                  </label>
+                  <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                    نسيت كلمة المرور؟
+                  </Link>
+                </div>
               )}
 
               <Button type="submit" className="w-full text-sm" disabled={loading}>

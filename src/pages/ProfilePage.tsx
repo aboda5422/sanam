@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Package, MapPin, Mail, Save, Loader2, AlertTriangle, ShoppingCart, Settings, Trash2, ShieldAlert, LogOut, Plus, Pencil, X, KeyRound } from "lucide-react";
+import { User, Package, MapPin, Mail, Save, Loader2, AlertTriangle, ShoppingCart, Settings, Trash2, ShieldAlert, LogOut, Plus, Pencil, X, KeyRound, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import SavedAddresses from "@/components/address/SavedAddresses";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { notifyAddressesChanged } from "@/lib/branch";
 import { translateError } from "@/lib/error-messages";
+import { openOrderInvoice } from "@/lib/order-invoice";
 
 const statusMap: Record<string, { label: string; labelEn: string; color: string }> = {
   pending: { label: "قيد الانتظار", labelEn: "Pending", color: "bg-yellow-100 text-yellow-800" },
@@ -542,8 +543,32 @@ const ProfilePage = () => {
                                   )}
                                 </div>
                               </div>
-                              <div className="flex items-center justify-between pt-2 border-t cursor-pointer" onClick={() => navigate(`/order/${order.id}`)}>
-                                <span className="text-sm text-muted-foreground">{t("عرض التفاصيل", "View Details")}</span>
+                              <div className="flex items-center justify-between pt-2 border-t">
+                                <div className="flex items-center gap-3">
+                                  <span
+                                    className="text-sm text-muted-foreground cursor-pointer hover:text-primary"
+                                    onClick={() => navigate(`/order/${order.id}`)}
+                                  >
+                                    {t("عرض التفاصيل", "View Details")}
+                                  </span>
+                                  {order.status === "delivered" && (
+                                    <button
+                                      type="button"
+                                      onClick={async (e) => {
+                                        e.stopPropagation();
+                                        try {
+                                          await openOrderInvoice(order);
+                                        } catch {
+                                          toast.error(t("تعذر فتح الفاتورة. اسمح بالنوافذ المنبثقة ثم أعد المحاولة.", "Could not open the invoice. Allow pop-ups and try again."));
+                                        }
+                                      }}
+                                      className="inline-flex items-center gap-1 text-sm text-primary font-medium hover:underline"
+                                    >
+                                      <FileText className="h-4 w-4" />
+                                      {t("الفاتورة", "Invoice")}
+                                    </button>
+                                  )}
+                                </div>
                                 <span className="font-bold text-primary">{order.total} {t("ر.س", "SAR")}</span>
                               </div>
                             </CardContent>

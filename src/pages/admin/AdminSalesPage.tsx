@@ -14,12 +14,34 @@ import {
   Loader2, TrendingUp, DollarSign, ShoppingCart, CreditCard, Banknote, BarChart3, Download, CalendarIcon, Search,
 } from "lucide-react";
 import { format, subDays, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
-import { ar } from "date-fns/locale";
 
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { applyBranchFilter } from "@/lib/branch-scope";
 
 type DateFilter = "today" | "week" | "month" | "custom";
+type CustodyFilter = "all" | "with_driver" | "remitted";
+
+function isCashHeldByDriver(o: {
+  status: string;
+  payment_method: string;
+  collected_amount: number | null;
+  cash_settled_at?: string | null;
+}) {
+  return (
+    o.status === "delivered" &&
+    o.payment_method === "cash" &&
+    Number(o.collected_amount || 0) > 0 &&
+    !o.cash_settled_at
+  );
+}
+
+function isCashRemitted(o: {
+  status: string;
+  payment_method: string;
+  cash_settled_at?: string | null;
+}) {
+  return o.status === "delivered" && o.payment_method === "cash" && !!o.cash_settled_at;
+}
 
 const AdminSalesPage = () => {
   const { scopedBranchIds } = useAdminAuth();
@@ -27,7 +49,7 @@ const AdminSalesPage = () => {
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
   const [searchOrder, setSearchOrder] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [custodyFilter, setCustodyFilter] = useState<CustodyFilter>("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
 
   const { data: orders, isLoading } = useQuery({
@@ -35,7 +57,7 @@ const AdminSalesPage = () => {
     queryFn: async () => {
       let q = supabase
         .from("orders")
-        .select("id, order_number, total, subtotal, delivery_fee, status, payment_method, created_at, collected_amount, customer_name, customer_phone, driver_id, drivers(full_name)")
+        .select("id, order_number, total, subtotal, delivery_fee, status, payment_method, created_at, collected_amount, cash_settled_at, customer_name, customer_phone, driver_id, drivers(full_name)")
         .order("created_at", { ascending: false });
       q = applyBranchFilter(q, scopedBranchIds);
       const { data, error } = await q;
@@ -67,11 +89,14 @@ const AdminSalesPage = () => {
         String(o.order_number).includes(searchOrder) || 
         (o.customer_name && o.customer_name.includes(searchOrder)) ||
         (o.customer_phone && o.customer_phone.includes(searchOrder));
-      const matchStatus = statusFilter === "all" || o.status === statusFilter;
+      const matchCustody =
+        custodyFilter === "all" ||
+        (custodyFilter === "with_driver" && isCashHeldByDriver(o)) ||
+        (custodyFilter === "remitted" && isCashRemitted(o));
       const matchPayment = paymentFilter === "all" || o.payment_method === paymentFilter;
-      return inRange && matchSearch && matchStatus && matchPayment;
+      return inRange && matchSearch && matchCustody && matchPayment;
     });
-  }, [orders, dateRange, searchOrder, statusFilter, paymentFilter]);
+  }, [orders, dateRange, searchOrder, custodyFilter, paymentFilter]);
 
   const stats = useMemo(() => {
     const delivered = filteredOrders.filter((o) => o.status === "delivered");
@@ -126,15 +151,6 @@ const AdminSalesPage = () => {
     { title: "طلبات شبكة", value: `${stats.cardOrders}`, icon: CreditCard, color: "text-indigo-600" },
     { title: "المبالغ المحصلة", value: `${stats.totalCollected.toFixed(2)} ر.س`, icon: TrendingUp, color: "text-blue-600" },
   ];
-
-  const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-    pending: { label: "معلق", variant: "secondary" },
-    assigned: { label: "معيّن", variant: "outline" },
-    preparing: { label: "تحضير", variant: "outline" },
-    on_the_way: { label: "في الطريق", variant: "default" },
-    delivered: { label: "تم التوصيل", variant: "default" },
-    cancelled: { label: "ملغي", variant: "destructive" },
-  };
 
   return (
     <AdminLayout title="الحسابات والمبيعات">
@@ -201,16 +217,12 @@ const AdminSalesPage = () => {
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="بحث برقم الطلب أو اسم العميل..." value={searchOrder} onChange={(e) => setSearchOrder(e.target.value)} className="pr-9" />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[130px]"><SelectValue placeholder="الحالة" /></SelectTrigger>
+        <Select value={custodyFilter} onValueChange={(v) => setCustodyFilter(v as CustodyFilter)}>
+          <SelectTrigger className="w-[200px]"><SelectValue placeholder="الحالة" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">كل الحالات</SelectItem>
-            <SelectItem value="pending">معلق</SelectItem>
-            <SelectItem value="assigned">معيّن</SelectItem>
-            <SelectItem value="preparing">تحضير</SelectItem>
-            <SelectItem value="on_the_way">في الطريق</SelectItem>
-            <SelectItem value="delivered">تم التوصيل</SelectItem>
-            <SelectItem value="cancelled">ملغي</SelectItem>
+            <SelectItem value="all">كل الطلبات</SelectItem>
+            <SelectItem value="with_driver">لم ترحل</SelectItem>
+            <SelectItem value="remitted">تم ترحيلها</SelectItem>
           </SelectContent>
         </Select>
         <Select value={paymentFilter} onValueChange={setPaymentFilter}>
@@ -247,7 +259,8 @@ const AdminSalesPage = () => {
                 <tr><td colSpan={10} className="p-8 text-center text-muted-foreground">لا توجد عمليات في الفترة المحددة</td></tr>
               ) : (
                 filteredOrders.map((o) => {
-                  const st = statusMap[o.status] || { label: o.status, variant: "outline" as const };
+                  const held = isCashHeldByDriver(o);
+                  const remitted = isCashRemitted(o);
                   return (
                     <tr key={o.id} className="border-b last:border-0 hover:bg-muted/10">
                       <td className="p-3 font-medium">{o.order_number}</td>
@@ -260,7 +273,13 @@ const AdminSalesPage = () => {
                         <Badge variant="outline">{o.payment_method === "cash" ? "كاش" : "شبكة"}</Badge>
                       </td>
                       <td className="p-3 text-center">
-                        <Badge variant={st.variant}>{st.label}</Badge>
+                        {held ? (
+                          <Badge className="bg-amber-100 text-amber-800 border-0">لم ترحل</Badge>
+                        ) : remitted ? (
+                          <Badge className="bg-green-100 text-green-800 border-0">تم ترحيلها</Badge>
+                        ) : (
+                          <Badge variant="outline">—</Badge>
+                        )}
                       </td>
                       <td className="p-3">{(o.drivers as any)?.full_name || "—"}</td>
                       <td className="p-3 text-muted-foreground text-xs">{format(new Date(o.created_at), "yyyy/MM/dd HH:mm")}</td>

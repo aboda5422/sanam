@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -25,18 +25,16 @@ const KPICards = ({ drivers, wallets }: { drivers: any[]; wallets: any[] }) => {
   const active = drivers?.filter((d) => d.status === "active").length ?? 0;
   const available = drivers?.filter((d) => d.is_available).length ?? 0;
   const totalEarnings = wallets?.reduce((s, w) => s + Number(w.total_collected), 0) ?? 0;
-  const totalCommission = wallets?.reduce((s, w) => s + Number(w.total_commission), 0) ?? 0;
 
   const cards = [
     { label: "إجمالي المناديب", value: total, icon: Users, color: "text-blue-600 bg-blue-50" },
     { label: "نشط", value: active, icon: CheckCircle, color: "text-green-600 bg-green-50" },
     { label: "متاح الآن", value: available, icon: Truck, color: "text-emerald-600 bg-emerald-50" },
     { label: "إجمالي التحصيل", value: `${totalEarnings.toFixed(0)} ر.س`, icon: Wallet, color: "text-amber-600 bg-amber-50" },
-    { label: "إجمالي العمولات", value: `${totalCommission.toFixed(0)} ر.س`, icon: Wallet, color: "text-purple-600 bg-purple-50" },
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
       {cards.map((c) => (
         <Card key={c.label} className="border-0 shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
@@ -55,7 +53,14 @@ const KPICards = ({ drivers, wallets }: { drivers: any[]; wallets: any[] }) => {
 /* ─── Add Driver Dialog ─── */
 const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) => {
   const qc = useQueryClient();
-  const { scopedBranchIds, filterBranchId } = useAdminAuth();
+  const { scopedBranchIds, filterBranchId, branches, role } = useAdminAuth();
+  const isBranchManager = role === "store_admin";
+  const lockedBranchId = isBranchManager
+    ? (writeBranchId(filterBranchId, scopedBranchIds) || (scopedBranchIds?.length === 1 ? scopedBranchIds[0] : null))
+    : null;
+  const assignableBranches = isBranchManager
+    ? branches.filter((b) => (scopedBranchIds || []).includes(b.id))
+    : branches;
   const [form, setForm] = useState({
     username: "",
     password: "",
@@ -63,7 +68,16 @@ const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: 
     phone: "",
     id_number: "",
     vehicle_type: "car",
+    pay_type: "salary",
+    per_delivery_fee: "",
+    branch_id: "",
   });
+
+  useEffect(() => {
+    if (!open) return;
+    const preset = lockedBranchId || filterBranchId || "";
+    setForm((f) => ({ ...f, branch_id: preset || f.branch_id }));
+  }, [open, lockedBranchId, filterBranchId]);
 
   const addMutation = useMutation({
     mutationFn: async () => {
@@ -73,8 +87,14 @@ const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: 
       if (form.password.trim().length < 6) {
         throw new Error("كلمة المرور يجب ألا تقل عن 6 أحرف");
       }
-      const bid = writeBranchId(filterBranchId, scopedBranchIds);
-      if (!bid) throw new Error("اختر فرعاً من أعلى الصفحة قبل إضافة مندوب");
+      if (form.pay_type === "per_order" && !(Number(form.per_delivery_fee) > 0)) {
+        throw new Error("حدد أجر التوصيلة الذي يدفعه المتجر للمندوب");
+      }
+      const bid = lockedBranchId || form.branch_id || writeBranchId(filterBranchId, scopedBranchIds);
+      if (!bid) throw new Error("اختر الفرع الذي سيُسند إليه المندوب");
+      if (isBranchManager && scopedBranchIds?.length && !scopedBranchIds.includes(bid)) {
+        throw new Error("لا يمكن إسناد المندوب لفرع خارج صلاحيتك");
+      }
       const { data, error } = await supabase.rpc("create_driver", {
         p_full_name: form.full_name.trim(),
         p_username: form.username.trim(),
@@ -83,6 +103,8 @@ const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: 
         p_id_number: form.id_number.trim() || undefined,
         p_vehicle_type: form.vehicle_type,
         p_branch_id: bid,
+        p_pay_type: form.pay_type,
+        p_per_delivery_fee: form.pay_type === "per_order" ? Number(form.per_delivery_fee) : 0,
       });
       if (error) throw error;
       const payload = data as { success?: boolean } | null;
@@ -92,10 +114,12 @@ const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: 
       toast.success("تم إضافة المندوب بنجاح");
       qc.invalidateQueries({ queryKey: ["admin-drivers"] });
       onOpenChange(false);
-      setForm({ username: "", password: "", full_name: "", phone: "", id_number: "", vehicle_type: "car" });
+      setForm({ username: "", password: "", full_name: "", phone: "", id_number: "", vehicle_type: "car", pay_type: "salary", per_delivery_fee: "", branch_id: lockedBranchId || "" });
     },
     onError: (e: any) => toast.error(e.message || "فشل في إضافة المندوب"),
   });
+
+  const lockedBranchName = assignableBranches.find((b) => b.id === (lockedBranchId || form.branch_id))?.name;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -124,6 +148,25 @@ const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: 
           </div>
           <div><Label>رقم الجوال</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
           <div><Label>رقم الهوية</Label><Input value={form.id_number} onChange={(e) => setForm({ ...form, id_number: e.target.value })} /></div>
+          {lockedBranchId ? (
+            <div>
+              <Label>الفرع</Label>
+              <p className="text-sm font-medium rounded-md border bg-muted/40 px-3 py-2">{lockedBranchName || "فرعك"}</p>
+              <p className="text-[11px] text-muted-foreground mt-1">يُسند المندوب تلقائياً إلى فرعك</p>
+            </div>
+          ) : (
+            <div>
+              <Label>الفرع *</Label>
+              <Select value={form.branch_id} onValueChange={(v) => setForm({ ...form, branch_id: v })}>
+                <SelectTrigger><SelectValue placeholder="اختر الفرع" /></SelectTrigger>
+                <SelectContent>
+                  {assignableBranches.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div>
             <Label>نوع المركبة</Label>
             <Select value={form.vehicle_type} onValueChange={(v) => setForm({ ...form, vehicle_type: v })}>
@@ -135,7 +178,32 @@ const AddDriverDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: 
               </SelectContent>
             </Select>
           </div>
-          <Button className="w-full" onClick={() => addMutation.mutate()} disabled={addMutation.isPending || !form.username.trim() || !form.password.trim() || !form.full_name.trim()}>
+          <div>
+            <Label>أجر المندوب *</Label>
+            <p className="text-[11px] text-muted-foreground mb-1">أجر داخلي من المتجر للمندوب، وليس رسوم التوصيل على العميل</p>
+            <Select value={form.pay_type} onValueChange={(v) => setForm({ ...form, pay_type: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="salary">راتب</SelectItem>
+                <SelectItem value="per_order">حسب الطلب</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {form.pay_type === "per_order" && (
+            <div>
+              <Label>أجر التوصيلة (ر.س) *</Label>
+              <Input
+                type="number"
+                min="0.01"
+                step="0.01"
+                dir="ltr"
+                value={form.per_delivery_fee}
+                onChange={(e) => setForm({ ...form, per_delivery_fee: e.target.value })}
+                placeholder="مثال: 8"
+              />
+            </div>
+          )}
+          <Button className="w-full" onClick={() => addMutation.mutate()} disabled={addMutation.isPending || !form.username.trim() || !form.password.trim() || !form.full_name.trim() || (!lockedBranchId && !form.branch_id)}>
             {addMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <UserPlus className="h-4 w-4 ml-2" />}
             إضافة المندوب
           </Button>
@@ -286,10 +354,12 @@ const OrderAssignment = () => {
 
 /* ─── Wallets Tab ─── */
 const WalletsTab = () => {
+  const { role } = useAdminAuth();
+  const canSettle = role === "store_admin";
   const { data: wallets, isLoading } = useQuery({
     queryKey: ["admin-wallets"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("driver_wallet").select("*, drivers(phone, full_name, user_id)").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("driver_wallet").select("*, drivers(phone, full_name, user_id, pay_type, per_delivery_fee, unpaid_delivery_pay)").order("created_at", { ascending: false });
       if (error) throw error;
       return data || [];
     },
@@ -298,28 +368,44 @@ const WalletsTab = () => {
   const qc = useQueryClient();
 
   const settleMutation = useMutation({
-    mutationFn: async ({ walletId, driverId, amount, type }: { walletId: string; driverId: string; amount: number; type: "cash" | "card" }) => {
-      // Record transaction
-      await supabase.from("wallet_transactions").insert({
-        driver_id: driverId,
-        type: "settlement" as any,
-        amount,
-        notes: type === "cash" ? "تسليم نقدي" : "تحويل عبر الشبكة",
+    mutationFn: async ({ driverId, type }: { driverId: string; type: "cash" | "card" }) => {
+      const { data, error } = await supabase.rpc("settle_driver_wallet", {
+        p_driver_id: driverId,
+        p_method: type,
       });
-      // Reset balance
-      await supabase.from("driver_wallet").update({ balance: 0 } as any).eq("id", walletId);
+      if (error) throw error;
+      return data as { amount?: number };
     },
-    onSuccess: () => {
-      toast.success("تم تسوية الرصيد");
+    onSuccess: (data) => {
+      toast.success(`تم تسوية ${Number(data?.amount || 0).toFixed(2)} ر.س`);
       qc.invalidateQueries({ queryKey: ["admin-wallets"] });
+      qc.invalidateQueries({ queryKey: ["admin-sales-orders"] });
     },
+    onError: (e: any) => toast.error(e.message || "فشل في التسوية"),
+  });
+
+  const settlePayMutation = useMutation({
+    mutationFn: async (driverId: string) => {
+      const { data, error } = await supabase.rpc("settle_driver_pay", { p_driver_id: driverId });
+      if (error) throw error;
+      return data as { amount?: number };
+    },
+    onSuccess: (data) => {
+      toast.success(`تم سداد ${Number(data?.amount || 0).toFixed(2)} ر.س وتصفير المستحق`);
+      qc.invalidateQueries({ queryKey: ["admin-wallets"] });
+      qc.invalidateQueries({ queryKey: ["admin-drivers"] });
+    },
+    onError: (e: any) => toast.error(e.message || "فشل سداد أجر المندوب"),
   });
 
   if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">المبالغ النقدية تبقى في حوزة المندوب حتى يتم تسليمها. الدفع عبر الشبكة يترحّل تلقائياً.</p>
+      <p className="text-sm text-muted-foreground">
+        المبالغ النقدية تبقى في حوزة المندوب حتى يتم تسليمها. الدفع عبر الشبكة يترحّل تلقائياً.
+        {!canSettle && " التسوية وسداد الأجور من صلاحية مدير الفرع فقط."}
+      </p>
       <div className="bg-card rounded-xl border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -327,8 +413,7 @@ const WalletsTab = () => {
               <th className="text-right p-3 font-medium">المندوب</th>
               <th className="text-right p-3 font-medium">الرصيد (نقدي بحوزته)</th>
               <th className="text-right p-3 font-medium">إجمالي التحصيل</th>
-              <th className="text-right p-3 font-medium">العمولات</th>
-              <th className="text-right p-3 font-medium">نسبة العمولة</th>
+              <th className="text-right p-3 font-medium">أجر المندوب المستحق</th>
               <th className="text-center p-3 font-medium">تسوية</th>
             </tr></thead>
             <tbody>
@@ -337,25 +422,47 @@ const WalletsTab = () => {
                   <td className="p-3 font-medium">{(w.drivers as any)?.full_name || (w.drivers as any)?.phone || w.driver_id.slice(0, 8)}</td>
                   <td className="p-3 font-bold text-amber-600">{Number(w.balance).toFixed(2)} ر.س</td>
                   <td className="p-3">{Number(w.total_collected).toFixed(2)} ر.س</td>
-                  <td className="p-3">{Number(w.total_commission).toFixed(2)} ر.س</td>
-                  <td className="p-3">{(Number(w.commission_rate) * 100).toFixed(0)}%</td>
+                  <td className="p-3">
+                    {(w.drivers as any)?.pay_type === "per_order" ? (
+                      <div className="space-y-1">
+                        <p className="font-bold text-emerald-700">{Number((w.drivers as any)?.unpaid_delivery_pay || 0).toFixed(2)} ر.س</p>
+                        {Number((w.drivers as any)?.unpaid_delivery_pay || 0) > 0 && canSettle && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-xs h-7"
+                            disabled={settlePayMutation.isPending}
+                            onClick={() => settlePayMutation.mutate(w.driver_id)}
+                          >
+                            سداد وتصفير
+                          </Button>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">راتب</span>
+                    )}
+                  </td>
                   <td className="p-3 text-center">
-                    {Number(w.balance) > 0 && (
+                    {canSettle && Number(w.balance) > 0 ? (
                       <div className="flex gap-1 justify-center">
                         <Button size="sm" variant="outline" className="text-xs h-7 gap-1"
-                          onClick={() => settleMutation.mutate({ walletId: w.id, driverId: w.driver_id, amount: Number(w.balance), type: "cash" })}>
+                          onClick={() => settleMutation.mutate({ driverId: w.driver_id, type: "cash" })}>
                           💵 كاش
                         </Button>
                         <Button size="sm" variant="outline" className="text-xs h-7 gap-1"
-                          onClick={() => settleMutation.mutate({ walletId: w.id, driverId: w.driver_id, amount: Number(w.balance), type: "card" })}>
+                          onClick={() => settleMutation.mutate({ driverId: w.driver_id, type: "card" })}>
                           💳 شبكة
                         </Button>
                       </div>
+                    ) : Number(w.balance) > 0 ? (
+                      <span className="text-xs text-muted-foreground">مدير الفرع</span>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
                     )}
                   </td>
                 </tr>
               ))}
-              {(!wallets || wallets.length === 0) && <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">لا توجد محافظ</td></tr>}
+              {(!wallets || wallets.length === 0) && <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">لا توجد محافظ</td></tr>}
             </tbody>
           </table>
         </div>
@@ -372,7 +479,8 @@ const AdminDriversPage = () => {
   const [addOpen, setAddOpen] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState<any>(null);
   const qc = useQueryClient();
-  const { scopedBranchIds } = useAdminAuth();
+  const { scopedBranchIds, role, branches } = useAdminAuth();
+  const canSettle = role === "store_admin";
 
   const { data: drivers, isLoading } = useQuery({
     queryKey: ["admin-drivers", scopedBranchIds],
@@ -387,11 +495,18 @@ const AdminDriversPage = () => {
         if (!ids.length) return [];
         const { data, error } = await supabase.from("drivers").select("*").in("id", ids).order("created_at", { ascending: false });
         if (error) throw error;
-        return data || [];
+        const rows = data || [];
+        const { data: dlinks } = await supabase.from("driver_branches" as any).select("driver_id, branch_id").in("driver_id", rows.map((r) => r.id));
+        const names = new Map((dlinks || []).map((r: any) => [r.driver_id, r.branch_id]));
+        return rows.map((d) => ({ ...d, branch_id: names.get(d.id) || null }));
       }
       const { data, error } = await supabase.from("drivers").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return data || [];
+      const rows = data || [];
+      if (!rows.length) return [];
+      const { data: dlinks } = await supabase.from("driver_branches" as any).select("driver_id, branch_id").in("driver_id", rows.map((r) => r.id));
+      const names = new Map((dlinks || []).map((r: any) => [r.driver_id, r.branch_id]));
+      return rows.map((d) => ({ ...d, branch_id: names.get(d.id) || null }));
     },
   });
 
@@ -421,6 +536,45 @@ const AdminDriversPage = () => {
   const busyDriverIds = new Set(
     (activeAssignments || []).map((o) => o.driver_id).filter(Boolean) as string[],
   );
+
+  const settlePayMutation = useMutation({
+    mutationFn: async (driverId: string) => {
+      const { data, error } = await supabase.rpc("settle_driver_pay", { p_driver_id: driverId });
+      if (error) throw error;
+      return data as { amount?: number };
+    },
+    onSuccess: (data) => {
+      toast.success(`تم سداد ${Number(data?.amount || 0).toFixed(2)} ر.س وتصفير المستحق`);
+      qc.invalidateQueries({ queryKey: ["admin-drivers"] });
+      qc.invalidateQueries({ queryKey: ["admin-wallets"] });
+      setSelectedDriver((prev: any) =>
+        prev ? { ...prev, unpaid_delivery_pay: 0 } : prev
+      );
+    },
+    onError: (e: any) => toast.error(e.message || "فشل سداد أجر المندوب"),
+  });
+
+  const updatePayMutation = useMutation({
+    mutationFn: async ({ driverId, payType, fee }: { driverId: string; payType: string; fee: number }) => {
+      const { error } = await supabase.rpc("update_driver_pay", {
+        p_driver_id: driverId,
+        p_pay_type: payType,
+        p_per_delivery_fee: fee,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_d, vars) => {
+      toast.success("تم تحديث أجر المندوب");
+      qc.invalidateQueries({ queryKey: ["admin-drivers"] });
+      qc.invalidateQueries({ queryKey: ["admin-wallets"] });
+      setSelectedDriver((prev: any) =>
+        prev
+          ? { ...prev, pay_type: vars.payType, per_delivery_fee: vars.payType === "per_order" ? vars.fee : 0 }
+          : prev
+      );
+    },
+    onError: (e: any) => toast.error(e.message || "فشل تحديث الأجر"),
+  });
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
@@ -468,7 +622,7 @@ const AdminDriversPage = () => {
           <TabsTrigger value="drivers" className="gap-1"><Users className="h-4 w-4" />المناديب</TabsTrigger>
           <TabsTrigger value="orders" className="gap-1"><ArrowLeftRight className="h-4 w-4" />توزيع الطلبات</TabsTrigger>
           <TabsTrigger value="tracking" className="gap-1"><MapPin className="h-4 w-4" />تتبع المناديب</TabsTrigger>
-          <TabsTrigger value="wallets" className="gap-1"><Wallet className="h-4 w-4" />المحافظ والعمولات</TabsTrigger>
+          <TabsTrigger value="wallets" className="gap-1"><Wallet className="h-4 w-4" />المحافظ والأجور</TabsTrigger>
         </TabsList>
 
         {/* ─── Drivers Tab ─── */}
@@ -505,10 +659,13 @@ const AdminDriversPage = () => {
                 <table className="w-full text-sm">
                   <thead><tr className="border-b bg-muted/30">
                     <th className="text-right p-3 font-medium">المندوب</th>
+                    <th className="text-right p-3 font-medium">الفرع</th>
                     <th className="text-right p-3 font-medium">الجوال</th>
                     <th className="text-right p-3 font-medium">البريد</th>
                     <th className="text-center p-3 font-medium">التقييم</th>
                     <th className="text-center p-3 font-medium">التوصيلات</th>
+                    <th className="text-right p-3 font-medium">الأجر</th>
+                    <th className="text-right p-3 font-medium">مستحق الأجر</th>
                     <th className="text-center p-3 font-medium">الحالة</th>
                     <th className="text-center p-3 font-medium">التوفر</th>
                     <th className="text-center p-3 font-medium">إجراءات</th>
@@ -528,6 +685,7 @@ const AdminDriversPage = () => {
                             <span className="font-medium">{(d as any).full_name || d.user_id.slice(0, 8)}</span>
                           </div>
                         </td>
+                        <td className="p-3 text-sm">{branches.find((b) => b.id === (d as any).branch_id)?.name || "—"}</td>
                         <td className="p-3 text-muted-foreground">{d.phone || "—"}</td>
                         <td className="p-3 text-muted-foreground text-xs">{(d as any).email || "—"}</td>
                         <td className="p-3 text-center">
@@ -536,6 +694,16 @@ const AdminDriversPage = () => {
                           </span>
                         </td>
                         <td className="p-3 text-center">{d.total_deliveries}</td>
+                        <td className="p-3 text-sm">
+                          {(d as any).pay_type === "per_order"
+                            ? `حسب الطلب (${Number((d as any).per_delivery_fee || 0).toFixed(2)} ر.س)`
+                            : "راتب"}
+                        </td>
+                        <td className="p-3 font-medium">
+                          {(d as any).pay_type === "per_order"
+                            ? `${Number((d as any).unpaid_delivery_pay || 0).toFixed(2)} ر.س`
+                            : "—"}
+                        </td>
                         <td className="p-3 text-center">
                           <Badge variant={(d as any).status === "active" ? "default" : "secondary"}>
                             {(d as any).status === "active" ? "مفعل" : "غير مفعل"}
@@ -569,7 +737,7 @@ const AdminDriversPage = () => {
                         </td>
                       </tr>
                     ))}
-                    {(!filtered || filtered.length === 0) && <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">لا يوجد مناديب</td></tr>}
+                    {(!filtered || filtered.length === 0) && <tr><td colSpan={11} className="p-8 text-center text-muted-foreground">لا يوجد مناديب</td></tr>}
                   </tbody>
                 </table>
               </div>
@@ -623,10 +791,72 @@ const AdminDriversPage = () => {
                 <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" />{(selectedDriver as any).email || "—"}</div>
                 <div><span className="text-muted-foreground">الهوية:</span> {(selectedDriver as any).id_number || "—"}</div>
                 <div><span className="text-muted-foreground">المركبة:</span> {selectedDriver.vehicle_type || "—"}</div>
+                <div><span className="text-muted-foreground">الفرع:</span> {branches.find((b) => b.id === selectedDriver.branch_id)?.name || "—"}</div>
                 <div><span className="text-muted-foreground">التقييم:</span> ⭐ {Number(selectedDriver.rating).toFixed(1)}</div>
                 <div><span className="text-muted-foreground">التوصيلات:</span> {selectedDriver.total_deliveries}</div>
                 <div><span className="text-muted-foreground">الأرباح:</span> {Number(selectedDriver.total_earnings).toFixed(2)} ر.س</div>
                 <div><span className="text-muted-foreground">متاح:</span> {selectedDriver.is_available ? "نعم ✅" : "لا ❌"}</div>
+              </div>
+              <div className="rounded-lg border p-3 space-y-2">
+                <p className="text-sm font-medium">أجر المندوب (من المتجر)</p>
+                <p className="text-[11px] text-muted-foreground">راتب، أو مبلغ ثابت عن كل توصيلة — ليس رسوم التوصيل على العميل</p>
+                <Select
+                  value={selectedDriver.pay_type || "salary"}
+                  onValueChange={(v) => {
+                    if (v === "salary") {
+                      updatePayMutation.mutate({ driverId: selectedDriver.id, payType: "salary", fee: 0 });
+                    } else {
+                      setSelectedDriver({ ...selectedDriver, pay_type: "per_order" });
+                    }
+                  }}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="salary">راتب</SelectItem>
+                    <SelectItem value="per_order">حسب الطلب</SelectItem>
+                  </SelectContent>
+                </Select>
+                {(selectedDriver.pay_type || "salary") === "per_order" && (
+                  <div className="flex gap-2">
+                    <Input
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      dir="ltr"
+                      value={selectedDriver.per_delivery_fee ?? ""}
+                      onChange={(e) => setSelectedDriver({ ...selectedDriver, per_delivery_fee: e.target.value })}
+                    />
+                    <Button
+                      size="sm"
+                      disabled={updatePayMutation.isPending}
+                      onClick={() =>
+                        updatePayMutation.mutate({
+                          driverId: selectedDriver.id,
+                          payType: "per_order",
+                          fee: Number(selectedDriver.per_delivery_fee),
+                        })
+                      }
+                    >
+                      حفظ
+                    </Button>
+                  </div>
+                )}
+                {(selectedDriver.pay_type || "salary") === "per_order" && (
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-sm">المستحق غير المسدد</span>
+                    <span className="font-bold">{Number(selectedDriver.unpaid_delivery_pay || 0).toFixed(2)} ر.س</span>
+                  </div>
+                )}
+                {Number(selectedDriver.unpaid_delivery_pay || 0) > 0 && canSettle && (
+                  <Button
+                    className="w-full"
+                    disabled={settlePayMutation.isPending}
+                    onClick={() => settlePayMutation.mutate(selectedDriver.id)}
+                  >
+                    {settlePayMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
+                    سداد وتصفير المستحق
+                  </Button>
+                )}
               </div>
             </div>
           )}

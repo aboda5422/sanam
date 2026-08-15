@@ -20,7 +20,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { allowedAdminPaths } from "@/lib/staff-access";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import logo from "@/assets/logo-full-light.png";
+import logo from "@/assets/logo-full-admin.png";
 import {
   Sidebar,
   SidebarContent,
