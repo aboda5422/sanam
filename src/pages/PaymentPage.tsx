@@ -72,7 +72,13 @@ const PaymentPage = () => {
           description: `طلب رقم ${ord.order_number}`,
           publishable_api_key: publishableKey,
           callback_url: `${window.location.origin}/payment-result`,
-          methods: ["creditcard", "applepay", "stcpay"],
+          supported_networks: ["mada", "visa", "mastercard"],
+          methods: ["creditcard", "stcpay", "applepay"],
+          apple_pay: {
+            country: "SA",
+            label: "سنام سوبرماركت",
+            validate_merchant_url: "https://api.moyasar.com/v1/applepay/initiate",
+          },
           metadata: { order_id: ord.id, user_id: ord.user_id },
         });
       }, 100);
