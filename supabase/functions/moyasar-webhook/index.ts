@@ -3,10 +3,33 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-moyasar-signature",
 };
 
-// Public webhook — no JWT required
+function webhookTokensMatch(provided: string, expected: string): boolean {
+  const enc = new TextEncoder();
+  const a = enc.encode(provided);
+  const b = enc.encode(expected);
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  return diff === 0;
+}
+
+function extractWebhookToken(req: Request, body: Record<string, unknown>): string {
+  const fromBody = typeof body.secret_token === "string" ? body.secret_token : "";
+  if (fromBody) return fromBody;
+  const headerToken =
+    req.headers.get("x-moyasar-signature") ||
+    req.headers.get("x-event-secret") ||
+    "";
+  if (headerToken) return headerToken.replace(/^sha256=/i, "").trim();
+  const auth = req.headers.get("authorization") || "";
+  if (auth.toLowerCase().startsWith("bearer ")) return auth.slice(7).trim();
+  return "";
+}
+
+// Public webhook — no JWT required; authenticated via Moyasar secret token
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -14,9 +37,15 @@ serve(async (req) => {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const MOYASAR_SECRET = Deno.env.get("MOYASAR_SECRET_KEY")!;
+    const WEBHOOK_SECRET = Deno.env.get("MOYASAR_WEBHOOK_SECRET") || "";
 
     const body = await req.json();
-    console.log("Moyasar webhook:", JSON.stringify(body));
+    if (!WEBHOOK_SECRET || !webhookTokensMatch(extractWebhookToken(req, body), WEBHOOK_SECRET)) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    console.log("Moyasar webhook:", body.type || body.id);
 
     const paymentData = body.data || body;
     const moyasarId = paymentData.id;

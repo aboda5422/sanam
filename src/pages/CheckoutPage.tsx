@@ -70,8 +70,7 @@ const CheckoutPage = () => {
   const [deliveryFee, setDeliveryFee] = useState<number>(10);
   const [customerDiscountPercent, setCustomerDiscountPercent] = useState(0);
 
-  // Online payment temporarily disabled while licensing is finalized with Moyasar
-  const ONLINE_PAYMENT_ENABLED = false;
+  const ONLINE_PAYMENT_ENABLED = true;
 
   useEffect(() => {
     markCheckoutReached();
@@ -382,14 +381,7 @@ const CheckoutPage = () => {
       return;
     }
 
-    // Online payment → redirect to Moyasar hosted form
-    const callbackUrl = `${window.location.origin}/payment-result`;
-    const publishableKey = import.meta.env.VITE_MOYASAR_PUBLISHABLE_KEY;
-
-    // We use Moyasar's hosted invoice page for simplicity & PCI compliance.
-    // Create an invoice via edge function would be ideal; for now we redirect to
-    // Moyasar's checkout page using their JS form would require client SDK.
-    // Simplest secure approach: navigate to internal payment page that loads Moyasar form.
+    // Online payment → Moyasar form on /pay/:orderId
     markConverted();
     clearCart();
     navigate(`/pay/${order.id}`);
@@ -599,10 +591,10 @@ const CheckoutPage = () => {
                   }`}
                   title={!ONLINE_PAYMENT_ENABLED ? "قريباً - قيد إجراءات الترخيص" : ""}
                 >
-                  <CreditCard className="h-6 w-6 text-muted-foreground" />
+                  <CreditCard className={`h-6 w-6 ${ONLINE_PAYMENT_ENABLED ? "text-primary" : "text-muted-foreground"}`} />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-semibold text-sm text-muted-foreground">دفع إلكتروني</p>
+                      <p className={`font-semibold text-sm ${ONLINE_PAYMENT_ENABLED ? "" : "text-muted-foreground"}`}>دفع إلكتروني</p>
                       {!ONLINE_PAYMENT_ENABLED && (
                         <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-bold flex items-center gap-1">
                           <Lock className="h-2.5 w-2.5" />
