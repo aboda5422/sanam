@@ -6,6 +6,16 @@ import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useCart } from "@/contexts/CartContext";
 import { useBranch } from "@/contexts/BranchContext";
 import { useToast } from "@/hooks/use-toast";
@@ -36,6 +46,8 @@ import {
 } from "@/lib/branch";
 import { applyCustomerDiscount } from "@/lib/customer-discount";
 import { splitInclusiveVat } from "@/lib/vat";
+import { convertGuestAccount, isAnonymousUser, startGuestSession } from "@/lib/guest";
+import { translateError } from "@/lib/error-messages";
 
 const deliveryTimes = [
   IMMEDIATE_DELIVERY_LABEL,
@@ -67,6 +79,15 @@ const CheckoutPage = () => {
   const [user, setUser] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("cash");
   const [processing, setProcessing] = useState(false);
+  const [askDefaultPhone, setAskDefaultPhone] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
+  const [askGuestRegister, setAskGuestRegister] = useState(false);
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestPassword, setGuestPassword] = useState("");
+  const [guestRegisterName, setGuestRegisterName] = useState("");
+  const [registeringGuest, setRegisteringGuest] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
+  const [startingGuest, setStartingGuest] = useState(false);
   const [deliveryFee, setDeliveryFee] = useState<number>(10);
   const [customerDiscountPercent, setCustomerDiscountPercent] = useState(0);
 
@@ -78,12 +99,22 @@ const CheckoutPage = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setUser(session.user);
+        const guest = isAnonymousUser(session.user);
+        setIsGuest(guest);
         const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", session.user.id).maybeSingle();
         if (profile) {
-          setName(profile.full_name || session.user.user_metadata?.full_name || "");
+          const guestFromProfile = Boolean((profile as any).is_guest);
+          setIsGuest(guest || guestFromProfile);
+          const guestLabel =
+            ((guest || guestFromProfile) && (profile as any).guest_number)
+              ? `ضيف #${(profile as any).guest_number}`
+              : profile.full_name;
+          setName(guestLabel || session.user.user_metadata?.full_name || "");
           setPhone(profile.phone || "");
           setSavedPhone(profile.phone || "");
           setCustomerDiscountPercent(Number((profile as any).discount_percent) || 0);
+        } else if (guest) {
+          setName("ضيف");
         }
         // Auto-select default delivery address
         const { data: defaultAddr } = await supabase
@@ -98,9 +129,70 @@ const CheckoutPage = () => {
           if (na) setNationalAddress(normalizeNationalAddress(na));
         }
       }
+      setSessionChecked(true);
     };
     init();
   }, [markCheckoutReached]);
+
+  const loadCheckoutSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setUser(null);
+      setIsGuest(false);
+      return;
+    }
+    setUser(session.user);
+    const guest = isAnonymousUser(session.user);
+    setIsGuest(guest);
+    const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", session.user.id).maybeSingle();
+    if (profile) {
+      const guestFromProfile = Boolean((profile as any).is_guest);
+      setIsGuest(guest || guestFromProfile);
+      const guestLabel =
+        ((guest || guestFromProfile) && (profile as any).guest_number)
+          ? `ضيف #${(profile as any).guest_number}`
+          : profile.full_name;
+      setName(guestLabel || session.user.user_metadata?.full_name || "");
+      setPhone(profile.phone || "");
+      setSavedPhone(profile.phone || "");
+      setCustomerDiscountPercent(Number((profile as any).discount_percent) || 0);
+    } else if (guest) {
+      setName("ضيف");
+    }
+  };
+
+  const handleContinueAsGuest = async () => {
+    setStartingGuest(true);
+    try {
+      const { data: sec } = await supabase
+        .from("store_settings")
+        .select("value")
+        .eq("key", "security")
+        .maybeSingle();
+      if ((sec?.value as any)?.allow_guest_checkout === false) {
+        toast({
+          title: "غير متاح حالياً",
+          description: "الشراء كزائر معطل من إعدادات المتجر",
+          variant: "destructive",
+        });
+        return;
+      }
+      const { profile } = await startGuestSession();
+      await loadCheckoutSession();
+      toast({
+        title: "تمت المتابعة كزائر",
+        description: `مرحباً ${profile.displayName}`,
+      });
+    } catch (err: any) {
+      toast({
+        title: "تعذرت المتابعة كزائر",
+        description: translateError(err?.message || String(err)),
+        variant: "destructive",
+      });
+    } finally {
+      setStartingGuest(false);
+    }
+  };
 
   // If a saved/default address falls outside active zones, clear it once zones are known
   useEffect(() => {
@@ -184,6 +276,66 @@ const CheckoutPage = () => {
     return null;
   }
 
+  if (!sessionChecked) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col" dir="rtl">
+        <Header />
+        <main className="flex-1 container py-10 flex items-center justify-center">
+          <div className="w-full max-w-md bg-card rounded-2xl border p-6 shadow-sm text-center space-y-4">
+            <h1 className="font-heading font-bold text-xl">إتمام الطلب</h1>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              سجّل الدخول لحفظ طلباتك، أو تابع كزائر بالجوال والعنوان فقط.
+            </p>
+            <Button
+              className="w-full"
+              onClick={() => navigate("/auth?next=/checkout")}
+              disabled={startingGuest}
+            >
+              تسجيل الدخول
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleContinueAsGuest}
+              disabled={startingGuest}
+            >
+              {startingGuest ? (
+                <>
+                  <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                  جاري المتابعة...
+                </>
+              ) : (
+                "المتابعة كزائر"
+              )}
+            </Button>
+            <button
+              type="button"
+              className="text-sm text-muted-foreground hover:text-primary"
+              onClick={() => navigate("/cart")}
+              disabled={startingGuest}
+            >
+              العودة للسلة
+            </button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   if (submitted && orderId) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -191,12 +343,100 @@ const CheckoutPage = () => {
         <main className="flex-1 container py-16 text-center">
           <CheckCircle className="h-20 w-20 mx-auto text-green-500 mb-4" />
           <h2 className="font-heading text-2xl font-bold mb-2">تم تأكيد طلبك بنجاح! 🎉</h2>
-          <p className="text-muted-foreground mb-6">سيتم التواصل معك على الرقم المسجل لتأكيد التوصيل</p>
-          <div className="flex gap-3 justify-center">
+          <p className="text-muted-foreground mb-2">
+            سيتم التواصل معك على الرقم <span dir="ltr" className="font-semibold text-foreground">{phone}</span> لتأكيد التوصيل
+          </p>
+          {isGuest && (
+            <p className="text-xs text-muted-foreground mb-6 max-w-md mx-auto">
+              طلبك باسم {name}. يمكنك متابعة الطلب طالما بقيت هذه الصفحة مفتوحة. إن أغلقتها قد تفقد التتبع ما لم تحفظ حساباً.
+            </p>
+          )}
+          {!isGuest && <div className="mb-6" />}
+          <div className="flex flex-wrap gap-3 justify-center">
             <Button onClick={() => navigate(`/order/${orderId}`)}>تتبع الطلب</Button>
+            {isGuest && (
+              <Button variant="secondary" onClick={() => setAskGuestRegister(true)}>
+                حفظ بياناتي / إنشاء حساب
+              </Button>
+            )}
             <Button variant="outline" onClick={() => navigate("/")}>العودة للتسوق</Button>
           </div>
         </main>
+        <AlertDialog open={askGuestRegister} onOpenChange={setAskGuestRegister}>
+          <AlertDialogContent dir="rtl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>حفظ بياناتك كحساب؟</AlertDialogTitle>
+              <AlertDialogDescription>
+                أضف بريداً وكلمة مرور لتتبع طلباتك لاحقاً. المندوب سيصل إليك بالجوال والعنوان حتى بدون حساب.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="space-y-3 py-2">
+              <div>
+                <Label className="text-sm">البريد الإلكتروني (إلزامي)</Label>
+                <Input
+                  type="email"
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                  placeholder="example@email.com"
+                  dir="ltr"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-sm">كلمة المرور (إلزامي)</Label>
+                <Input
+                  type="password"
+                  value={guestPassword}
+                  onChange={(e) => setGuestPassword(e.target.value)}
+                  placeholder="6 أحرف على الأقل"
+                  dir="ltr"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-sm">الاسم (اختياري)</Label>
+                <Input
+                  value={guestRegisterName}
+                  onChange={(e) => setGuestRegisterName(e.target.value)}
+                  placeholder="اتركه فارغاً للإبقاء على اسم الضيف"
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            <AlertDialogFooter className="gap-2 sm:gap-0">
+              <AlertDialogCancel disabled={registeringGuest}>لاحقاً</AlertDialogCancel>
+              <AlertDialogAction
+                disabled={registeringGuest}
+                onClick={async (e) => {
+                  e.preventDefault();
+                  setRegisteringGuest(true);
+                  try {
+                    await convertGuestAccount({
+                      email: guestEmail,
+                      password: guestPassword,
+                      fullName: guestRegisterName || undefined,
+                      phone,
+                    });
+                    setIsGuest(false);
+                    if (guestRegisterName.trim()) setName(guestRegisterName.trim());
+                    setAskGuestRegister(false);
+                    toast({ title: "تم حفظ الحساب", description: "يمكنك تسجيل الدخول بنفس البريد لاحقاً" });
+                  } catch (err: any) {
+                    toast({
+                      title: "تعذر حفظ الحساب",
+                      description: translateError(err?.message || String(err)),
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setRegisteringGuest(false);
+                  }
+                }}
+              >
+                {registeringGuest ? "جاري الحفظ..." : "حفظ الحساب"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         <Footer />
       </div>
     );
@@ -211,7 +451,7 @@ const CheckoutPage = () => {
     if (addr.national_address) setNationalAddress(addr.national_address);
     setShowMapPicker(false);
 
-    if (user && !addr.id) {
+    if (user && !addr.id && !isGuest) {
       const { count } = await supabase
         .from("user_addresses")
         .select("id", { count: "exact", head: true })
@@ -238,68 +478,12 @@ const CheckoutPage = () => {
     if (addr.national_address) setNationalAddress(normalizeNationalAddress(addr.national_address));
   };
 
-  const handleSubmit = async () => {
-    if (!selectedBranch) {
-      toast({ title: "يرجى اختيار الفرع أولاً", variant: "destructive" });
-      openPicker();
-      return;
-    }
-
-    if (totalPrice < minOrder) {
-      toast({
-        title: "الطلب أقل من الحد الأدنى",
-        description: `أقل طلب لهذا الفرع ${minOrder} ر.س`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (selectedTime === IMMEDIATE_DELIVERY_LABEL && !isBranchOpenNow(selectedBranch.work_start, selectedBranch.work_end)) {
-      toast({
-        title: "خارج وقت الدوام",
-        description: immediateDeliveryClosedMessage(selectedBranch.work_start, selectedBranch.work_end),
-        variant: "destructive",
-      });
-      return;
-    }
+  const placeOrder = async () => {
+    if (!selectedBranch || !user) return;
 
     const national = normalizeNationalAddress(nationalAddress || selectedAddress?.national_address || "");
     const hasNational = isValidNationalAddress(national);
     const hasCoords = selectedAddress ? addressHasCoords(selectedAddress) : false;
-
-    if (!name || !phone || !selectedTime) {
-      toast({ title: "يرجى تعبئة الاسم والجوال ووقت التوصيل", variant: "destructive" });
-      return;
-    }
-
-    if (!hasNational && !hasCoords) {
-      toast({
-        title: "أضف عنوان التوصيل",
-        description: "يكفي العنوان الوطني المختصر أو الموقع على الخريطة",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (national && !hasNational) {
-      toast({
-        title: "العنوان الوطني المختصر غير صحيح",
-        description: "مثال: ANCAW32154",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!user) {
-      toast({ title: "يرجى تسجيل الدخول أولاً", variant: "destructive" });
-      navigate("/auth");
-      return;
-    }
-
-    if (hasCoords && !isLocationCovered(selectedAddress!.lat!, selectedAddress!.lng!, activeZones)) {
-      toast({ title: "خارج نطاق التوصيل", description: OUT_OF_SERVICE_MESSAGE, variant: "destructive" });
-      return;
-    }
 
     setProcessing(true);
 
@@ -378,6 +562,7 @@ const CheckoutPage = () => {
       clearCart();
       setProcessing(false);
       toast({ title: "تم إرسال الطلب بنجاح ✅" });
+      if (isGuest) setAskGuestRegister(true);
       return;
     }
 
@@ -388,9 +573,140 @@ const CheckoutPage = () => {
     setProcessing(false);
   };
 
+  const handleSubmit = async () => {
+    if (!selectedBranch) {
+      toast({ title: "يرجى اختيار الفرع أولاً", variant: "destructive" });
+      openPicker();
+      return;
+    }
+
+    if (totalPrice < minOrder) {
+      toast({
+        title: "الطلب أقل من الحد الأدنى",
+        description: `أقل طلب لهذا الفرع ${minOrder} ر.س`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (selectedTime === IMMEDIATE_DELIVERY_LABEL && !isBranchOpenNow(selectedBranch.work_start, selectedBranch.work_end)) {
+      toast({
+        title: "خارج وقت الدوام",
+        description: immediateDeliveryClosedMessage(selectedBranch.work_start, selectedBranch.work_end),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const national = normalizeNationalAddress(nationalAddress || selectedAddress?.national_address || "");
+    const hasNational = isValidNationalAddress(national);
+    const hasCoords = selectedAddress ? addressHasCoords(selectedAddress) : false;
+
+    if (!phone || !selectedTime) {
+      toast({ title: "يرجى تعبئة الجوال ووقت التوصيل", variant: "destructive" });
+      return;
+    }
+
+    if (!isGuest && !name) {
+      toast({ title: "يرجى تعبئة الاسم", variant: "destructive" });
+      return;
+    }
+
+    if (!hasNational && !hasCoords) {
+      toast({
+        title: "أضف عنوان التوصيل",
+        description: "يكفي العنوان الوطني المختصر أو الموقع على الخريطة",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (national && !hasNational) {
+      toast({
+        title: "العنوان الوطني المختصر غير صحيح",
+        description: "مثال: ANCAW32154",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({ title: "يرجى تسجيل الدخول أو المتابعة كزائر", variant: "destructive" });
+      return;
+    }
+
+    if (hasCoords && !isLocationCovered(selectedAddress!.lat!, selectedAddress!.lng!, activeZones)) {
+      toast({ title: "خارج نطاق التوصيل", description: OUT_OF_SERVICE_MESSAGE, variant: "destructive" });
+      return;
+    }
+
+    // First-time phone for registered users: ask to save as default
+    if (!isGuest && !savedPhone.trim() && phone.trim()) {
+      setAskDefaultPhone(true);
+      return;
+    }
+
+    if (isGuest && user && phone.trim()) {
+      await supabase.from("profiles").update({ phone: phone.trim() }).eq("user_id", user.id);
+    }
+
+    await placeOrder();
+  };
+
+  const savePhoneAsDefault = async (): Promise<boolean> => {
+    if (!user || !phone.trim()) return false;
+    const { error } = await supabase
+      .from("profiles")
+      .update({ phone: phone.trim() })
+      .eq("user_id", user.id);
+    if (error) {
+      toast({ title: "تعذر حفظ الرقم", description: error.message, variant: "destructive" });
+      return false;
+    }
+    setSavedPhone(phone.trim());
+    setEditingPhone(false);
+    toast({ title: "تم اعتماد الرقم كافتراضي" });
+    return true;
+  };
+
   return (
     <div className="min-h-screen flex flex-col" dir="rtl">
       <Header />
+      <AlertDialog open={askDefaultPhone} onOpenChange={setAskDefaultPhone}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>اعتماد رقم الجوال؟</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل تريد اعتماد الرقم{" "}
+              <span className="font-semibold text-foreground" dir="ltr">{phone}</span>
+              {" "}كرقم افتراضي في حسابك حتى لا يُطلب منك في كل مرة؟
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2 sm:gap-0">
+            <AlertDialogCancel
+              disabled={processing}
+              onClick={() => {
+                setAskDefaultPhone(false);
+                void placeOrder();
+              }}
+            >
+              لا، لهذه المرة فقط
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={processing}
+              onClick={async (e) => {
+                e.preventDefault();
+                const saved = await savePhoneAsDefault();
+                if (!saved) return;
+                setAskDefaultPhone(false);
+                await placeOrder();
+              }}
+            >
+              نعم، احفظه
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <main className="flex-1 container py-6">
         <h1 className="font-heading font-bold text-2xl mb-6">إتمام الطلب</h1>
 
@@ -404,8 +720,19 @@ const CheckoutPage = () => {
               </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">الاسم الكامل</label>
-                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="أدخل اسمك" />
+                  <label className="text-sm font-medium mb-1.5 block">
+                    {isGuest ? "اسم العميل" : "الاسم الكامل"}
+                  </label>
+                  {isGuest ? (
+                    <div className="p-3 rounded-lg border bg-muted/30">
+                      <p className="font-semibold text-sm">{name || "ضيف"}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        يظهر للمناديب والإدارة بهذا الاسم المميّز — الاسم الحقيقي غير مطلوب للضيف
+                      </p>
+                    </div>
+                  ) : (
+                    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="أدخل اسمك" />
+                  )}
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">رقم الجوال</label>
@@ -505,15 +832,24 @@ const CheckoutPage = () => {
                 <AddressMapPicker onAddressSelected={handleAddressSelected} />
               ) : (
                 <div className="space-y-3">
-                  {user && (
+                  {user && !isGuest && (
                     <SavedAddresses
                       onSelect={handleSelectSavedAddress}
                       onAddNew={() => setShowMapPicker(true)}
                       selectedId={selectedAddress?.id}
                     />
                   )}
-                  {!user && (
-                    <AddressMapPicker onAddressSelected={handleAddressSelected} />
+                  {(!user || isGuest) && (
+                    <>
+                      {isGuest && (
+                        <p className="text-xs text-muted-foreground">
+                          العنوان إلزامي للضيف حتى يصل المندوب إليك.
+                        </p>
+                      )}
+                      <Button type="button" className="w-full" onClick={() => setShowMapPicker(true)}>
+                        تحديد عنوان التوصيل على الخريطة
+                      </Button>
+                    </>
                   )}
                 </div>
               )}
@@ -602,7 +938,7 @@ const CheckoutPage = () => {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">مدى · فيزا · Apple Pay</p>
+                    <p className="text-xs text-muted-foreground">مدى · فيزا · STC Pay · أبل باي على آيفون</p>
                   </div>
                 </button>
               </div>

@@ -916,6 +916,8 @@ export type Database = {
           id: string
           contact_email: string | null
           id_number: string | null
+          is_guest: boolean
+          guest_number: number | null
           phone: string | null
           status: string
           updated_at: string
@@ -931,6 +933,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           id_number?: string | null
+          is_guest?: boolean
+          guest_number?: number | null
           phone?: string | null
           status?: string
           updated_at?: string
@@ -946,6 +950,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           id_number?: string | null
+          is_guest?: boolean
+          guest_number?: number | null
           phone?: string | null
           status?: string
           updated_at?: string

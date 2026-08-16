@@ -24,6 +24,7 @@ const Header = () => {
   const { uniqueItems } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [displayName, setDisplayName] = useState("");
   const [defaultAddress, setDefaultAddress] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,14 +43,31 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
+    const applyUser = async (sessionUser: any | null) => {
+      setUser(sessionUser);
+      if (!sessionUser) {
+        setDisplayName("");
+        setDefaultAddress(null);
+        return;
+      }
+      loadDefaultAddress(sessionUser.id);
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name, guest_number, is_guest")
+        .eq("user_id", sessionUser.id)
+        .maybeSingle();
+      if (profile?.is_guest && profile.guest_number) {
+        setDisplayName(`ضيف #${profile.guest_number}`);
+      } else {
+        setDisplayName(profile?.full_name || sessionUser.user_metadata?.full_name || "");
+      }
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) loadDefaultAddress(session.user.id);
-      else setDefaultAddress(null);
+      void applyUser(session?.user ?? null);
     });
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) loadDefaultAddress(session.user.id);
+      void applyUser(session?.user ?? null);
     });
     const onAddressesChanged = () => {
       supabase.auth.getSession().then(({ data: { session } }) => {
@@ -159,7 +177,7 @@ const Header = () => {
                       className="flex items-center gap-2"
                     >
                       <User className="h-5 w-5 text-primary" />
-                      <span className="font-medium text-sm">{user.user_metadata?.full_name || t("حسابي", "My Account")}</span>
+                      <span className="font-medium text-sm">{displayName || t("حسابي", "My Account")}</span>
                     </Link>
                     <button
                       onClick={handleLogout}
@@ -383,7 +401,7 @@ const Header = () => {
                   >
                     <User className="h-5 w-5" />
                     <span className="hidden sm:inline max-w-[120px] truncate">
-                      {user.user_metadata?.full_name || t("حسابي", "Account")}
+                      {displayName || t("حسابي", "Account")}
                     </span>
                   </button>
                 </DropdownMenuTrigger>

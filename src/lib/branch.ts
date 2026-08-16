@@ -29,7 +29,7 @@ export type BranchDeliveryRate = {
 export const BRANCH_STORAGE_KEY = "sanam:selected_branch_slug";
 
 /** Saudi national short address e.g. ANCAW32154 */
-export const NATIONAL_ADDRESS_LOOKUP_ENABLED = false;
+export const NATIONAL_ADDRESS_LOOKUP_ENABLED = true;
 
 export function isValidNationalAddress(value: string): boolean {
   return /^[A-Za-z]{4,6}\d{4,5}$/.test(value.trim());

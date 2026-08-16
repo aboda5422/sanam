@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import {
   Loader2, Star, Plus, Truck, Users, Wallet, MapPin, Search,
-  UserPlus, Ban, CheckCircle, Trash2, ArrowLeftRight, Eye, Phone, Mail
+  UserPlus, Ban, CheckCircle, Trash2, ArrowLeftRight, Eye, Phone, Mail, ScrollText
 } from "lucide-react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { applyBranchFilter, writeBranchId } from "@/lib/branch-scope";
@@ -352,10 +352,40 @@ const OrderAssignment = () => {
   );
 };
 
+type WalletTx = {
+  id: string;
+  amount: number;
+  notes: string | null;
+  created_at: string;
+  type: string;
+};
+
+function isWageTx(tx: WalletTx) {
+  if (tx.type === "commission") return true;
+  return tx.type === "settlement" && (tx.notes || "").includes("أجور التوصيل");
+}
+
+function isCashSettlement(tx: WalletTx) {
+  if (tx.type !== "settlement") return false;
+  return !(tx.notes || "").includes("أجور التوصيل");
+}
+
+function wageKindLabel(tx: WalletTx) {
+  if (tx.type === "commission") return "أجر توصيلة";
+  return "سداد";
+}
+
+function settlementMethodLabel(notes: string | null) {
+  const n = notes || "";
+  if (n.includes("شبكة") || n.includes("تحويل")) return "شبكة";
+  return "كاش";
+}
+
 /* ─── Wallets Tab ─── */
 const WalletsTab = () => {
   const { role } = useAdminAuth();
   const canSettle = role === "store_admin";
+  const [log, setLog] = useState<{ driverId: string; name: string; kind: "wage" | "settle" } | null>(null);
   const { data: wallets, isLoading } = useQuery({
     queryKey: ["admin-wallets"],
     queryFn: async () => {
@@ -366,6 +396,23 @@ const WalletsTab = () => {
   });
 
   const qc = useQueryClient();
+
+  const { data: logTxs, isLoading: logLoading } = useQuery({
+    queryKey: ["admin-driver-wallet-log", log?.driverId],
+    enabled: !!log?.driverId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("wallet_transactions")
+        .select("id, amount, notes, created_at, type")
+        .eq("driver_id", log!.driverId)
+        .in("type", ["settlement", "commission"])
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data || []) as WalletTx[];
+    },
+  });
+
+  const visibleLog = (logTxs || []).filter((tx) => (log?.kind === "wage" ? isWageTx(tx) : isCashSettlement(tx)));
 
   const settleMutation = useMutation({
     mutationFn: async ({ driverId, type }: { driverId: string; type: "cash" | "card" }) => {
@@ -380,6 +427,7 @@ const WalletsTab = () => {
       toast.success(`تم تسوية ${Number(data?.amount || 0).toFixed(2)} ر.س`);
       qc.invalidateQueries({ queryKey: ["admin-wallets"] });
       qc.invalidateQueries({ queryKey: ["admin-sales-orders"] });
+      qc.invalidateQueries({ queryKey: ["admin-driver-wallet-log"] });
     },
     onError: (e: any) => toast.error(e.message || "فشل في التسوية"),
   });
@@ -394,6 +442,7 @@ const WalletsTab = () => {
       toast.success(`تم سداد ${Number(data?.amount || 0).toFixed(2)} ر.س وتصفير المستحق`);
       qc.invalidateQueries({ queryKey: ["admin-wallets"] });
       qc.invalidateQueries({ queryKey: ["admin-drivers"] });
+      qc.invalidateQueries({ queryKey: ["admin-driver-wallet-log"] });
     },
     onError: (e: any) => toast.error(e.message || "فشل سداد أجر المندوب"),
   });
@@ -414,6 +463,7 @@ const WalletsTab = () => {
               <th className="text-right p-3 font-medium">الرصيد (نقدي بحوزته)</th>
               <th className="text-right p-3 font-medium">إجمالي التحصيل</th>
               <th className="text-right p-3 font-medium">أجر المندوب المستحق</th>
+              <th className="text-center p-3 font-medium">السجلات</th>
               <th className="text-center p-3 font-medium">تسوية</th>
             </tr></thead>
             <tbody>
@@ -442,6 +492,36 @@ const WalletsTab = () => {
                       <span className="text-muted-foreground">راتب</span>
                     )}
                   </td>
+                  <td className="p-3">
+                    <div className="flex flex-col gap-1 items-center">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs h-7 w-full max-w-[140px]"
+                        onClick={() => setLog({
+                          driverId: w.driver_id,
+                          name: (w.drivers as any)?.full_name || (w.drivers as any)?.phone || "مندوب",
+                          kind: "wage",
+                        })}
+                      >
+                        <ScrollText className="h-3.5 w-3.5 ml-1" />
+                        سجل الأجر
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs h-7 w-full max-w-[140px]"
+                        onClick={() => setLog({
+                          driverId: w.driver_id,
+                          name: (w.drivers as any)?.full_name || (w.drivers as any)?.phone || "مندوب",
+                          kind: "settle",
+                        })}
+                      >
+                        <ScrollText className="h-3.5 w-3.5 ml-1" />
+                        سجل التسوية
+                      </Button>
+                    </div>
+                  </td>
                   <td className="p-3 text-center">
                     {canSettle && Number(w.balance) > 0 ? (
                       <div className="flex gap-1 justify-center">
@@ -462,11 +542,61 @@ const WalletsTab = () => {
                   </td>
                 </tr>
               ))}
-              {(!wallets || wallets.length === 0) && <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">لا توجد محافظ</td></tr>}
+              {(!wallets || wallets.length === 0) && <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">لا توجد محافظ</td></tr>}
             </tbody>
           </table>
         </div>
       </div>
+
+      <Dialog open={!!log} onOpenChange={(open) => { if (!open) setLog(null); }}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto" dir="rtl">
+          <DialogHeader>
+            <DialogTitle>
+              {log?.kind === "wage" ? "سجل الأجر" : "سجل التسوية"}
+              {log?.name ? ` — ${log.name}` : ""}
+            </DialogTitle>
+          </DialogHeader>
+          {logLoading ? (
+            <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          ) : visibleLog.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-6 text-center">
+              {log?.kind === "wage" ? "لا توجد حركات أجر بعد" : "لا توجد تسويات بعد"}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {visibleLog.map((tx) => (
+                <div key={tx.id} className="rounded-xl border p-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold">{Number(tx.amount).toFixed(2)} ر.س</span>
+                    {log?.kind === "wage" ? (
+                      <span className={`text-xs rounded-full px-2 py-0.5 ${
+                        tx.type === "commission" ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"
+                      }`}>
+                        {wageKindLabel(tx)}
+                      </span>
+                    ) : (
+                      <span className="text-xs rounded-full bg-amber-100 text-amber-800 px-2 py-0.5">
+                        {settlementMethodLabel(tx.notes)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {new Date(tx.created_at).toLocaleString("ar-SA", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  {tx.notes && <p className="text-xs text-muted-foreground">{tx.notes}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

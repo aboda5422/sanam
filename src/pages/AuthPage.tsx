@@ -13,6 +13,7 @@ import Footer from "@/components/layout/Footer";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { Capacitor } from "@capacitor/core";
 import { openBlankOAuthPopup, openOAuthWindow } from "@/lib/google-web-auth";
+import { startGuestSession } from "@/lib/guest";
 
 const REMEMBER_KEY = "sanam:customer-login-remember";
 
@@ -42,6 +43,10 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { verify: verifyRecaptcha } = useRecaptcha();
+  const nextPath = (() => {
+    const n = new URLSearchParams(window.location.search).get("next");
+    return n && n.startsWith("/") && !n.startsWith("//") ? n : "/";
+  })();
 
   useEffect(() => {
     if (!rememberLogin) {
@@ -63,7 +68,7 @@ const AuthPage = () => {
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && (event === "SIGNED_IN" || fromOAuth)) {
         toast({ title: "تم تسجيل الدخول بنجاح", description: "مرحباً بك في سنام" });
-        navigate("/", { replace: true });
+        navigate(nextPath, { replace: true });
       }
     });
 
@@ -71,13 +76,13 @@ const AuthPage = () => {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
           toast({ title: "تم تسجيل الدخول بنجاح", description: "مرحباً بك في سنام" });
-          navigate("/", { replace: true });
+          navigate(nextPath, { replace: true });
         }
       });
     }
 
     return () => subscription.unsubscribe();
-  }, [navigate, toast]);
+  }, [navigate, toast, nextPath]);
 
   const handleGoogle = async () => {
     const WEB_CLIENT_ID =
@@ -110,7 +115,7 @@ const AuthPage = () => {
         });
         if (error) throw error;
         toast({ title: "تم تسجيل الدخول بنجاح", description: "مرحباً بك في سنام" });
-        navigate("/");
+        navigate(nextPath);
       } catch (err: any) {
         console.error("Native Google sign-in failed:", err);
         toast({
@@ -128,7 +133,7 @@ const AuthPage = () => {
     // are not used to host accounts.google.com (Google blocks that, so no accounts appear).
     const popup = openBlankOAuthPopup();
     setLoading(true);
-    const redirectTo = `${window.location.origin}/auth`;
+    const redirectTo = `${window.location.origin}/auth${nextPath !== "/" ? `?next=${encodeURIComponent(nextPath)}` : ""}`;
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -165,7 +170,7 @@ const AuthPage = () => {
           /* ignore */
         }
         toast({ title: "تم تسجيل الدخول بنجاح", description: "مرحباً بك في سنام" });
-        navigate("/", { replace: true });
+        navigate(nextPath, { replace: true });
       }
     }, 800);
   };
@@ -223,12 +228,47 @@ const AuthPage = () => {
         } catch {}
       }
       toast({ title: "تم تسجيل الدخول بنجاح", description: "مرحباً بك في سنام" });
-      navigate("/");
+      navigate(nextPath);
     } catch (err: any) {
       console.error("Native Apple sign-in failed:", err);
       toast({
         title: "فشل تسجيل الدخول",
         description: err?.message || "تعذر تسجيل الدخول عبر Apple",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGuest = async () => {
+    setLoading(true);
+    try {
+      const { data: sec } = await supabase
+        .from("store_settings")
+        .select("value")
+        .eq("key", "security")
+        .maybeSingle();
+      const allow = (sec?.value as any)?.allow_guest_checkout;
+      if (allow === false) {
+        toast({
+          title: "غير متاح حالياً",
+          description: "الشراء كضيف معطل من إعدادات المتجر",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { profile } = await startGuestSession();
+      toast({
+        title: "تمت المتابعة كزائر",
+        description: `مرحباً ${profile.displayName} — الجوال والعنوان مطلوبان عند الطلب فقط`,
+      });
+      navigate(nextPath);
+    } catch (err: any) {
+      toast({
+        title: "تعذرت المتابعة كزائر",
+        description: translateError(err?.message || String(err)),
         variant: "destructive",
       });
     } finally {
@@ -259,7 +299,7 @@ const AuthPage = () => {
           localStorage.removeItem(REMEMBER_KEY);
         }
         toast({ title: "تم تسجيل الدخول بنجاح", description: "مرحباً بك في سنام" });
-        navigate("/");
+        navigate(nextPath);
       } else {
         // Validate email format client-side first
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -290,7 +330,7 @@ const AuthPage = () => {
             })
             .catch((err) => console.warn("Welcome email failed:", err));
           toast({ title: "تم التسجيل بنجاح", description: "يمكنك البدء بالتسوق الآن" });
-          navigate("/");
+          navigate(nextPath);
         } else if (created?.error) {
           throw new Error(created.error);
         } else {
@@ -448,6 +488,15 @@ const AuthPage = () => {
                 {isLogin ? "سجّل الآن" : "تسجيل الدخول"}
               </button>
             </div>
+
+            <button
+              type="button"
+              onClick={handleGuest}
+              disabled={loading}
+              className="mt-3 w-full text-center text-sm text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
+            >
+              المتابعة كزائر
+            </button>
           </div>
         </div>
       </main>

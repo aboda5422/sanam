@@ -92,10 +92,13 @@ const PaymentPage = () => {
       <main className="flex-1 container py-8 max-w-2xl">
         <h1 className="font-heading font-bold text-2xl mb-2">الدفع الإلكتروني</h1>
         {order && (
-          <p className="text-muted-foreground mb-6">
+          <p className="text-muted-foreground mb-2">
             طلب رقم {order.order_number} · المبلغ: <span className="font-bold text-primary">{Number(order.total).toFixed(2)} ر.س</span>
           </p>
         )}
+        <p className="text-xs text-muted-foreground mb-6">
+          أبل باي يظهر على سفاري/آيفون فقط. سامسونج باي يحتاج تفعيل الخدمة من لوحة ميسر (رقم Service ID).
+        </p>
         {loading && (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

@@ -215,9 +215,13 @@ const GENERIC_SA_POINTS = [
   { lat: 21.4858, lng: 39.1925 },
 ];
 
-function isCredibleNationalHit(hit: GeoHit, code: string): boolean {
+function isCredibleNationalHit(hit: GeoHit, code: string, provider?: string): boolean {
   const compact = (hit.formatted || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (compact.includes(code.toUpperCase())) return true;
+  // Nominatim rarely embeds SPL short codes; accept non-generic SA pins from the edge function.
+  if (provider === "nominatim" || (hit as any).provider === "nominatim") {
+    return !GENERIC_SA_POINTS.some((p) => kmBetween(hit, p) < 4);
+  }
   return !GENERIC_SA_POINTS.some((p) => kmBetween(hit, p) < 4);
 }
 
@@ -237,7 +241,7 @@ async function geocodeRest(query: string): Promise<GeoHit | null> {
   }
 }
 
-async function geocodeViaFunction(code: string): Promise<GeoHit | null> {
+async function geocodeViaFunction(code: string): Promise<(GeoHit & { provider?: string }) | null> {
   try {
     const { data, error } = await supabase.functions.invoke("geocode-national", {
       body: { code },
@@ -245,19 +249,23 @@ async function geocodeViaFunction(code: string): Promise<GeoHit | null> {
     if (error || !data?.hit) return null;
     const hit = data.hit;
     if (!Number.isFinite(hit.lat) || !Number.isFinite(hit.lng)) return null;
-    return hit;
+    return { ...hit, provider: data.provider || hit.provider };
   } catch {
     return null;
   }
 }
 
-/** Resolve a Saudi national short address (e.g. MEKD2885) the same way Maps search does. */
+/** Resolve a Saudi national short address (e.g. MEKD2885). Uses free Nominatim first via edge function. */
 export async function geocodeNationalAddress(
   code: string
 ): Promise<GeoHit | null> {
   const q = code.trim().toUpperCase();
   const fromFn = await geocodeViaFunction(q);
-  if (fromFn && isCredibleNationalHit(fromFn, q)) return fromFn;
+  if (fromFn && isCredibleNationalHit(fromFn, q, fromFn.provider)) return fromFn;
+
+  // Skip browser Google geocode when billing/key fails — Nominatim already tried server-side.
+  const key = await getMapsKey();
+  if (!key) return fromFn;
 
   const queries = [
     q,
@@ -272,7 +280,7 @@ export async function geocodeNationalAddress(
   }
 
   const ok = await loadGoogleMaps();
-  if (!ok || !window.google?.maps) return null;
+  if (!ok || !window.google?.maps) return fromFn;
 
   for (const query of queries) {
     const hit =
@@ -284,7 +292,7 @@ export async function geocodeNationalAddress(
       (await geocodeQuery(query, true));
     if (hit && isCredibleNationalHit(hit, q)) return hit;
   }
-  return null;
+  return fromFn;
 }
 
 /** Force Google Maps to recalculate size (needed inside dialogs/drawers). */
