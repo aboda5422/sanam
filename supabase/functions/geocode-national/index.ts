@@ -15,7 +15,7 @@ type GeoHit = {
   postCode?: string;
 };
 
-const NOMINATIM_UA = "SanamGrocery/1.0 (https://sanam.xbarawa.com; geocode-national)";
+const NOMINATIM_UA = "SanamGrocery/1.0 (https://sanam.sa; geocode-national)";
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {

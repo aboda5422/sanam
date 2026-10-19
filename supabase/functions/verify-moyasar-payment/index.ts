@@ -44,6 +44,9 @@ serve(async (req) => {
     if (orderId) {
       const updates: any = { payment_status: newStatus };
       if (newStatus === "paid") updates.status = "preparing";
+      if (newStatus === "failed") {
+        await supabase.rpc("restore_order_stock", { p_order_id: orderId });
+      }
       await supabase.from("orders").update(updates).eq("id", orderId);
     }
 

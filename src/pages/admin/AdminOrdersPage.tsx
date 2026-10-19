@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -13,10 +14,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { mapsLinkFromCoords, parseMapsCoords } from "@/lib/maps-link";
 
+const OPEN_STATUSES = new Set(["pending", "assigned", "preparing"]);
+
 const statusMap: Record<string, { label: string; color: string }> = {
   pending: { label: "بانتظار", color: "bg-yellow-100 text-yellow-800" },
-  assigned: { label: "تم التعيين", color: "bg-blue-100 text-blue-800" },
   preparing: { label: "جاري التحضير", color: "bg-orange-100 text-orange-800" },
+  ready: { label: "جاهز للمندوب", color: "bg-teal-100 text-teal-800" },
+  assigned: { label: "تم التعيين", color: "bg-blue-100 text-blue-800" },
   on_the_way: { label: "في الطريق", color: "bg-indigo-100 text-indigo-800" },
   delivered: { label: "تم التوصيل", color: "bg-green-100 text-green-800" },
   cancelled: { label: "ملغي", color: "bg-red-100 text-red-800" },
@@ -50,6 +54,7 @@ function orderDeliveryCoords(order: {
 const AdminOrdersContent = () => {
   const { scopedBranchIds, isSuperAdmin } = useAdminAuth();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
@@ -59,6 +64,12 @@ const AdminOrdersContent = () => {
   const [refundOrder, setRefundOrder] = useState<any | null>(null);
   const [refundAmount, setRefundAmount] = useState<string>("");
   const [refunding, setRefunding] = useState(false);
+
+  useEffect(() => {
+    const status = searchParams.get("status");
+    if (!status) return;
+    if (status === "open" || statusMap[status]) setStatusFilter(status);
+  }, [searchParams]);
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ["admin-orders", scopedBranchIds],
@@ -83,6 +94,9 @@ const AdminOrdersContent = () => {
       const update: any = { status: status as any };
       if (notes) update.notes = notes;
       if (status === "delivered") update.delivered_at = new Date().toISOString();
+      if (status === "cancelled") {
+        await supabase.rpc("restore_order_stock" as any, { p_order_id: id });
+      }
       const { error } = await supabase.from("orders").update(update).eq("id", id);
       if (error) throw error;
 
@@ -155,7 +169,12 @@ const AdminOrdersContent = () => {
 
   const filtered = orders?.filter((o) => {
     const matchSearch = search === "" || o.order_number?.toString().includes(search) || o.customer_name?.includes(search) || o.customer_phone?.includes(search);
-    const matchStatus = statusFilter === "all" || o.status === statusFilter;
+    const matchStatus =
+      statusFilter === "all"
+        ? true
+        : statusFilter === "open"
+          ? OPEN_STATUSES.has(o.status)
+          : o.status === statusFilter;
     const matchPayment = paymentFilter === "all" || o.payment_status === paymentFilter;
     return matchSearch && matchStatus && matchPayment;
   });
@@ -171,6 +190,7 @@ const AdminOrdersContent = () => {
           <SelectTrigger className="w-[160px]"><SelectValue placeholder="الحالة" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">الكل</SelectItem>
+            <SelectItem value="open">معلقة / قيد المعالجة</SelectItem>
             {Object.entries(statusMap).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
           </SelectContent>
         </Select>

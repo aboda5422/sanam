@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Wallet, Truck, Star, Loader2, CalendarIcon, BadgeCheck, ScrollText } from "lucide-react";
+import { Wallet, Truck, Star, Loader2, CalendarIcon, FileDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar as DatePicker } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import DriverLayout from "@/components/driver/DriverLayout";
@@ -20,45 +20,27 @@ import {
   isWithinInterval,
   subDays,
 } from "date-fns";
+import { buildOrderLedger, type LedgerOrder } from "@/lib/driver-order-ledger";
+import { openDriverTransactionsPrint } from "@/lib/driver-transactions-print";
+import { DRIVER_COLLECTIONS_HINT, DriverTransactionsTable } from "@/components/driver/DriverTransactionsTable";
 
-type DateFilter = "today" | "week" | "month" | "custom";
+type DateFilter = "all" | "today" | "week" | "month" | "custom";
 
-type DeliveredOrder = {
+type DeliveredOrder = LedgerOrder & {
   collected_amount: number | null;
-  delivered_at: string | null;
 };
 
 type WalletTx = {
   id: string;
+  order_id: string | null;
   amount: number;
   notes: string | null;
   created_at: string;
   type: string;
 };
 
-function isWageTx(tx: WalletTx) {
-  if (tx.type === "commission") return true;
-  return tx.type === "settlement" && (tx.notes || "").includes("أجور التوصيل");
-}
-
-function wageKindLabel(tx: WalletTx) {
-  if (tx.type === "commission") return "أجر توصيلة";
-  return "سداد";
-}
-
-function isCashSettlement(tx: WalletTx) {
-  if (tx.type !== "settlement") return false;
-  const notes = tx.notes || "";
-  return !notes.includes("أجور التوصيل");
-}
-
-function settlementMethodLabel(notes: string | null) {
-  const n = notes || "";
-  if (n.includes("شبكة") || n.includes("تحويل")) return "شبكة";
-  return "كاش";
-}
-
 const filterLabels: Record<DateFilter, string> = {
+  all: "الكل",
   today: "يومي",
   week: "أسبوعي",
   month: "شهري",
@@ -66,25 +48,21 @@ const filterLabels: Record<DateFilter, string> = {
 };
 
 const periodTitles: Record<DateFilter, string> = {
-  today: "إحصائيات اليوم",
-  week: "إحصائيات هذا الأسبوع",
-  month: "إحصائيات هذا الشهر",
-  custom: "إحصائيات الفترة المحددة",
+  all: "كل المعاملات",
+  today: "معاملات اليوم",
+  week: "معاملات هذا الأسبوع",
+  month: "معاملات هذا الشهر",
+  custom: "معاملات الفترة المحددة",
 };
 
 const DriverEarningsPage = () => {
   const { loading: authLoading, driverId } = useDriverAuth();
   const [driver, setDriver] = useState<any>(null);
   const [orders, setOrders] = useState<DeliveredOrder[]>([]);
-  const [settlements, setSettlements] = useState<WalletTx[]>([]);
-  const [wageLog, setWageLog] = useState<WalletTx[]>([]);
-  const [walletBalance, setWalletBalance] = useState(0);
-  const [dateFilter, setDateFilter] = useState<DateFilter>("today");
+  const [txs, setTxs] = useState<WalletTx[]>([]);
+  const [dateFilter, setDateFilter] = useState<DateFilter>("all");
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
-  const [logOpen, setLogOpen] = useState(false);
-  const [wageLogOpen, setWageLogOpen] = useState(false);
-
   useEffect(() => {
     if (!driverId) return;
 
@@ -99,28 +77,19 @@ const DriverEarningsPage = () => {
 
       const { data } = await supabase
         .from("orders")
-        .select("collected_amount, delivered_at")
+        .select("id, order_number, delivery_fee, total, payment_method, delivered_at, created_at, cash_settled_at, collected_amount")
         .eq("driver_id", driverId)
         .eq("status", "delivered");
 
       setOrders((data || []) as DeliveredOrder[]);
 
-      const { data: wallet } = await supabase
-        .from("driver_wallet")
-        .select("balance")
-        .eq("driver_id", driverId)
-        .maybeSingle();
-      setWalletBalance(Number(wallet?.balance || 0));
-
-      const { data: txs } = await supabase
+      const { data: txRows } = await supabase
         .from("wallet_transactions")
-        .select("id, amount, notes, created_at, type")
+        .select("id, order_id, amount, notes, created_at, type")
         .eq("driver_id", driverId)
         .in("type", ["settlement", "commission"])
         .order("created_at", { ascending: false });
-      const all = (txs || []) as WalletTx[];
-      setSettlements(all.filter(isCashSettlement));
-      setWageLog(all.filter(isWageTx));
+      setTxs((txRows || []) as WalletTx[]);
     };
 
     fetchData();
@@ -158,24 +127,45 @@ const DriverEarningsPage = () => {
           from: customFrom ? startOfDay(customFrom) : startOfDay(subDays(now, 30)),
           to: customTo ? endOfDay(customTo) : endOfDay(now),
         };
+      default:
+        return { from: startOfDay(subDays(now, 3650)), to: endOfDay(now) };
     }
   }, [dateFilter, customFrom, customTo]);
 
+  const ledger = useMemo(
+    () => buildOrderLedger({
+      orders,
+      wages: txs.filter((tx) => tx.type === "commission").map((tx) => ({ order_id: tx.order_id, amount: tx.amount })),
+    }),
+    [orders, txs],
+  );
+
   const periodStats = useMemo(() => {
-    const rows = orders.filter((o) => {
-      if (!o.delivered_at) return false;
-      return isWithinInterval(new Date(o.delivered_at), { start: dateRange.from, end: dateRange.to });
-    });
-    const collections = rows.reduce((s, o) => s + Number(o.collected_amount || 0), 0);
-    const deliveries = rows.length;
-    const fee = Number(driver?.per_delivery_fee || 0);
-    const periodWage = driver?.pay_type === "per_order" ? deliveries * fee : 0;
-    const periodSettlements = settlements.filter((tx) =>
-      isWithinInterval(new Date(tx.created_at), { start: dateRange.from, end: dateRange.to }),
-    );
-    const settledAmount = periodSettlements.reduce((s, tx) => s + Number(tx.amount || 0), 0);
-    return { collections, deliveries, periodWage, periodSettlements, settledAmount };
-  }, [orders, dateRange, driver, settlements]);
+    const inPeriod = (iso: string | null) =>
+      dateFilter === "all" || (!!iso && isWithinInterval(new Date(iso), { start: dateRange.from, end: dateRange.to }));
+    const rows = orders.filter((order) => inPeriod(order.delivered_at));
+    const collections = rows.reduce((s, order) => s + Number(order.collected_amount || 0), 0);
+    const periodLedger = ledger.filter((row) => inPeriod(row.at));
+    return { collections, deliveries: rows.length, periodLedger };
+  }, [orders, dateRange, dateFilter, ledger]);
+
+  const exportTransactions = async () => {
+    if (!periodStats.periodLedger.length) {
+      toast.error("لا معاملات في هذه الفترة");
+      return;
+    }
+    try {
+      await openDriverTransactionsPrint({
+        driverName: driver?.full_name || "مندوب",
+        from: dateFilter === "all" ? "" : format(dateRange.from, "yyyy-MM-dd"),
+        to: dateFilter === "all" ? "" : format(dateRange.to, "yyyy-MM-dd"),
+        rows: periodStats.periodLedger,
+        hideSiteShare: true,
+      });
+    } catch {
+      toast.error("تعذر فتح ملف الطباعة. اسمح بالنوافذ المنبثقة ثم أعد المحاولة");
+    }
+  };
 
   if (authLoading) {
     return (
@@ -189,9 +179,9 @@ const DriverEarningsPage = () => {
 
   return (
     <DriverLayout title="التحصيلات والإحصائيات">
-      <div className="p-4 md:p-6 max-w-lg mx-auto space-y-4">
+      <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-4">
         <div className="flex flex-wrap items-center gap-2">
-          {(["today", "week", "month", "custom"] as DateFilter[]).map((f) => (
+          {(["all", "today", "week", "month", "custom"] as DateFilter[]).map((f) => (
             <Button
               key={f}
               size="sm"
@@ -264,153 +254,18 @@ const DriverEarningsPage = () => {
           </Card>
         </div>
 
-        <Card>
-          <CardContent className="p-4 space-y-4">
-            <h3 className="font-heading font-bold">{periodTitles[dateFilter]}</h3>
-
-            {driver?.pay_type === "per_order" && (
-              <div className="rounded-xl border bg-emerald-50/60 p-3 space-y-2">
-                <p className="text-sm font-medium">أجر التوصيل من المتجر</p>
-                <p className="text-xs text-muted-foreground">
-                  {Number(driver.per_delivery_fee || 0).toFixed(2)} ر.س عن كل توصيلة مكتملة
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">أجر الفترة</span>
-                  <span className="font-bold">{periodStats.periodWage.toFixed(2)} ر.س</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">المستحق غير المسدد</span>
-                  <span className="font-bold text-lg">{Number(driver.unpaid_delivery_pay || 0).toFixed(2)} ر.س</span>
-                </div>
-                <p className="text-[11px] text-muted-foreground">يُصفَّر الرصيد غير المسدد عند سداد الإدارة</p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-full bg-white/80"
-                  onClick={() => setWageLogOpen(true)}
-                  disabled={wageLog.length === 0}
-                >
-                  <ScrollText className="h-4 w-4 ml-1" />
-                  سجل الأجر
-                  {wageLog.length > 0 ? ` (${wageLog.length})` : ""}
-                </Button>
-                {wageLog.length === 0 && (
-                  <p className="text-[11px] text-muted-foreground">لا توجد حركات أجر مسجّلة بعد</p>
-                )}
-              </div>
-            )}
-
-            <div className="rounded-xl border bg-amber-50/70 p-3 space-y-2">
-              <div className="flex items-center gap-2">
-                <BadgeCheck className="h-4 w-4 text-amber-700" />
-                <p className="text-sm font-medium">تسوية التحصيل مع الفرع</p>
-              </div>
-              <p className="text-xs text-muted-foreground">يثبت استلام مدير الفرع للمبالغ النقدية التي حصّلتها كاش</p>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">نقد لا يزال بحوزتك</span>
-                <span className="font-bold">{walletBalance.toFixed(2)} ر.س</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">تم تسويته في الفترة</span>
-                <span className="font-bold text-lg">{periodStats.settledAmount.toFixed(2)} ر.س</span>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="w-full bg-white/80"
-                onClick={() => setLogOpen(true)}
-                disabled={settlements.length === 0}
-              >
-                <ScrollText className="h-4 w-4 ml-1" />
-                سجل التسوية
-                {settlements.length > 0 ? ` (${settlements.length})` : ""}
-              </Button>
-              {settlements.length === 0 && (
-                <p className="text-[11px] text-muted-foreground">لا توجد تسويات مسجّلة بعد</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Dialog open={wageLogOpen} onOpenChange={setWageLogOpen}>
-          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto" dir="rtl">
-            <DialogHeader>
-              <DialogTitle>سجل الأجر</DialogTitle>
-            </DialogHeader>
-            {wageLog.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-6 text-center">لا توجد حركات أجر بعد</p>
-            ) : (
-              <div className="space-y-2">
-                {wageLog.map((tx) => (
-                  <div key={tx.id} className="rounded-xl border p-3 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold">{Number(tx.amount).toFixed(2)} ر.س</span>
-                      <span className={`text-xs rounded-full px-2 py-0.5 ${
-                        tx.type === "commission"
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-blue-100 text-blue-800"
-                      }`}>
-                        {wageKindLabel(tx)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(tx.created_at).toLocaleString("ar-SA", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                    {tx.notes && (
-                      <p className="text-xs text-muted-foreground">{tx.notes}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={logOpen} onOpenChange={setLogOpen}>
-          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto" dir="rtl">
-            <DialogHeader>
-              <DialogTitle>سجل التسوية</DialogTitle>
-            </DialogHeader>
-            {settlements.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-6 text-center">لا توجد تسويات بعد</p>
-            ) : (
-              <div className="space-y-2">
-                {settlements.map((tx) => (
-                  <div key={tx.id} className="rounded-xl border p-3 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold">{Number(tx.amount).toFixed(2)} ر.س</span>
-                      <span className="text-xs rounded-full bg-amber-100 text-amber-800 px-2 py-0.5">
-                        {settlementMethodLabel(tx.notes)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(tx.created_at).toLocaleString("ar-SA", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                    {tx.notes && (
-                      <p className="text-xs text-muted-foreground">{tx.notes}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="font-heading font-bold">المعاملات</h3>
+            <Button type="button" size="sm" variant="outline" className="h-8" onClick={() => void exportTransactions()}>
+              <FileDown className="h-3.5 w-3.5 ml-1" />
+              تصدير PDF
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">{DRIVER_COLLECTIONS_HINT}</p>
+          <p className="text-xs text-muted-foreground">{periodTitles[dateFilter]}</p>
+          <DriverTransactionsTable rows={periodStats.periodLedger} hideSiteShare />
+        </div>
       </div>
     </DriverLayout>
   );

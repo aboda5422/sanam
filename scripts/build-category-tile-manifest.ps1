@@ -23,7 +23,7 @@ foreach ($c in $cats) {
       if ($p.image -and $p.image -like "http*") { $imgs += $p.image }
     }
   } catch {}
-  $manifest += [pscustomobject]@{
+  $manifest += @{
     id = $c.id
     slug = $c.slug
     name = $c.name

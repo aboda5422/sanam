@@ -1,14 +1,7 @@
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { categories } from "@/data/store-data";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCategories, useCategorySections } from "@/hooks/useCategories";
-
-/** Sanam-only categories that live in Supabase but not in the Ninja static catalog. */
-const EXTRA_BY_SECTION: Record<string, string[]> = {
-  daily: ["cheese-pickles-weighed"],
-  pantry: ["roastery-weighed"],
-  home: ["plastics-section", "charcoal-gas", "cooking-tools", "summer-resort-goods"],
-};
 
 const CategoryTile = ({
   to,
@@ -36,10 +29,14 @@ const CategoryTile = ({
         <img
           src={image}
           alt={name}
+          width={160}
+          height={160}
           className={`w-full h-full transition-transform duration-500 group-hover:scale-[1.03] ${
             isPlaceholder ? "object-contain p-6" : "object-cover"
           }`}
           loading="lazy"
+          decoding="async"
+          fetchPriority="low"
           onError={(e) => {
             e.currentTarget.onerror = null;
             e.currentTarget.src = "/placeholder.png";
@@ -56,25 +53,37 @@ const HomeSections = () => {
   const { lang } = useLanguage();
   const { data: dbCategories } = useCategories();
   const { data: categorySections = [] } = useCategorySections();
-  const dbBySlug = new Map((dbCategories || []).map((c) => [c.slug, c]));
   const forceCaptionOverlay = lang === "en";
+  const [shownSections, setShownSections] = useState(2);
+  const moreRef = useRef<HTMLDivElement>(null);
+
+  const populated = useMemo(
+    () =>
+      categorySections.filter((section) =>
+        (dbCategories || []).some((c) => c.section === section.id),
+      ),
+    [categorySections, dbCategories],
+  );
+
+  useEffect(() => {
+    const el = moreRef.current;
+    if (!el || shownSections >= populated.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setShownSections((n) => Math.min(n + 2, populated.length));
+        }
+      },
+      { rootMargin: "300px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [shownSections, populated.length]);
 
   return (
     <div className="space-y-10">
-      {categorySections.map((section) => {
-        const sectionCats = categories.filter((c) => c.section === section.id);
-        const extraSlugs = EXTRA_BY_SECTION[section.id] || [];
-        const extras = extraSlugs
-          .map((slug) => dbBySlug.get(slug))
-          .filter(Boolean)
-          .map((c) => ({
-            id: c!.slug,
-            name: c!.name,
-            nameEn: c!.name_en || c!.name,
-            image: c!.image || "/placeholder.png",
-          }));
-
-        if (!sectionCats.length && !extras.length) return null;
+      {populated.slice(0, shownSections).map((section) => {
+        const sectionCats = (dbCategories || []).filter((c) => c.section === section.id);
 
         return (
           <section key={section.id}>
@@ -82,25 +91,12 @@ const HomeSections = () => {
               {lang === "ar" ? section.title : section.titleEn}
             </h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-              {sectionCats.map((cat) => {
-                const db = dbBySlug.get(cat.id);
-                const image = db?.image || cat.image || "/placeholder.png";
-                return (
-                  <CategoryTile
-                    key={cat.id}
-                    to={`/category/${cat.id}`}
-                    name={lang === "ar" ? cat.name : cat.nameEn}
-                    image={image}
-                    forceCaptionOverlay={forceCaptionOverlay}
-                  />
-                );
-              })}
-              {extras.map((cat) => (
+              {sectionCats.map((cat) => (
                 <CategoryTile
                   key={cat.id}
-                  to={`/category/${cat.id}`}
-                  name={lang === "ar" ? cat.name : cat.nameEn}
-                  image={cat.image}
+                  to={`/category/${cat.slug}`}
+                  name={lang === "ar" ? cat.name : cat.name_en || cat.name}
+                  image={cat.image || section.image || "/placeholder.png"}
                   forceCaptionOverlay={forceCaptionOverlay}
                 />
               ))}
@@ -108,6 +104,7 @@ const HomeSections = () => {
           </section>
         );
       })}
+      {shownSections < populated.length ? <div ref={moreRef} className="h-4" aria-hidden /> : null}
     </div>
   );
 };

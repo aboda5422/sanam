@@ -1,5 +1,9 @@
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  isDriverLocationBypassed,
+  MAIN_CENTER_COORDS,
+} from "@/lib/driver-location-bypass";
 
 /**
  * Hook that sends the driver's GPS location to the database every 30 seconds.
@@ -13,7 +17,6 @@ export function useDriverGPS(driverId: string | null, isAvailable: boolean) {
 
   useEffect(() => {
     if (!driverId || !isAvailable) return;
-    if (!("geolocation" in navigator)) return;
 
     const updateLocation = async (lat: number, lng: number) => {
       if (lastPositionRef.current) {
@@ -27,6 +30,23 @@ export function useDriverGPS(driverId: string | null, isAvailable: boolean) {
         .update({ current_lat: lat, current_lng: lng })
         .eq("id", driverId);
     };
+
+    if (isDriverLocationBypassed()) {
+      void updateLocation(MAIN_CENTER_COORDS.lat, MAIN_CENTER_COORDS.lng);
+      intervalRef.current = setInterval(() => {
+        if (isDriverLocationBypassed()) {
+          void updateLocation(MAIN_CENTER_COORDS.lat, MAIN_CENTER_COORDS.lng);
+        }
+      }, 30000);
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+      };
+    }
+
+    if (!("geolocation" in navigator)) return;
 
     navigator.geolocation.getCurrentPosition(
       (pos) => updateLocation(pos.coords.latitude, pos.coords.longitude),

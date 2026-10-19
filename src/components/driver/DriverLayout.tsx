@@ -4,7 +4,7 @@ import { ArrowRight, MapPin, Loader2 } from "lucide-react";
 import DriverBottomNav from "./DriverBottomNav";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { supabase } from "@/integrations/supabase/client";
-import logoMark from "@/assets/logo-mark.png";
+import logoFull from "@/assets/logo-full-light.png";
 import { BRAND } from "@/lib/brand";
 import { Badge } from "@/components/ui/badge";
 
@@ -70,7 +70,7 @@ const DriverLayout = ({ children, title, backTo, headerExtra }: DriverLayoutProp
           </button>
         ) : (
           <Link to="/driver" className="shrink-0">
-            <img src={logoMark} alt={BRAND.fullNameAr} className="h-9 w-auto" />
+            <img src={logoFull} alt={BRAND.fullNameAr} className="h-9 w-auto max-w-[11rem] object-contain" />
           </Link>
         )}
         {title && <h1 className="font-heading font-bold text-lg truncate">{title}</h1>}

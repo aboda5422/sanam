@@ -16,6 +16,26 @@ export function invalidateCategoryQueries(queryClient: ReturnType<typeof useQuer
   queryClient.invalidateQueries({ queryKey: ["store-settings", CATEGORY_SECTIONS_SETTING_KEY] });
 }
 
+const CATEGORY_SELECT =
+  "id, catalog_id, name, name_en, image, slug, section, is_active, sort_order, branch_id";
+
+/** Dedupe unified category rows (one per catalog_id) preferring an active overlay. */
+function dedupeCategories(rows: any[]): Category[] {
+  const map = new Map<string, any>();
+  for (const row of rows) {
+    const key = String(row.catalog_id || row.id);
+    const prev = map.get(key);
+    if (!prev) {
+      map.set(key, row);
+      continue;
+    }
+    const prevScore = (prev.is_active ? 10 : 0) + (prev.legacy_category_id ? 1 : 0);
+    const nextScore = (row.is_active ? 10 : 0) + (row.legacy_category_id ? 1 : 0);
+    if (nextScore > prevScore) map.set(key, row);
+  }
+  return [...map.values()] as Category[];
+}
+
 export const useCategories = () => {
   const { selectedBranch } = useBranch();
   const branchId = selectedBranch?.id;
@@ -24,13 +44,13 @@ export const useCategories = () => {
     enabled: !!branchId,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("categories")
-        .select("id, name, name_en, image, slug, section, is_active, sort_order, branch_id")
+        .from("catalog_branch_categories" as "categories")
+        .select(CATEGORY_SELECT)
         .eq("is_active", true)
         .eq("branch_id", branchId!)
         .order("sort_order");
       if (error) throw error;
-      return data || [];
+      return (data || []) as Category[];
     },
   });
 };
@@ -40,13 +60,14 @@ export const useAllCategories = (scopedBranchIds?: string[] | null) => {
     queryKey: ["all-categories", scopedBranchIds],
     queryFn: async () => {
       let q = supabase
-        .from("categories")
-        .select("id, name, name_en, image, slug, section, is_active, sort_order, branch_id")
+        .from("catalog_branch_categories" as "categories")
+        .select(CATEGORY_SELECT)
         .order("sort_order");
       q = applyBranchFilter(q, scopedBranchIds);
       const { data, error } = await q;
       if (error) throw error;
-      return data || [];
+      // Admin product filters need one entry per logical category when multi-branch
+      return dedupeCategories(data || []);
     },
     staleTime: 0,
     refetchOnMount: "always",

@@ -1,5 +1,7 @@
 import { LucideIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface KPICardProps {
   title: string;
@@ -9,9 +11,11 @@ interface KPICardProps {
   trendUp?: boolean;
   color?: string;
   loading?: boolean;
+  /** Navigate to the data source when the card is clicked */
+  to?: string;
 }
 
-const KPICard = ({ title, value, icon: Icon, trend, trendUp, color = "primary", loading }: KPICardProps) => {
+const KPICard = ({ title, value, icon: Icon, trend, trendUp, color = "primary", loading, to }: KPICardProps) => {
   const colorMap: Record<string, string> = {
     primary: "bg-primary/10 text-primary",
     success: "bg-green-100 text-green-600",
@@ -23,28 +27,46 @@ const KPICard = ({ title, value, icon: Icon, trend, trendUp, color = "primary", 
     orange: "bg-orange-100 text-orange-600",
   };
 
-  return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4 flex items-center gap-4">
-        <div className={`rounded-xl p-3 ${colorMap[color] || colorMap.primary}`}>
-          <Icon className="h-6 w-6" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm text-muted-foreground truncate">{title}</p>
-          {loading ? (
-            <div className="h-7 w-16 bg-muted animate-pulse rounded mt-1" />
-          ) : (
-            <p className="text-2xl font-bold font-heading">{value}</p>
-          )}
-          {trend && (
-            <p className={`text-xs mt-0.5 ${trendUp ? "text-green-600" : "text-red-500"}`}>
-              {trend}
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+  const body = (
+    <CardContent className="p-4 flex items-center gap-4">
+      <div className={`rounded-xl p-3 ${colorMap[color] || colorMap.primary}`}>
+        <Icon className="h-6 w-6" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-muted-foreground truncate">{title}</p>
+        {loading ? (
+          <div className="h-7 w-16 bg-muted animate-pulse rounded mt-1" />
+        ) : (
+          <p className="text-2xl font-bold font-heading">{value}</p>
+        )}
+        {trend && (
+          <p className={`text-xs mt-0.5 ${trendUp ? "text-green-600" : "text-red-500"}`}>
+            {trend}
+          </p>
+        )}
+      </div>
+    </CardContent>
   );
+
+  if (to) {
+    return (
+      <Link
+        to={to}
+        className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={`${title}: فتح المصدر`}
+      >
+        <Card
+          className={cn(
+            "h-full transition-shadow hover:shadow-md hover:border-primary/30 cursor-pointer",
+          )}
+        >
+          {body}
+        </Card>
+      </Link>
+    );
+  }
+
+  return <Card className="hover:shadow-md transition-shadow">{body}</Card>;
 };
 
 export default KPICard;

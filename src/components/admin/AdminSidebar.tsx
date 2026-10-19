@@ -12,15 +12,16 @@ import {
   BarChart3,
   Users,
   Megaphone,
-  Mail,
   Timer,
+  MonitorSmartphone,
+  Star,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { allowedAdminPaths } from "@/lib/staff-access";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import logo from "@/assets/logo-full-admin.png";
+import logoFull from "@/assets/logo-full-light.png";
 import {
   Sidebar,
   SidebarContent,
@@ -47,12 +48,14 @@ const operationItems = [
   { title: "إدارة المناديب", url: "/admin/drivers", icon: Truck },
   { title: "إعدادات التوصيل", url: "/admin/delivery", icon: Timer },
   { title: "الشكاوى", url: "/admin/complaints", icon: MessageSquare },
+  { title: "تقييمات منخفضة", url: "/admin/ratings", icon: Star },
 ];
 
 const settingsItems = [
+  { title: "نظام الكاشير", url: "/admin/pos", icon: MonitorSmartphone },
   { title: "الحسابات والمبيعات", url: "/admin/sales", icon: BarChart3 },
+  { title: "التحصيل", url: "/admin/collections", icon: Wallet },
   { title: "سجل المدفوعات", url: "/admin/payments", icon: Wallet },
-  { title: "سجل البريد الإلكتروني", url: "/admin/email-logs", icon: Mail },
   { title: "الشعارات والإعلانات", url: "/admin/announcements", icon: Megaphone },
   { title: "الإعدادات", url: "/admin/settings", icon: Settings },
 ];
@@ -120,11 +123,15 @@ export function AdminSidebar() {
       <SidebarContent className="[direction:ltr]">
         <div dir="rtl" className="flex min-h-0 flex-1 flex-col gap-2">
           {!collapsed && (
-            <div className="p-4 border-b border-sidebar-border flex items-center gap-2">
-              <img src={logo} alt="سنام" className="h-9 w-auto" />
-              <div>
-                <p className="text-xs text-muted-foreground">لوحة الإدارة</p>
-              </div>
+            <div className="p-3 border-b border-border bg-white space-y-2">
+              <img
+                src={logoFull}
+                alt="سنام"
+                className="h-11 w-full object-contain"
+              />
+              <p className="text-sm font-semibold tracking-wide text-foreground text-center">
+                لوحة الإدارة
+              </p>
             </div>
           )}
           {renderGroup("الرئيسية", filterItems(mainItems))}

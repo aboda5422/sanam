@@ -5,6 +5,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -81,18 +82,29 @@ const AdminCategoriesPage = () => {
 
   const [moveSubId, setMoveSubId] = useState<string | null>(null);
   const [moveTargetSection, setMoveTargetSection] = useState("");
+  const [expandedSubSections, setExpandedSubSections] = useState<Record<string, boolean>>({});
 
   const { data: categories, isLoading: catsLoading } = useQuery({
-    queryKey: ["admin-categories", scopedBranchIds],
+    queryKey: ["admin-categories", scopedBranchIds, filterBranchId],
     queryFn: async () => {
       let q = supabase
-        .from("categories")
-        .select("id, name, name_en, image, slug, section, is_active, sort_order, branch_id")
+        .from("catalog_branch_categories" as "categories")
+        .select("id, catalog_id, name, name_en, image, slug, section, is_active, sort_order, branch_id")
         .order("sort_order");
-      q = applyBranchFilter(q, scopedBranchIds);
+      if (filterBranchId) q = q.eq("branch_id", filterBranchId);
+      else q = applyBranchFilter(q, scopedBranchIds);
       const { data, error } = await q;
       if (error) throw error;
-      return (data || []) as CategoryRow[];
+      // One row per logical category when viewing multiple branches
+      const byCatalog = new Map<string, CategoryRow>();
+      for (const row of (data || []) as (CategoryRow & { catalog_id?: string })[]) {
+        const key = String((row as any).catalog_id || row.id);
+        const prev = byCatalog.get(key);
+        if (!prev || (filterBranchId && row.branch_id === filterBranchId) || (!prev.is_active && row.is_active)) {
+          byCatalog.set(key, row);
+        }
+      }
+      return [...byCatalog.values()];
     },
   });
 
@@ -196,12 +208,16 @@ const AdminCategoriesPage = () => {
       const id = (editingMainId || mainForm.id || autoSlug(mainForm.title_en || mainForm.title)).trim();
       if (!id) throw new Error("missing id");
       const sortOrder = Number(mainForm.sort_order) || sections.length + 1;
+      const prev = editingMainId ? sections.find((s) => s.id === editingMainId) : undefined;
       const entry: CategorySection = {
         id,
         title: mainForm.title.trim(),
         titleEn: mainForm.title_en.trim() || mainForm.title.trim(),
         image: mainForm.image || undefined,
         sortOrder,
+        allowCashOnDelivery: prev?.allowCashOnDelivery,
+        checkoutNoticeEnabled: prev?.checkoutNoticeEnabled,
+        checkoutNotice: prev?.checkoutNotice,
       };
       let next: CategorySection[];
       if (editingMainId) {
@@ -279,6 +295,21 @@ const AdminCategoriesPage = () => {
       const idx = Math.max(0, Math.min(sortOrder - 1, without.length));
       without.splice(idx, 0, { ...current, sortOrder });
       await persistSections(without.map((s, i) => ({ ...s, sortOrder: i + 1 })));
+    },
+    onSuccess: () => invalidateAll(),
+    onError: () => toast.error("حدث خطأ"),
+  });
+
+  const patchSectionMutation = useMutation({
+    mutationFn: async ({
+      sectionId,
+      patch,
+    }: {
+      sectionId: string;
+      patch: Partial<Pick<CategorySection, "allowCashOnDelivery" | "checkoutNoticeEnabled" | "checkoutNotice">>;
+    }) => {
+      const next = sections.map((s) => (s.id === sectionId ? { ...s, ...patch } : s));
+      await persistSections(next);
     },
     onSuccess: () => invalidateAll(),
     onError: () => toast.error("حدث خطأ"),
@@ -512,6 +543,64 @@ const AdminCategoriesPage = () => {
                             </Button>
                             <Badge variant="secondary" className="mr-auto">{subs.length}</Badge>
                           </div>
+                          <div className="flex items-center justify-between gap-2 rounded-lg border bg-muted/20 px-2 py-1.5">
+                            <Label className="text-xs font-medium leading-snug">
+                              الدفع عند الاستلام
+                              <span className="block text-[10px] font-normal text-muted-foreground">
+                                {section.allowCashOnDelivery === false
+                                  ? "الدفع الإلكتروني إلزامي"
+                                  : "مفعّل للعميل"}
+                              </span>
+                            </Label>
+                            <Switch
+                              checked={section.allowCashOnDelivery !== false}
+                              disabled={patchSectionMutation.isPending}
+                              onCheckedChange={(v) =>
+                                patchSectionMutation.mutate({
+                                  sectionId: section.id,
+                                  patch: { allowCashOnDelivery: v },
+                                })
+                              }
+                            />
+                          </div>
+                          <div className="flex items-center justify-between gap-2 rounded-lg border bg-muted/20 px-2 py-1.5">
+                            <Label className="text-xs font-medium leading-snug">
+                              ملاحظة قبل تأكيد الطلب
+                              <span className="block text-[10px] font-normal text-muted-foreground">
+                                {section.checkoutNoticeEnabled ? "تظهر للعميل عند الدفع" : "معطّلة"}
+                              </span>
+                            </Label>
+                            <Switch
+                              checked={!!section.checkoutNoticeEnabled}
+                              disabled={patchSectionMutation.isPending}
+                              onCheckedChange={(v) =>
+                                patchSectionMutation.mutate({
+                                  sectionId: section.id,
+                                  patch: { checkoutNoticeEnabled: v },
+                                })
+                              }
+                            />
+                          </div>
+                          {section.checkoutNoticeEnabled && (
+                            <div className="space-y-1">
+                              <Textarea
+                                key={`${section.id}-notice-${section.checkoutNotice ?? ""}`}
+                                defaultValue={section.checkoutNotice || ""}
+                                placeholder="مثال: أجر المندوب لا يُسترد · استرجاع هذا المنتج غير مسموح"
+                                className="min-h-[64px] text-xs resize-y"
+                                disabled={patchSectionMutation.isPending}
+                                onBlur={(e) => {
+                                  const next = e.target.value.trim();
+                                  const current = (section.checkoutNotice || "").trim();
+                                  if (next === current) return;
+                                  patchSectionMutation.mutate({
+                                    sectionId: section.id,
+                                    patch: { checkoutNotice: next || undefined },
+                                  });
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -541,87 +630,107 @@ const AdminCategoriesPage = () => {
                       {subs.length === 0 ? (
                         <p className="text-xs text-muted-foreground py-2">لا توجد أقسام فرعية — اضغط «فرعي» للإضافة</p>
                       ) : (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-3 px-2 text-[11px] font-medium text-muted-foreground">
-                            <span className="w-9 shrink-0" />
-                            <span className="flex-1">القسم</span>
-                            <span className="w-16 text-center">الترتيب</span>
-                            <span className="w-8 text-center">نقل</span>
-                            <span className="w-[120px] text-center border-s ps-3">إجراءات</span>
-                          </div>
-                          {subs.map((c, localIndex) => (
-                            <div
-                              key={c.id}
-                              className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border bg-background/80 px-2 py-1.5"
-                            >
-                              <img
-                                src={c.image || "/placeholder.png"}
-                                alt={c.name}
-                                className="w-9 h-9 rounded-md object-cover bg-white border shrink-0"
-                                onError={(e) => {
-                                  e.currentTarget.onerror = null;
-                                  e.currentTarget.src = "/placeholder.png";
-                                }}
-                              />
-                              <div className="min-w-0 flex-1">
-                                <p className="font-medium truncate">{c.name}</p>
-                                <p className="text-[11px] text-muted-foreground truncate">
-                                  {c.name_en || "—"} · <span dir="ltr">{c.slug}</span>
-                                </p>
+                        (() => {
+                          const expanded = !!expandedSubSections[section.id];
+                          const visibleSubs = expanded || subs.length <= 2 ? subs : subs.slice(0, 2);
+                          return (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-3 px-2 text-[11px] font-medium text-muted-foreground">
+                                <span className="w-9 shrink-0" />
+                                <span className="flex-1">القسم</span>
+                                <span className="w-16 text-center">الترتيب</span>
+                                <span className="w-8 text-center">نقل</span>
+                                <span className="w-[120px] text-center border-s ps-3">إجراءات</span>
                               </div>
-                              <Input
-                                type="number"
-                                min={1}
-                                max={subs.length}
-                                className="h-8 w-16 text-center px-1 shrink-0"
-                                defaultValue={localIndex + 1}
-                                key={`${c.id}-${localIndex + 1}-${subs.length}`}
-                                disabled={setSubOrderMutation.isPending}
-                                onBlur={(e) => {
-                                  const next = Number(e.target.value);
-                                  const current = localIndex + 1;
-                                  if (!Number.isFinite(next) || next < 1 || next === current) {
-                                    e.target.value = String(current);
-                                    return;
+                              {visibleSubs.map((c, localIndex) => (
+                                  <div
+                                    key={c.id}
+                                    className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border bg-background/80 px-2 py-1.5"
+                                  >
+                                    <img
+                                      src={c.image || "/placeholder.png"}
+                                      alt={c.name}
+                                      className="w-9 h-9 rounded-md object-cover bg-white border shrink-0"
+                                      onError={(e) => {
+                                        e.currentTarget.onerror = null;
+                                        e.currentTarget.src = "/placeholder.png";
+                                      }}
+                                    />
+                                    <div className="min-w-0 flex-1">
+                                      <p className="font-medium truncate">{c.name}</p>
+                                      <p className="text-[11px] text-muted-foreground truncate">
+                                        {c.name_en || "—"} · <span dir="ltr">{c.slug}</span>
+                                      </p>
+                                    </div>
+                                    <Input
+                                      type="number"
+                                      min={1}
+                                      max={subs.length}
+                                      className="h-8 w-16 text-center px-1 shrink-0"
+                                      defaultValue={localIndex + 1}
+                                      key={`${c.id}-${localIndex + 1}-${subs.length}`}
+                                      disabled={setSubOrderMutation.isPending}
+                                      onBlur={(e) => {
+                                        const next = Number(e.target.value);
+                                        const current = localIndex + 1;
+                                        if (!Number.isFinite(next) || next < 1 || next === current) {
+                                          e.target.value = String(current);
+                                          return;
+                                        }
+                                        setSubOrderMutation.mutate({ id: c.id, sortOrder: next });
+                                      }}
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                                      }}
+                                    />
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 shrink-0"
+                                      title="نقل إلى قسم رئيسي آخر"
+                                      onClick={() => {
+                                        setMoveSubId(c.id);
+                                        setMoveTargetSection(c.section || "");
+                                      }}
+                                    >
+                                      <FolderInput className="h-4 w-4" />
+                                    </Button>
+                                    <div className="flex items-center gap-2 w-[120px] justify-center border-s ps-3 shrink-0">
+                                      <Switch
+                                        checked={c.is_active}
+                                        onCheckedChange={(v) => toggleMutation.mutate({ id: c.id, value: v })}
+                                      />
+                                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditSub(c)}>
+                                        <Pencil className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-destructive hover:text-destructive"
+                                        onClick={() => setDeleteSubId(c.id)}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                              ))}
+                              {subs.length > 2 && (
+                                <button
+                                  type="button"
+                                  className="w-full text-center text-sm text-primary hover:underline py-1"
+                                  onClick={() =>
+                                    setExpandedSubSections((prev) => ({
+                                      ...prev,
+                                      [section.id]: !expanded,
+                                    }))
                                   }
-                                  setSubOrderMutation.mutate({ id: c.id, sortOrder: next });
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-                                }}
-                              />
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 shrink-0"
-                                title="نقل إلى قسم رئيسي آخر"
-                                onClick={() => {
-                                  setMoveSubId(c.id);
-                                  setMoveTargetSection(c.section || "");
-                                }}
-                              >
-                                <FolderInput className="h-4 w-4" />
-                              </Button>
-                              <div className="flex items-center gap-2 w-[120px] justify-center border-s ps-3 shrink-0">
-                                <Switch
-                                  checked={c.is_active}
-                                  onCheckedChange={(v) => toggleMutation.mutate({ id: c.id, value: v })}
-                                />
-                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditSub(c)}>
-                                  <Pencil className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 text-destructive hover:text-destructive"
-                                  onClick={() => setDeleteSubId(c.id)}
                                 >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
+                                  {expanded ? "عرض أقل" : `عرض المزيد (${subs.length - 2})`}
+                                </button>
+                              )}
                             </div>
-                          ))}
-                        </div>
+                          );
+                        })()
                       )}
                     </td>
                   </tr>

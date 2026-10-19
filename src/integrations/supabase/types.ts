@@ -192,6 +192,7 @@ export type Database = {
           name: string
           phone: string | null
           slug: string
+          partner_code: string | null
           city: string | null
           work_start: string
           work_end: string
@@ -210,6 +211,7 @@ export type Database = {
           name: string
           phone?: string | null
           slug?: string
+          partner_code?: string | null
           city?: string | null
           work_start?: string
           work_end?: string
@@ -228,6 +230,7 @@ export type Database = {
           name?: string
           phone?: string | null
           slug?: string
+          partner_code?: string | null
           city?: string | null
           work_start?: string
           work_end?: string
@@ -632,6 +635,7 @@ export type Database = {
           driver_id: string | null
           id: string
           notes: string | null
+          on_the_way_at: string | null
           order_number: number
           payment_id: string | null
           payment_method: string
@@ -660,6 +664,7 @@ export type Database = {
           driver_id?: string | null
           id?: string
           notes?: string | null
+          on_the_way_at?: string | null
           order_number?: number
           payment_id?: string | null
           payment_method?: string
@@ -688,6 +693,7 @@ export type Database = {
           driver_id?: string | null
           id?: string
           notes?: string | null
+          on_the_way_at?: string | null
           order_number?: number
           payment_id?: string | null
           payment_method?: string
@@ -824,6 +830,7 @@ export type Database = {
           cost_price: number | null
           created_at: string
           description: string | null
+          external_id: string | null
           extra_label: string | null
           gallery_urls: string[] | null
           id: string
@@ -841,6 +848,14 @@ export type Database = {
           stock_quantity: number
           branch_id: string
           unit: string
+          alt_unit: string | null
+          alt_barcode: string | null
+          alt_image: string | null
+          units_per_pack: number | null
+          alt_price: number | null
+          alt_original_price: number | null
+          offer_unit: string | null
+          offer_channel: string | null
           updated_at: string
         }
         Insert: {
@@ -850,6 +865,7 @@ export type Database = {
           cost_price?: number | null
           created_at?: string
           description?: string | null
+          external_id?: string | null
           extra_label?: string | null
           gallery_urls?: string[] | null
           id?: string
@@ -867,6 +883,14 @@ export type Database = {
           stock_quantity?: number
           branch_id: string
           unit?: string
+          alt_unit?: string | null
+          alt_barcode?: string | null
+          alt_image?: string | null
+          units_per_pack?: number | null
+          alt_price?: number | null
+          alt_original_price?: number | null
+          offer_unit?: string | null
+          offer_channel?: string | null
           updated_at?: string
         }
         Update: {
@@ -876,6 +900,7 @@ export type Database = {
           cost_price?: number | null
           created_at?: string
           description?: string | null
+          external_id?: string | null
           extra_label?: string | null
           gallery_urls?: string[] | null
           id?: string
@@ -893,6 +918,14 @@ export type Database = {
           stock_quantity?: number
           branch_id?: string
           unit?: string
+          alt_unit?: string | null
+          alt_barcode?: string | null
+          alt_image?: string | null
+          units_per_pack?: number | null
+          alt_price?: number | null
+          alt_original_price?: number | null
+          offer_unit?: string | null
+          offer_channel?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1279,13 +1312,14 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "customer" | "driver" | "store_admin" | "site_admin" | "accountant" | "inventory" | "support"
+      app_role: "customer" | "driver" | "store_admin" | "site_admin" | "accountant" | "inventory" | "support" | "cashier" | "order_preparer"
       complaint_status: "open" | "in_progress" | "resolved"
-      complaint_type: "complaint" | "inquiry"
+      complaint_type: "complaint" | "inquiry" | "return"
       order_status:
         | "pending"
         | "assigned"
         | "preparing"
+        | "ready"
         | "on_the_way"
         | "delivered"
         | "cancelled"
@@ -1418,13 +1452,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["customer", "driver", "store_admin", "site_admin", "accountant", "inventory", "support"],
+      app_role: ["customer", "driver", "store_admin", "site_admin", "accountant", "inventory", "support", "cashier", "order_preparer"],
       complaint_status: ["open", "in_progress", "resolved"],
-      complaint_type: ["complaint", "inquiry"],
+      complaint_type: ["complaint", "inquiry", "return"],
       order_status: [
         "pending",
         "assigned",
         "preparing",
+        "ready",
         "on_the_way",
         "delivered",
         "cancelled",

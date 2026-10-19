@@ -9,15 +9,21 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Store, Bell, Shield, Save, Loader2, Users, ScrollText } from "lucide-react";
+import { Store, Bell, Shield, Save, Loader2, Users, ScrollText, MonitorSmartphone, Link2, CreditCard, PackageCheck, Mail, LayoutTemplate } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import AdminUsersSection from "@/components/admin/AdminUsersSection";
 import AdminActivityLogSection from "@/components/admin/AdminActivityLogSection";
+import { PosFeaturesSection, PosIntegrationsSection, PreparerFeaturesSection } from "@/components/admin/PosSettingsSections";
 import { DEFAULT_NOTIFICATION_PREFS } from "@/hooks/useAdminNotifications";
 import { playNotificationSound, unlockNotificationAudio } from "@/lib/notification-sound";
+import { DEFAULT_CHECKOUT_FEATURES, CHECKOUT_FEATURES_KEY } from "@/hooks/useCheckoutFeatures";
+import { SettingsDialogCloseContext, useCloseSettingsDialog } from "@/contexts/SettingsDialogCloseContext";
+import { DEFAULT_STORE_INFO, STORE_INFO_KEY, mergeStoreInfo, type StoreInfo } from "@/lib/store-info";
 
 const useSetting = (key: string, defaultValue: any) => {
   const queryClient = useQueryClient();
+  const closeDialog = useCloseSettingsDialog();
   const { data, isLoading } = useQuery({
     queryKey: ["store-settings", key],
     queryFn: async () => {
@@ -37,42 +43,135 @@ const useSetting = (key: string, defaultValue: any) => {
         .from("store_settings")
         .upsert({ key, value }, { onConflict: "key" });
       if (error) throw error;
+      return value;
     },
-    onSuccess: () => {
+    onSuccess: (value) => {
+      // Write merged store_info into cache immediately so Footer updates without waiting
+      const cached =
+        key === STORE_INFO_KEY ? mergeStoreInfo(value) : value;
+      queryClient.setQueryData(["store-settings", key], cached);
       queryClient.invalidateQueries({ queryKey: ["store-settings", key] });
       toast.success("تم الحفظ بنجاح");
+      closeDialog?.();
     },
     onError: () => toast.error("حدث خطأ أثناء الحفظ"),
   });
 
-  return { data: data ?? defaultValue, isLoading, save: mutation.mutate, saving: mutation.isPending };
+  return {
+    data: key === STORE_INFO_KEY ? mergeStoreInfo(data ?? defaultValue) : (data ?? defaultValue),
+    isLoading,
+    save: mutation.mutate,
+    saving: mutation.isPending,
+  };
 };
 
-// ─── Store Info Section ───
+// ─── Store Info Section (also drives public footer) ───
 const StoreInfoSection = () => {
-  const { data, isLoading, save, saving } = useSetting("store_info", {
-    name: "سنام سوبر ماركت",
-    phone: "0502291213",
-    email: "",
-    address: "مكة المكرمة والرياض",
-    cr_number: "",
-    description: "",
-  });
-  const [form, setForm] = useState<any>(null);
-  const d = form ?? data;
+  const { data, isLoading, save, saving } = useSetting(STORE_INFO_KEY, DEFAULT_STORE_INFO);
+  const [form, setForm] = useState<StoreInfo | null>(null);
+  const d = form ?? mergeStoreInfo(data);
+
+  const set = (patch: Partial<StoreInfo>) => setForm({ ...d, ...patch });
+  const setSocial = (key: keyof StoreInfo["social"], value: string) =>
+    setForm({ ...d, social: { ...d.social, [key]: value } });
 
   if (isLoading) return <Loader2 className="h-6 w-6 animate-spin mx-auto" />;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2">
-        <div><Label>اسم المتجر</Label><Input value={d.name} onChange={e => setForm({ ...d, name: e.target.value })} /></div>
-        <div><Label>رقم الجوال</Label><Input value={d.phone} onChange={e => setForm({ ...d, phone: e.target.value })} dir="ltr" /></div>
-        <div><Label>البريد الإلكتروني</Label><Input value={d.email} onChange={e => setForm({ ...d, email: e.target.value })} dir="ltr" /></div>
-        <div><Label>العنوان</Label><Input value={d.address} onChange={e => setForm({ ...d, address: e.target.value })} /></div>
-        <div><Label>رقم السجل التجاري</Label><Input value={d.cr_number} onChange={e => setForm({ ...d, cr_number: e.target.value })} dir="ltr" /></div>
+        <div>
+          <Label>اسم المتجر</Label>
+          <Input value={d.name} onChange={(e) => set({ name: e.target.value })} />
+        </div>
+        <div>
+          <Label>اسم الشركة (للتوقيع في الفوتر)</Label>
+          <Input value={d.company_name} onChange={(e) => set({ company_name: e.target.value })} />
+        </div>
+        <div>
+          <Label>رقم الجوال</Label>
+          <Input value={d.phone} onChange={(e) => set({ phone: e.target.value })} dir="ltr" placeholder="0537688877" />
+        </div>
+        <div>
+          <Label>رقم الواتساب</Label>
+          <Input
+            value={d.whatsapp}
+            onChange={(e) => set({ whatsapp: e.target.value })}
+            dir="ltr"
+            placeholder="966537688877 أو 0537688877"
+          />
+          <p className="text-[11px] text-muted-foreground mt-1">يظهر في زر واتساب بالفوتر</p>
+        </div>
+        <div>
+          <Label>البريد الإلكتروني</Label>
+          <Input value={d.email} onChange={(e) => set({ email: e.target.value })} dir="ltr" />
+        </div>
+        <div>
+          <Label>العنوان / نطاق التغطية</Label>
+          <Input value={d.address} onChange={(e) => set({ address: e.target.value })} />
+        </div>
+        <div>
+          <Label>رقم السجل التجاري</Label>
+          <Input value={d.cr_number} onChange={(e) => set({ cr_number: e.target.value })} dir="ltr" />
+        </div>
+        <div>
+          <Label>الرقم الضريبي (VAT)</Label>
+          <Input value={d.vat_number} onChange={(e) => set({ vat_number: e.target.value })} dir="ltr" placeholder="اختياري" />
+        </div>
       </div>
-      <div><Label>وصف المتجر</Label><Textarea value={d.description} onChange={e => setForm({ ...d, description: e.target.value })} rows={3} /></div>
+
+      <div>
+        <Label>شعار قصير (تحت الشعار في الفوتر)</Label>
+        <Input value={d.tagline} onChange={(e) => set({ tagline: e.target.value })} />
+      </div>
+      <div>
+        <Label>وصف المتجر</Label>
+        <Textarea value={d.description} onChange={(e) => set({ description: e.target.value })} rows={3} />
+      </div>
+
+      <div className="space-y-3 rounded-xl border p-3 bg-muted/20">
+        <p className="text-sm font-semibold">حسابات التواصل (الفوتر)</p>
+        <p className="text-xs text-muted-foreground -mt-1">اترك الحقل فارغاً لإخفاء الأيقونة من الموقع</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <Label>Instagram</Label>
+            <Input
+              value={d.social.instagram}
+              onChange={(e) => setSocial("instagram", e.target.value)}
+              dir="ltr"
+              placeholder="https://instagram.com/..."
+            />
+          </div>
+          <div>
+            <Label>Snapchat</Label>
+            <Input
+              value={d.social.snapchat}
+              onChange={(e) => setSocial("snapchat", e.target.value)}
+              dir="ltr"
+              placeholder="https://snapchat.com/add/..."
+            />
+          </div>
+          <div>
+            <Label>TikTok</Label>
+            <Input
+              value={d.social.tiktok}
+              onChange={(e) => setSocial("tiktok", e.target.value)}
+              dir="ltr"
+              placeholder="https://tiktok.com/@..."
+            />
+          </div>
+          <div>
+            <Label>X (Twitter)</Label>
+            <Input
+              value={d.social.x}
+              onChange={(e) => setSocial("x", e.target.value)}
+              dir="ltr"
+              placeholder="https://x.com/..."
+            />
+          </div>
+        </div>
+      </div>
+
       <Button onClick={() => save(form ?? d)} disabled={saving}>
         {saving ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <Save className="h-4 w-4 ml-2" />}
         حفظ
@@ -165,26 +264,93 @@ const SecuritySection = () => {
   );
 };
 
+// ─── Checkout features (payments + national address) ───
+const CheckoutFeaturesSection = () => {
+  const { data, isLoading, save, saving } = useSetting(CHECKOUT_FEATURES_KEY, DEFAULT_CHECKOUT_FEATURES);
+  const [form, setForm] = useState<any>(null);
+  const d = form ?? data;
+
+  if (isLoading) return <Loader2 className="h-6 w-6 animate-spin mx-auto" />;
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        عند الإيقاف تبقى أيقونة الدفع الإلكتروني أو العنوان الوطني ظاهرة للعميل لكنها غير قابلة للنقر —
+        مفيد أثناء تأخير الربط مع شركة المدفوعات أو مزوّد العنوان الوطني.
+      </p>
+      <div className="flex items-center justify-between py-2 border-b gap-4">
+        <div>
+          <p className="text-sm font-medium">الدفع الإلكتروني</p>
+          <p className="text-xs text-muted-foreground">مدى / فيزا / STC Pay / أبل باي في صفحة الدفع</p>
+        </div>
+        <Switch
+          checked={!!d.online_payment_enabled}
+          onCheckedChange={(v) => setForm({ ...d, online_payment_enabled: v })}
+        />
+      </div>
+      <div className="flex items-center justify-between py-2 border-b gap-4">
+        <div>
+          <p className="text-sm font-medium">العنوان الوطني المختصر</p>
+          <p className="text-xs text-muted-foreground">إدخال الرمز الوطني في الخريطة والدفع</p>
+        </div>
+        <Switch
+          checked={!!d.national_address_enabled}
+          onCheckedChange={(v) => setForm({ ...d, national_address_enabled: v })}
+        />
+      </div>
+      <Button onClick={() => save(form ?? d)} disabled={saving}>
+        {saving ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <Save className="h-4 w-4 ml-2" />}
+        حفظ
+      </Button>
+    </div>
+  );
+};
+
 // ─── Main Page ───
 const AdminSettingsPage = () => {
   const [openSection, setOpenSection] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const sections = [
-    { key: "store", icon: Store, title: "بيانات المتجر", desc: "اسم المتجر، الشعار، بيانات التواصل", component: StoreInfoSection },
+  const dialogSections = [
+    { key: "store", icon: Store, title: "بيانات المتجر", desc: "اسم المتجر، الشركة، واتساب، السجل التجاري، وروابط التواصل للفوتر", component: StoreInfoSection },
+    { key: "checkout", icon: CreditCard, title: "الدفع والعنوان الوطني", desc: "تفعيل أو إيقاف الدفع الإلكتروني والعنوان الوطني للعملاء", component: CheckoutFeaturesSection },
+    { key: "pos", icon: MonitorSmartphone, title: "كاشير سنام السحابي", desc: "تفعيل الكاشير، الضريبة، الأتمتة، وتقرير آخر اليوم", component: PosFeaturesSection },
+    { key: "preparer", icon: PackageCheck, title: "محضّر الطلبات", desc: "تفعيل مرحلة التجهيز قبل المندوب وإنشاء حسابات المحضّرين", component: PreparerFeaturesSection },
+    { key: "pos_integrations", icon: Link2, title: "توافق أنظمة الكاشير الخارجية", desc: "أودو، لوايرس، فودكس، قيود وغيرها — للمزامنة بدل الاستبدال", component: PosIntegrationsSection },
     { key: "users", icon: Users, title: "مستخدمو الموقع والصلاحيات", desc: "مدير، محاسب، مخزون، وشكاوى — بدون مدراء الفروع والمناديب", component: AdminUsersSection },
     { key: "activity", icon: ScrollText, title: "سجل العمليات", desc: "متابعة إجراءات المدراء والمستخدمين — يُحذف بعد 48 ساعة", component: AdminActivityLogSection },
     { key: "notifications", icon: Bell, title: "الإشعارات", desc: "إعدادات التنبيهات والإشعارات الفورية", component: NotificationsSection },
     { key: "security", icon: Shield, title: "الأمان", desc: "تأكيد البريد، محاولات الدخول، مدة الجلسة، والشراء بدون حساب", component: SecuritySection },
   ];
 
+  const linkCards = [
+    {
+      key: "home_layout",
+      icon: LayoutTemplate,
+      title: "الصفحة الرئيسية",
+      desc: "ترتيب أقسام الصفحة الرئيسية واللافتات والمقاطع التسويقية",
+      href: "/admin/home",
+    },
+    { key: "email_logs", icon: Mail, title: "سجل البريد الإلكتروني", desc: "متابعة رسائل الإرسال والحالة والأخطاء", href: "/admin/email-logs" },
+  ];
+
+  const cards = [
+    ...dialogSections.slice(0, 7),
+    ...linkCards,
+    ...dialogSections.slice(7),
+  ];
+
   return (
     <AdminLayout title="الإعدادات">
       <div className="grid gap-4 md:grid-cols-2">
-        {sections.map(s => (
+        {cards.map((s) => (
           <Card
             key={s.key}
             className="cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => setOpenSection(s.key)}
+            onClick={() => {
+              if ("href" in s && s.href) navigate(s.href);
+              else setOpenSection(s.key);
+            }}
           >
             <CardHeader className="flex flex-row items-center gap-3">
               <s.icon className="h-5 w-5 text-primary" />
@@ -197,10 +363,10 @@ const AdminSettingsPage = () => {
         ))}
       </div>
 
-      {sections.map(s => (
-        <Dialog key={s.key} open={openSection === s.key} onOpenChange={open => !open && setOpenSection(null)}>
+      {dialogSections.map((s) => (
+        <Dialog key={s.key} open={openSection === s.key} onOpenChange={(open) => !open && setOpenSection(null)}>
           <DialogContent
-            className={`${s.key === "activity" ? "max-w-4xl" : "max-w-2xl"} max-h-[90vh] overflow-y-auto`}
+            className={`${s.key === "activity" || s.key === "pos_integrations" || s.key === "store" ? "max-w-4xl" : "max-w-2xl"} max-h-[90vh] overflow-y-auto`}
             dir="rtl"
             onPointerDownOutside={(e) => {
               if (document.querySelector("[data-add-staff-dialog]")) e.preventDefault();
@@ -218,7 +384,9 @@ const AdminSettingsPage = () => {
                 {s.title}
               </DialogTitle>
             </DialogHeader>
-            <s.component />
+            <SettingsDialogCloseContext.Provider value={() => setOpenSection(null)}>
+              <s.component />
+            </SettingsDialogCloseContext.Provider>
           </DialogContent>
         </Dialog>
       ))}

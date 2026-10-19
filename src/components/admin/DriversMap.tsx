@@ -6,6 +6,13 @@ import { MapPin, Truck, Circle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { applyBranchFilter, fetchDriverIdsForBranches } from "@/lib/branch-scope";
+import {
+  createOsmMap,
+  loadLeaflet,
+  osmCircleMarker,
+  osmFitPoints,
+  resetLeafletContainer,
+} from "@/lib/osm-map";
 
 interface DriverLocation {
   id: string;
@@ -24,7 +31,8 @@ const DriversMap = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
-  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
+  const [mapError, setMapError] = useState(false);
   const { scopedBranchIds } = useAdminAuth();
 
   const { data: drivers, isLoading } = useQuery({
@@ -42,7 +50,7 @@ const DriversMap = () => {
       if (error) throw error;
       return (data || []) as DriverLocation[];
     },
-    refetchInterval: 15000,
+    refetchInterval: 60_000,
   });
 
   const { data: branches } = useQuery({
@@ -56,120 +64,118 @@ const DriversMap = () => {
     },
   });
 
-  // Load Google Maps script
   useEffect(() => {
-    const loadMap = async () => {
-      try {
-        const { data } = await supabase.functions.invoke("get-maps-key");
-        const key = data?.key;
-        if (!key) {
-          setMapLoaded(true);
-          return;
-        }
-        if (!(window as any).google) {
-          if (!document.getElementById("google-maps-script")) {
-            const script = document.createElement("script");
-            script.id = "google-maps-script";
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&language=ar`;
-            script.async = true;
-            script.onload = () => setMapLoaded(true);
-            document.head.appendChild(script);
-          } else {
-            setMapLoaded(true);
-          }
-        } else {
-          setMapLoaded(true);
-        }
-      } catch {
-        setMapLoaded(true);
+    let cancelled = false;
+    (async () => {
+      const ok = await loadLeaflet();
+      if (cancelled) return;
+      if (!ok) {
+        setMapError(true);
+        return;
       }
+      let host = mapRef.current;
+      for (let i = 0; i < 40 && !host; i++) {
+        await new Promise((r) => requestAnimationFrame(r));
+        host = mapRef.current;
+      }
+      if (cancelled || !host) {
+        setMapError(true);
+        return;
+      }
+      const center = { lat: KHAMIS_LAT, lng: KHAMIS_LNG };
+      if (mapInstanceRef.current) {
+        try {
+          mapInstanceRef.current.remove();
+        } catch {
+          /* ignore */
+        }
+        mapInstanceRef.current = null;
+      }
+      const map = createOsmMap(host, center, 13);
+      if (!map) {
+        setMapError(true);
+        return;
+      }
+      mapInstanceRef.current = map;
+      setMapReady(true);
+      setMapError(false);
+    })();
+    return () => {
+      cancelled = true;
+      if (mapInstanceRef.current) {
+        try {
+          mapInstanceRef.current.remove();
+        } catch {
+          /* ignore */
+        }
+        mapInstanceRef.current = null;
+      }
+      resetLeafletContainer(mapRef.current);
     };
-    loadMap();
   }, []);
-
-  // Initialize map
-  useEffect(() => {
-    if (!mapLoaded || !(window as any).google || !mapRef.current || mapInstanceRef.current) return;
-    mapInstanceRef.current = new (window as any).google.maps.Map(mapRef.current, {
-      center: { lat: KHAMIS_LAT, lng: KHAMIS_LNG },
-      zoom: 13,
-      disableDefaultUI: false,
-      zoomControl: true,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: true,
-      gestureHandling: "greedy",
-    });
-  }, [mapLoaded]);
 
   useEffect(() => {
     const map = mapInstanceRef.current;
     const branch = branches?.find((b) => b.lat && b.lng);
     if (!map || !branch) return;
-    map.panTo({ lat: Number(branch.lat), lng: Number(branch.lng) });
+    map.setView([Number(branch.lat), Number(branch.lng)], map.getZoom());
   }, [branches]);
 
-  // Update markers when data changes
   const updateMarkers = useCallback(() => {
-    const google = (window as any).google;
     const map = mapInstanceRef.current;
-    if (!google || !map) return;
+    if (!map || !window.L || !mapReady) return;
 
-    // Clear old markers
-    markersRef.current.forEach((m) => m.setMap(null));
+    markersRef.current.forEach((m) => {
+      try {
+        map.removeLayer(m);
+      } catch {
+        /* ignore */
+      }
+    });
     markersRef.current = [];
 
-    // Branch markers
+    const fitPts: { lat: number; lng: number }[] = [];
+
     branches?.forEach((branch) => {
       if (!branch.lat || !branch.lng) return;
-      const marker = new google.maps.Marker({
-        position: { lat: branch.lat, lng: branch.lng },
-        map,
+      const lat = Number(branch.lat);
+      const lng = Number(branch.lng);
+      fitPts.push({ lat, lng });
+      const m = osmCircleMarker(map, lat, lng, {
+        color: "#1a3c2a",
+        radius: 12,
         title: branch.name,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 12,
-          fillColor: "#1a3c2a",
-          fillOpacity: 1,
-          strokeColor: "#fff",
-          strokeWeight: 2,
-        },
-        label: { text: "🏪", fontSize: "14px" },
+        label: "🏪",
       });
-      const infoWindow = new google.maps.InfoWindow({
-        content: `<div style="font-family:sans-serif;direction:rtl;padding:4px"><b>${branch.name}</b></div>`,
-      });
-      marker.addListener("click", () => infoWindow.open(map, marker));
-      markersRef.current.push(marker);
+      if (m) {
+        m.bindPopup(`<div style="direction:rtl;font-family:sans-serif"><b>${branch.name}</b></div>`);
+        markersRef.current.push(m);
+      }
     });
 
-    // Driver markers
     drivers?.forEach((driver) => {
       const lat = driver.current_lat || KHAMIS_LAT + (Math.random() - 0.5) * 0.05;
       const lng = driver.current_lng || KHAMIS_LNG + (Math.random() - 0.5) * 0.05;
-      const marker = new google.maps.Marker({
-        position: { lat, lng },
-        map,
-        title: driver.full_name || driver.phone || "مندوب",
-        icon: {
-          path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z",
-          fillColor: driver.is_available ? "#22c55e" : "#ef4444",
-          fillOpacity: 1,
-          strokeColor: "#fff",
-          strokeWeight: 1.5,
-          scale: 1.8,
-          anchor: new google.maps.Point(12, 22),
-        },
-      });
+      fitPts.push({ lat, lng });
       const name = driver.full_name || driver.phone || "مندوب";
       const status = driver.is_available ? "متاح" : "مشغول";
-      const infoWindow = new google.maps.InfoWindow({
-        content: `<div style="font-family:sans-serif;direction:rtl;padding:4px"><b>${name}</b><br/><span style="color:${driver.is_available ? 'green' : 'red'}">${status}</span></div>`,
+      const m = osmCircleMarker(map, lat, lng, {
+        color: driver.is_available ? "#22c55e" : "#ef4444",
+        radius: 11,
+        title: name,
       });
-      marker.addListener("click", () => infoWindow.open(map, marker));
-      markersRef.current.push(marker);
+      if (m) {
+        m.bindPopup(
+          `<div style="direction:rtl;font-family:sans-serif"><b>${name}</b><br/><span style="color:${
+            driver.is_available ? "green" : "red"
+          }">${status}</span></div>`,
+        );
+        markersRef.current.push(m);
+      }
     });
-  }, [drivers, branches]);
+
+    if (fitPts.length) osmFitPoints(map, fitPts, 40);
+  }, [drivers, branches, mapReady]);
 
   useEffect(() => {
     updateMarkers();
@@ -199,15 +205,18 @@ const DriversMap = () => {
         </div>
       </CardHeader>
       <CardContent>
-        <div ref={mapRef} className="w-full h-[350px] rounded-xl overflow-hidden border bg-muted">
-          {!mapLoaded && (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+        <div
+          ref={mapRef}
+          className="w-full h-[350px] rounded-xl overflow-hidden border bg-muted relative"
+        >
+          {!mapReady && !mapError && (
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm z-[400] bg-muted">
               <MapPin className="h-5 w-5 animate-pulse ml-2" />
               جاري تحميل الخريطة...
             </div>
           )}
-          {mapLoaded && !(window as any).google && (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm text-center p-4">
+          {mapError && (
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm text-center p-4 z-[400] bg-muted">
               <div>
                 <MapPin className="h-8 w-8 mx-auto mb-2" />
                 <p>تعذر تحميل الخريطة</p>
@@ -216,7 +225,6 @@ const DriversMap = () => {
           )}
         </div>
 
-        {/* Drivers list */}
         {!isLoading && drivers && drivers.length > 0 && (
           <div className="mt-4 space-y-2">
             <p className="text-xs font-bold text-muted-foreground">قائمة المناديب</p>

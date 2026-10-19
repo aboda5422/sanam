@@ -87,7 +87,10 @@ serve(async (req) => {
     }).eq("id", payment.id);
 
     const orderUpdate: any = { payment_status: isFullRefund ? "refunded" : "paid" };
-    if (isFullRefund) orderUpdate.status = "cancelled";
+    if (isFullRefund) {
+      await supabase.rpc("restore_order_stock", { p_order_id: order_id });
+      orderUpdate.status = "cancelled";
+    }
     await supabase.from("orders").update(orderUpdate).eq("id", order_id);
 
     return new Response(JSON.stringify({

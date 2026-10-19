@@ -10,13 +10,13 @@ import { pickImage } from "@/lib/native-camera";
 interface ImageUploadProps {
   value: string;
   onChange: (url: string) => void;
-  folder: "products" | "categories";
+  folder: "products" | "categories" | "announcements";
   label?: string;
 }
 
 const ImageUpload = ({ value, onChange, folder, label = "الصورة" }: ImageUploadProps) => {
   const [uploading, setUploading] = useState(false);
-  const [mode, setMode] = useState<"upload" | "url">(value && !value.includes("/storage/v1/") ? "url" : "upload");
+  const [mode, setMode] = useState<"upload" | "url" | null>(value && !value.includes("/storage/v1/") ? "url" : null);
 
   const handlePick = async () => {
     let file: File | null = null;
@@ -60,26 +60,23 @@ const ImageUpload = ({ value, onChange, folder, label = "الصورة" }: ImageU
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label>{label}</Label>
-        <div className="flex gap-1">
-          <Button type="button" variant={mode === "upload" ? "default" : "ghost"} size="sm" className="h-6 text-xs px-2" onClick={() => setMode("upload")}>
-            <Upload className="h-3 w-3 ml-1" />رفع
-          </Button>
-          <Button type="button" variant={mode === "url" ? "default" : "ghost"} size="sm" className="h-6 text-xs px-2" onClick={() => setMode("url")}>
-            <LinkIcon className="h-3 w-3 ml-1" />رابط
-          </Button>
-        </div>
+      <Label>{label}</Label>
+      <div className="grid grid-cols-2 gap-1">
+        <Button type="button" variant={mode === "upload" ? "default" : "outline"} size="sm" className="h-8 text-xs" title="رفع صورة محفوظة على الكمبيوتر" onClick={() => setMode("upload")}>
+          <Upload className="h-3.5 w-3.5 ml-1" />رفع من الكمبيوتر
+        </Button>
+        <Button type="button" variant={mode === "url" ? "default" : "outline"} size="sm" className="h-8 text-xs" title="انسخ رابط الصورة والصقه في الحقل" onClick={() => setMode("url")}>
+          <LinkIcon className="h-3.5 w-3.5 ml-1" />لصق رابط
+        </Button>
       </div>
 
-      {mode === "upload" ? (
-        <div>
-          <Button type="button" variant="outline" className="w-full" onClick={handlePick} disabled={uploading}>
-            {uploading ? <><Loader2 className="h-4 w-4 animate-spin ml-2" />جاري الرفع...</> : <><Upload className="h-4 w-4 ml-2" />اختر صورة</>}
-          </Button>
-        </div>
-      ) : (
-        <Input value={value} onChange={(e) => onChange(e.target.value)} placeholder="https://..." />
+      {mode === "upload" && (
+        <Button type="button" variant="outline" className="w-full" onClick={handlePick} disabled={uploading}>
+          {uploading ? <><Loader2 className="h-4 w-4 animate-spin ml-2" />جاري الرفع...</> : <><Upload className="h-4 w-4 ml-2" />اختر الصورة من الكمبيوتر</>}
+        </Button>
+      )}
+      {mode === "url" && (
+        <Input value={value} onChange={(e) => onChange(e.target.value)} placeholder="الصق رابط الصورة هنا" />
       )}
 
       {value && (

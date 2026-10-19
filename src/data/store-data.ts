@@ -31,6 +31,12 @@ export interface CategorySection {
   titleEn: string;
   image?: string;
   sortOrder?: number;
+  /** When false, cash on delivery is blocked for cart items in this section. Default true. */
+  allowCashOnDelivery?: boolean;
+  /** When true, show/edit checkout notice and display it to the customer. */
+  checkoutNoticeEnabled?: boolean;
+  /** Shown to the customer at checkout before confirming / paying. */
+  checkoutNotice?: string;
 }
 
 // ===== الأقسام الرئيسية مطابقة لنينجا =====

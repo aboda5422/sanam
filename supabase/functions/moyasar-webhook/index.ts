@@ -83,6 +83,9 @@ serve(async (req) => {
       if (newStatus === "paid") {
         updates.status = "preparing"; // auto-confirm order
       }
+      if (newStatus === "failed") {
+        await supabase.rpc("restore_order_stock", { p_order_id: orderId });
+      }
       await supabase.from("orders").update(updates).eq("id", orderId);
 
       // Send payment receipt by email when status flips to paid

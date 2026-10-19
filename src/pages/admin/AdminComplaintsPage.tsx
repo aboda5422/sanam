@@ -8,10 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { MessageSquare, Clock, CheckCircle, Loader2 } from "lucide-react";
+import { MessageSquare, Clock, CheckCircle, Loader2, Undo2 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { applyBranchFilter } from "@/lib/branch-scope";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RETURN_STATUS_LABELS, type OrderReturnStatus } from "@/lib/order-returns";
 
 type Complaint = Database["public"]["Tables"]["complaints"]["Row"];
 type ComplaintStatus = Database["public"]["Enums"]["complaint_status"];
@@ -28,6 +31,10 @@ const AdminComplaintsPage = () => {
   const [selected, setSelected] = useState<Complaint | null>(null);
   const [reply, setReply] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [refundAmount, setRefundAmount] = useState("");
+  const [approvingReturn, setApprovingReturn] = useState(false);
+  const [orderTotal, setOrderTotal] = useState<number | null>(null);
+  const [linkedReturn, setLinkedReturn] = useState<any | null>(null);
 
   const { data: complaints, isLoading } = useQuery({
     queryKey: ["admin-complaints", scopedBranchIds],
@@ -39,6 +46,31 @@ const AdminComplaintsPage = () => {
       return data as Complaint[];
     },
   });
+
+  const openComplaint = async (c: Complaint) => {
+    setSelected(c);
+    setReply(c.admin_reply || "");
+    setLinkedReturn(null);
+    setOrderTotal(null);
+    setRefundAmount("");
+    if (c.order_id) {
+      const [{ data: order }, { data: ret }] = await Promise.all([
+        supabase.from("orders").select("id, total, order_number, payment_method").eq("id", c.order_id).maybeSingle(),
+        supabase
+          .from("order_returns" as any)
+          .select("*")
+          .eq("complaint_id", c.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+      if (order) {
+        setOrderTotal(Number(order.total));
+        setRefundAmount(String(order.total));
+      }
+      setLinkedReturn(ret);
+    }
+  };
 
   const replyMutation = useMutation({
     mutationFn: async ({ id, reply, status }: { id: string; reply: string; status: ComplaintStatus }) => {
@@ -56,6 +88,53 @@ const AdminComplaintsPage = () => {
     },
     onError: () => toast.error("حدث خطأ أثناء الرد"),
   });
+
+  const approveReturn = async () => {
+    if (!selected?.order_id) {
+      toast.error("اربط الشكوى بطلب أولاً للموافقة على إرجاع");
+      return;
+    }
+    const amt = Number(refundAmount);
+    if (!amt || amt <= 0 || (orderTotal != null && amt > orderTotal)) {
+      toast.error("مبلغ الاسترداد غير صالح");
+      return;
+    }
+    setApprovingReturn(true);
+    try {
+      const { data, error } = await supabase.rpc("approve_order_return" as any, {
+        p_complaint_id: selected.id,
+        p_order_id: selected.order_id,
+        p_refund_amount: amt,
+        p_admin_note: reply || null,
+      });
+      if (error) throw error;
+      toast.success("تمت الموافقة — مهمة استلام مرتجع متاحة للمندوبين");
+      setLinkedReturn(data);
+      queryClient.invalidateQueries({ queryKey: ["admin-complaints"] });
+    } catch (e: any) {
+      toast.error(e.message || "تعذر الموافقة على الإرجاع");
+    } finally {
+      setApprovingReturn(false);
+    }
+  };
+
+  const retryRefund = async () => {
+    if (!linkedReturn?.id) return;
+    setApprovingReturn(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("finalize-order-return", {
+        body: { return_id: linkedReturn.id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("تم تنفيذ الاسترداد");
+      openComplaint(selected!);
+    } catch (e: any) {
+      toast.error(e.message || "فشل الاسترداد");
+    } finally {
+      setApprovingReturn(false);
+    }
+  };
 
   const filtered = complaints?.filter((c) =>
     filterStatus === "all" ? true : c.status === filterStatus
@@ -85,13 +164,13 @@ const AdminComplaintsPage = () => {
           {filtered?.map((c) => {
             const st = statusMap[c.status];
             return (
-              <div key={c.id} className="bg-card rounded-xl border p-4 hover:shadow-sm transition-shadow cursor-pointer" onClick={() => { setSelected(c); setReply(c.admin_reply || ""); }}>
+              <div key={c.id} className="bg-card rounded-xl border p-4 hover:shadow-sm transition-shadow cursor-pointer" onClick={() => openComplaint(c)}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <MessageSquare className="h-4 w-4 text-muted-foreground shrink-0" />
                       <span className="text-xs text-muted-foreground">
-                        {c.type === "complaint" ? "شكوى" : "استفسار"} • {new Date(c.created_at).toLocaleDateString("ar-SA")}
+                        {c.type === "return" ? "طلب إرجاع" : c.type === "complaint" ? "شكوى" : "استفسار"} • {new Date(c.created_at).toLocaleDateString("ar-SA")}
                       </span>
                     </div>
                     <p className="text-sm line-clamp-2">{c.message}</p>
@@ -122,7 +201,9 @@ const AdminComplaintsPage = () => {
       <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
         <DialogContent className="max-w-lg" dir="rtl">
           <DialogHeader>
-            <DialogTitle>{selected?.type === "complaint" ? "شكوى" : "استفسار"}</DialogTitle>
+            <DialogTitle>
+              {selected?.type === "return" ? "طلب إرجاع" : selected?.type === "complaint" ? "شكوى" : "استفسار"}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="bg-muted/30 rounded-lg p-3">
@@ -140,6 +221,54 @@ const AdminComplaintsPage = () => {
                 {selected && new Date(selected.created_at).toLocaleString("ar-SA")}
               </p>
             </div>
+
+            {linkedReturn && (
+              <div className="rounded-lg border border-teal-200 bg-teal-50 p-3 text-sm space-y-1">
+                <p className="font-semibold text-teal-900 flex items-center gap-1">
+                  <Undo2 className="h-4 w-4" /> مسار الإرجاع
+                </p>
+                <p>
+                  الحالة:{" "}
+                  {RETURN_STATUS_LABELS[(linkedReturn.status as OrderReturnStatus)] || linkedReturn.status}
+                </p>
+                <p>مبلغ الاسترداد: {Number(linkedReturn.refund_amount).toFixed(2)} ر.س</p>
+                {linkedReturn.refund_error && (
+                  <p className="text-destructive text-xs">{linkedReturn.refund_error}</p>
+                )}
+                {linkedReturn.status === "refund_failed" && (
+                  <Button size="sm" variant="outline" onClick={retryRefund} disabled={approvingReturn}>
+                    إعادة محاولة الاسترداد
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {selected?.order_id && !linkedReturn && (
+              <div className="rounded-lg border p-3 space-y-2">
+                <Label>موافقة إرجاع → مهمة مندوب ثم استرداد</Label>
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <Label className="text-xs text-muted-foreground">مبلغ الاسترداد (ر.س)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min={0.01}
+                      max={orderTotal ?? undefined}
+                      value={refundAmount}
+                      onChange={(e) => setRefundAmount(e.target.value)}
+                    />
+                  </div>
+                  <Button onClick={approveReturn} disabled={approvingReturn} variant="secondary">
+                    {approvingReturn ? <Loader2 className="h-4 w-4 animate-spin" /> : <Undo2 className="h-4 w-4 ml-1" />}
+                    موافقة إرجاع
+                  </Button>
+                </div>
+                {orderTotal != null && (
+                  <p className="text-xs text-muted-foreground">إجمالي الطلب: {orderTotal.toFixed(2)} ر.س</p>
+                )}
+              </div>
+            )}
+
             <Textarea
               value={reply}
               onChange={(e) => setReply(e.target.value)}

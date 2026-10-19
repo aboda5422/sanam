@@ -6,9 +6,11 @@ import { Link } from "react-router-dom";
 
 interface ProductCardProps {
   product: Product;
+  /** First-screen cards can opt into eager load; default is lazy. */
+  priority?: boolean;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = ({ product, priority = false }: ProductCardProps) => {
   const { items, addItem, updateQuantity } = useCart();
   const cartItem = items.find((i) => i.product.id === product.id);
   const legacyProduct = toLegacyProduct(product);
@@ -17,14 +19,21 @@ const ProductCard = ({ product }: ProductCardProps) => {
     : 0;
 
   return (
-    <div className="bg-card rounded-xl overflow-hidden group relative">
+    <div
+      className="bg-card rounded-xl overflow-hidden group relative"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "0 280px" }}
+    >
       <Link to={`/product/${product.id}`} className="block">
         <div className="relative aspect-square overflow-hidden bg-white p-3">
           <img
             src={product.image || "/placeholder.png"}
             alt={product.name}
+            width={200}
+            height={200}
             className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
+            loading={priority ? "eager" : "lazy"}
+            decoding="async"
+            fetchPriority={priority ? "high" : "low"}
             onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/placeholder.png"; }}
           />
           {discount > 0 && (

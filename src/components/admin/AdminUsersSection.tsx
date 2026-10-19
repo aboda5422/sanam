@@ -12,6 +12,7 @@ import { Loader2, Plus, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { STAFF_ROLE_META, type StaffRole } from "@/lib/staff-access";
+import { useCloseSettingsDialog } from "@/contexts/SettingsDialogCloseContext";
 
 type StaffUser = {
   user_id: string;
@@ -25,6 +26,7 @@ type StaffUser = {
 
 const AdminUsersSection = () => {
   const queryClient = useQueryClient();
+  const closeDialog = useCloseSettingsDialog();
   const { isSuperAdmin, branchIds, branches: authBranches } = useAdminAuth();
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
@@ -146,6 +148,7 @@ const AdminUsersSection = () => {
       setAddOpen(false);
       queryClient.invalidateQueries({ queryKey: ["site-staff-users"] });
       queryClient.invalidateQueries({ queryKey: ["admin-branch-access"] });
+      closeDialog?.();
     },
     onError: (e: any) => toast.error(e.message || "تعذر الإضافة"),
   });

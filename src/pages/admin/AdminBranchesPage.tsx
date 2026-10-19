@@ -16,9 +16,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Loader2, MapPin, Plus, Pencil, ExternalLink, Store, Link2, UserPlus, Clock } from "lucide-react";
+import { Loader2, MapPin, Plus, Pencil, ExternalLink, Store, Link2, UserPlus, Clock, Phone } from "lucide-react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import { mapsLinkFromCoords, parseMapsCoords } from "@/lib/maps-link";
+import { isShortMapsLink, mapsLinkFromCoords, resolveMapsCoords } from "@/lib/maps-link";
 
 type BranchRow = {
   id: string;
@@ -43,6 +43,94 @@ type StoreAdmin = {
 const toTimeInput = (value?: string | null, fallback = "08:00") => {
   if (!value) return fallback;
   return value.slice(0, 5);
+};
+
+const BranchPhoneEditor = ({
+  branch,
+  canEdit,
+  saving,
+  onSave,
+}: {
+  branch: BranchRow;
+  canEdit: boolean;
+  saving: boolean;
+  onSave: (phone: string | null) => void;
+}) => {
+  const [phone, setPhone] = useState(() => branch.phone || "");
+  const dirty = (phone.trim() || "") !== (branch.phone || "").trim();
+
+  return (
+    <div className="flex items-center gap-2 flex-wrap">
+      <Phone className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+      {canEdit ? (
+        <>
+          <Input
+            dir="ltr"
+            className="h-8 max-w-[180px] text-sm"
+            value={phone}
+            placeholder="رقم الفرع"
+            inputMode="tel"
+            onChange={(e) => setPhone(e.target.value)}
+          />
+          <Button
+            type="button"
+            size="sm"
+            className="h-8"
+            disabled={!dirty || saving}
+            onClick={() => onSave(phone.trim() || null)}
+          >
+            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "حفظ الرقم"}
+          </Button>
+        </>
+      ) : (
+        <span className="text-sm" dir="ltr">
+          {branch.phone || "—"}
+        </span>
+      )}
+    </div>
+  );
+};
+
+const BranchCityEditor = ({
+  branch,
+  canEdit,
+  saving,
+  onSave,
+}: {
+  branch: BranchRow;
+  canEdit: boolean;
+  saving: boolean;
+  onSave: (city: string | null) => void;
+}) => {
+  const [city, setCity] = useState(() => branch.city || "");
+  const dirty = (city.trim() || "") !== (branch.city || "").trim();
+
+  return (
+    <div className="flex items-center gap-2 flex-wrap">
+      <MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+      {canEdit ? (
+        <>
+          <Input
+            className="h-8 max-w-[180px] text-sm"
+            value={city}
+            placeholder="المدينة"
+            onChange={(e) => setCity(e.target.value)}
+          />
+          <Button
+            type="button"
+            size="sm"
+            className="h-8"
+            disabled={!dirty || saving}
+            onClick={() => onSave(city.trim() || null)}
+          >
+            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "حفظ المدينة"}
+          </Button>
+        </>
+      ) : (
+        <span className="text-sm font-medium text-foreground">{branch.city || "—"}</span>
+      )}
+    </div>
+  );
 };
 
 const BranchHoursEditor = ({
@@ -120,6 +208,8 @@ const AdminBranchesContent = () => {
   const [newManagerPassword, setNewManagerPassword] = useState("");
   const [locationBranch, setLocationBranch] = useState<BranchRow | null>(null);
   const [locationLink, setLocationLink] = useState("");
+  const [locationCity, setLocationCity] = useState("");
+  const [resolvingMaps, setResolvingMaps] = useState(false);
   const [editManagerId, setEditManagerId] = useState<string | null>(null);
   const [editManagerName, setEditManagerName] = useState("");
   const [editManagerUsername, setEditManagerUsername] = useState("");
@@ -200,11 +290,20 @@ const AdminBranchesContent = () => {
   });
 
   const saveLocationMutation = useMutation({
-    mutationFn: async ({ id, lat, lng }: { id: string; lat: number; lng: number }) => {
-      const { error } = await supabase
-        .from("branches")
-        .update({ lat, lng })
-        .eq("id", id);
+    mutationFn: async ({
+      id,
+      lat,
+      lng,
+      city,
+    }: {
+      id: string;
+      lat: number;
+      lng: number;
+      city?: string | null;
+    }) => {
+      const patch: { lat: number; lng: number; city?: string | null } = { lat, lng };
+      if (city !== undefined) patch.city = city;
+      const { error } = await supabase.from("branches").update(patch).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -234,6 +333,30 @@ const AdminBranchesContent = () => {
       toast.success("تم حفظ أوقات الدوام");
     },
     onError: (e: any) => toast.error(e?.message || "تعذر حفظ الدوام"),
+  });
+
+  const savePhoneMutation = useMutation({
+    mutationFn: async ({ id, phone }: { id: string; phone: string | null }) => {
+      const { error } = await supabase.from("branches").update({ phone }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-branches"] });
+      toast.success("تم حفظ رقم الفرع");
+    },
+    onError: (e: any) => toast.error(e?.message || "تعذر حفظ الرقم"),
+  });
+
+  const saveCityMutation = useMutation({
+    mutationFn: async ({ id, city }: { id: string; city: string | null }) => {
+      const { error } = await supabase.from("branches").update({ city }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-branches"] });
+      toast.success("تم حفظ المدينة");
+    },
+    onError: (e: any) => toast.error(e?.message || "تعذر حفظ المدينة"),
   });
 
   const saveManagersMutation = useMutation({
@@ -370,6 +493,7 @@ const AdminBranchesContent = () => {
 
   const openLocation = (branch: BranchRow) => {
     setLocationBranch(branch);
+    setLocationCity(branch.city || "");
     if (
       branch.lat != null &&
       branch.lng != null &&
@@ -430,14 +554,26 @@ const AdminBranchesContent = () => {
                 </div>
 
                 <div className="text-sm text-muted-foreground space-y-1">
-                  {b.city && <p className="font-medium text-foreground">{b.city}</p>}
+                  <BranchCityEditor
+                    key={`${b.id}-city-${b.city || ""}`}
+                    branch={b}
+                    canEdit={isSuperAdmin || (scopedBranchIds || []).includes(b.id)}
+                    saving={saveCityMutation.isPending && saveCityMutation.variables?.id === b.id}
+                    onSave={(city) => saveCityMutation.mutate({ id: b.id, city })}
+                  />
                   {b.address && (
                     <p className="flex items-center gap-1">
                       <MapPin className="h-3 w-3 shrink-0" />
                       {b.address}
                     </p>
                   )}
-                  {b.phone && <p>📞 {b.phone}</p>}
+                  <BranchPhoneEditor
+                    key={`${b.id}-${b.phone || ""}`}
+                    branch={b}
+                    canEdit={isSuperAdmin || (scopedBranchIds || []).includes(b.id)}
+                    saving={savePhoneMutation.isPending && savePhoneMutation.variables?.id === b.id}
+                    onSave={(phone) => savePhoneMutation.mutate({ id: b.id, phone })}
+                  />
                 </div>
 
                 {/* Branch location — foundation for zones & rate tiers */}
@@ -555,8 +691,18 @@ const AdminBranchesContent = () => {
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            الصق رابط موقع الفرع من خرائط جوجل (أو إحداثيات lat,lng). يُستخدم كمركز للنطاق الجغرافي وشرائح التوصيل.
+            الصق رابط موقع الفرع من خرائط جوجل (يشمل الروابط المختصرة maps.app.goo.gl) أو إحداثيات lat,lng.
+            يُستخدم كمركز للنطاق الجغرافي وشرائح التوصيل.
           </p>
+          <div className="space-y-2">
+            <Label htmlFor="branch-city">المدينة</Label>
+            <Input
+              id="branch-city"
+              value={locationCity}
+              onChange={(e) => setLocationCity(e.target.value)}
+              placeholder="مثال: الرياض، الدمام، جدة"
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="branch-maps-link">رابط الموقع</Label>
             <Input
@@ -565,7 +711,7 @@ const AdminBranchesContent = () => {
               type="url"
               value={locationLink}
               onChange={(e) => setLocationLink(e.target.value)}
-              placeholder="https://www.google.com/maps?q=21.452,39.857"
+              placeholder="https://maps.app.goo.gl/... أو https://www.google.com/maps?q=21.452,39.857"
               className="font-mono text-sm"
             />
           </div>
@@ -577,23 +723,45 @@ const AdminBranchesContent = () => {
               disabled={
                 !locationBranch ||
                 saveLocationMutation.isPending ||
+                resolvingMaps ||
                 !locationLink.trim()
               }
-              onClick={() => {
+              onClick={async () => {
                 if (!locationBranch) return;
-                const coords = parseMapsCoords(locationLink);
-                if (!coords) {
-                  toast.error("تعذر قراءة الموقع من الرابط — استخدم رابط خرائط جوجل أو lat,lng");
-                  return;
+                setResolvingMaps(true);
+                try {
+                  const coords = await resolveMapsCoords(locationLink, async (url) => {
+                    const { data, error } = await supabase.functions.invoke("resolve-maps-link", {
+                      body: { url },
+                    });
+                    if (error) throw error;
+                    if (data?.lat != null && data?.lng != null) {
+                      return mapsLinkFromCoords(Number(data.lat), Number(data.lng));
+                    }
+                    return data?.expanded || null;
+                  });
+                  if (!coords) {
+                    toast.error(
+                      isShortMapsLink(locationLink)
+                        ? "تعذر فتح الرابط المختصر — تأكد من نشر دالة resolve-maps-link أو الصق الرابط الكامل"
+                        : "تعذر قراءة الموقع من الرابط — استخدم رابط خرائط جوجل أو lat,lng",
+                    );
+                    return;
+                  }
+                  saveLocationMutation.mutate({
+                    id: locationBranch.id,
+                    lat: coords.lat,
+                    lng: coords.lng,
+                    city: locationCity.trim() || null,
+                  });
+                } catch (e: any) {
+                  toast.error(e?.message || "تعذر قراءة رابط الخرائط");
+                } finally {
+                  setResolvingMaps(false);
                 }
-                saveLocationMutation.mutate({
-                  id: locationBranch.id,
-                  lat: coords.lat,
-                  lng: coords.lng,
-                });
               }}
             >
-              {saveLocationMutation.isPending ? (
+              {saveLocationMutation.isPending || resolvingMaps ? (
                 <Loader2 className="h-4 w-4 animate-spin ml-2" />
               ) : null}
               حفظ الموقع

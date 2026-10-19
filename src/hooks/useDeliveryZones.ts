@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { isPointInAnyPolygon, normalizePolygon, type LatLng } from "@/lib/geo";
@@ -53,7 +54,11 @@ export function useDeliveryZones(branchId?: string | null) {
 
 export function useActiveDeliveryZones(branchId?: string | null) {
   const query = useDeliveryZones(branchId);
-  const active = (query.data || []).filter((z) => z.is_active && z.polygon.length >= 3);
+  // Stable reference — callers often put `active` in useEffect deps
+  const active = useMemo(
+    () => (query.data || []).filter((z) => z.is_active && z.polygon.length >= 3),
+    [query.data],
+  );
   return { ...query, active };
 }
 

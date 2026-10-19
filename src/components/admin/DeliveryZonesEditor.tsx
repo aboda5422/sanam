@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { loadGoogleMaps, triggerMapResize, waitForElementSize } from "@/lib/google-maps";
+import { attachBaseLayers, loadLeaflet } from "@/lib/osm-map";
 import { useDeliveryZones, type DeliveryZone } from "@/hooks/useDeliveryZones";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,37 +11,30 @@ import { Loader2, MapPin, Pencil, Plus, Trash2, Save, X, Eye, Check } from "luci
 import { toast } from "sonner";
 import type { LatLng } from "@/lib/geo";
 
-const DEFAULT_CENTER = { lat: 21.4225, lng: 39.8262 }; // Makkah
-const BRANCH_ZOOM = 16;
+const DEFAULT_CENTER = { lat: 21.4225, lng: 39.8262 };
+const BRANCH_ZOOM = 14;
 
 type DeliveryZonesEditorProps = {
-  /** When set, only that branch's zones are shown and new zones are linked to it. */
   branchId?: string | null;
   branchName?: string;
   branchCenter?: { lat: number; lng: number } | null;
   mapHeightClass?: string;
 };
 
-const pathToPolygon = (path: any): LatLng[] => {
-  const result: LatLng[] = [];
-  path.forEach((p: any) => {
-    result.push({ lat: p.lat(), lng: p.lng() });
-  });
-  return result;
-};
-
-const fitPolygonOnMap = (map: any, polygon: LatLng[]) => {
-  if (!map || !window.google?.maps || polygon.length < 1) return;
-  const bounds = new window.google.maps.LatLngBounds();
-  polygon.forEach((p) => bounds.extend(p));
-  try {
-    map.fitBounds(bounds, 56);
-  } catch {
-    map.setCenter(polygon[0]);
-    map.setZoom(12);
+const fitLatLngs = (map: any, L: any, points: LatLng[]) => {
+  if (!map || !L || points.length < 1) return;
+  if (points.length === 1) {
+    map.setView([points[0].lat, points[0].lng], 13);
+    return;
   }
+  const bounds = L.latLngBounds(points.map((p) => [p.lat, p.lng]));
+  map.fitBounds(bounds, { padding: [48, 48] });
 };
 
+/**
+ * محرر مضلعات نطاق التوصيل — OpenStreetMap / Leaflet
+ * (بديل عن Google Maps التي تفشل بدون Billing)
+ */
 const DeliveryZonesEditor = ({
   branchId = null,
   branchName,
@@ -54,15 +47,13 @@ const DeliveryZonesEditor = ({
     branchCenter && Number.isFinite(branchCenter.lat) && Number.isFinite(branchCenter.lng)
       ? branchCenter
       : DEFAULT_CENTER;
+
   const mapHostRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<any>(null);
   const branchMarkerRef = useRef<any>(null);
   const polygonsRef = useRef<Map<string, any>>(new Map());
-  const draftPolygonRef = useRef<any>(null);
-  const draftMarkersRef = useRef<any[]>([]);
-  const clickListenerRef = useRef<any[]>([]);
-  const clickDomCleanupRef = useRef<(() => void) | null>(null);
-  const pathListenersRef = useRef<any[]>([]);
+  const draftLayerRef = useRef<any>(null);
+  const clickHandlerRef = useRef<((e: any) => void) | null>(null);
   const drawingRef = useRef(false);
   const lastAddAtRef = useRef(0);
   const draftPointsRef = useRef<LatLng[]>([]);
@@ -85,37 +76,22 @@ const DeliveryZonesEditor = ({
     queryClient.invalidateQueries({ queryKey: ["admin-branches-delivery"] });
   };
 
-  const clearPathListeners = () => {
-    pathListenersRef.current.forEach((listener) => {
+  const clearDraftOverlays = () => {
+    if (draftLayerRef.current && mapInstance.current) {
       try {
-        window.google?.maps?.event?.removeListener(listener);
+        mapInstance.current.removeLayer(draftLayerRef.current);
       } catch {
         /* ignore */
       }
-    });
-    pathListenersRef.current = [];
-  };
-
-  const clearDraftOverlays = () => {
-    if (draftPolygonRef.current) {
-      draftPolygonRef.current.setMap(null);
-      draftPolygonRef.current = null;
+      draftLayerRef.current = null;
     }
-    draftMarkersRef.current.forEach((m) => m.setMap(null));
-    draftMarkersRef.current = [];
   };
 
   const removeClickListener = () => {
-    clickListenerRef.current.forEach((listener) => {
-      try {
-        window.google?.maps?.event?.removeListener(listener);
-      } catch {
-        /* ignore */
-      }
-    });
-    clickListenerRef.current = [];
-    clickDomCleanupRef.current?.();
-    clickDomCleanupRef.current = null;
+    if (clickHandlerRef.current && mapInstance.current) {
+      mapInstance.current.off("click", clickHandlerRef.current);
+      clickHandlerRef.current = null;
+    }
   };
 
   const saveZone = useMutation({
@@ -180,7 +156,6 @@ const DeliveryZonesEditor = ({
       invalidate();
       if (selectedId === id) setSelectedId(null);
       if (editingId === id) {
-        clearPathListeners();
         setEditingId(null);
         setEditPath(null);
       }
@@ -191,48 +166,41 @@ const DeliveryZonesEditor = ({
 
   const renderDraftPreview = useCallback((points: LatLng[]) => {
     const map = mapInstance.current;
-    if (!map || !window.google?.maps) return;
+    const L = window.L;
+    if (!map || !L) return;
 
     clearDraftOverlays();
+    const group = L.layerGroup();
 
-    draftMarkersRef.current = points.map(
-      (p, i) =>
-        new window.google.maps.Marker({
-          position: p,
-          map,
-          label: {
-            text: String(i + 1),
-            color: "#fff",
-            fontSize: "11px",
-            fontWeight: "700",
-          },
-          icon: {
-            path: window.google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            fillColor: "#15803d",
-            fillOpacity: 1,
-            strokeColor: "#fff",
-            strokeWeight: 2,
-          },
-        })
-    );
+    points.forEach((p, i) => {
+      L.circleMarker([p.lat, p.lng], {
+        radius: 8,
+        color: "#fff",
+        weight: 2,
+        fillColor: "#15803d",
+        fillOpacity: 1,
+      })
+        .bindTooltip(String(i + 1), { permanent: true, direction: "center", className: "leaflet-zone-num" })
+        .addTo(group);
+    });
 
     if (points.length >= 2) {
-      draftPolygonRef.current = new window.google.maps.Polygon({
-        paths: points,
-        map,
-        fillColor: "#16a34a",
-        fillOpacity: points.length >= 3 ? 0.25 : 0.08,
-        strokeWeight: 2,
-        strokeColor: "#15803d",
-        clickable: false,
-        zIndex: 20,
-      });
+      L.polygon(
+        points.map((p) => [p.lat, p.lng]),
+        {
+          color: "#15803d",
+          weight: 2,
+          fillColor: "#16a34a",
+          fillOpacity: points.length >= 3 ? 0.25 : 0.08,
+        },
+      ).addTo(group);
     }
+
+    group.addTo(map);
+    draftLayerRef.current = group;
   }, []);
 
-  // Init map after the dialog finishes laying out. Use a nested host so Google Maps
-  // never reuses a previous Map's DOM node (common when switching branches).
+  // Init Leaflet map
   useEffect(() => {
     let cancelled = false;
     let resizeObserver: ResizeObserver | null = null;
@@ -244,31 +212,24 @@ const DeliveryZonesEditor = ({
       setMapReady(false);
 
       try {
-        const ok = await loadGoogleMaps();
+        const ok = await loadLeaflet();
         if (cancelled) return;
-
-        if (!ok || !window.google?.maps) {
+        if (!ok || !window.L) {
           setMapError("تعذر تحميل الخريطة. تحقق من الاتصال ثم أعد فتح الإعدادات.");
           setMapLoading(false);
           return;
         }
 
-        // Dialog zoom/grid can leave the container at 0×0 for a few frames.
         let host = mapHostRef.current;
         for (let i = 0; i < 40 && !host; i++) {
           await new Promise((r) => requestAnimationFrame(r));
           host = mapHostRef.current;
         }
-        if (cancelled) return;
-        if (!host) {
+        if (cancelled || !host) {
           setMapError("تعذر تهيئة الخريطة. أعد فتح النافذة.");
           setMapLoading(false);
           return;
         }
-
-        await waitForElementSize(host, 6000);
-        if (cancelled || !mapHostRef.current) return;
-        host = mapHostRef.current;
 
         host.replaceChildren();
         const inner = document.createElement("div");
@@ -277,53 +238,29 @@ const DeliveryZonesEditor = ({
         inner.style.minHeight = "420px";
         host.appendChild(inner);
 
-        const map = new window.google.maps.Map(inner, {
-          center: mapCenter,
-          zoom: BRANCH_ZOOM,
-          mapTypeControl: false,
-          streetViewControl: false,
-          fullscreenControl: false,
-          gestureHandling: "greedy",
-          clickableIcons: false,
-          keyboardShortcuts: false,
-        });
+        const L = window.L;
+        const map = L.map(inner, {
+          zoomControl: true,
+          attributionControl: true,
+        }).setView([mapCenter.lat, mapCenter.lng], BRANCH_ZOOM);
+
+        attachBaseLayers(map);
+
         mapInstance.current = map;
-
-        if (branchMarkerRef.current) {
-          branchMarkerRef.current.setMap(null);
-        }
-        branchMarkerRef.current = new window.google.maps.Marker({
-          position: mapCenter,
-          map,
+        branchMarkerRef.current = L.marker([mapCenter.lat, mapCenter.lng], {
           title: branchName || "موقع الفرع",
-          clickable: false,
-          label: {
-            text: "فرع",
-            color: "#fff",
-            fontSize: "11px",
-            fontWeight: "700",
-          },
-          zIndex: 50,
-        });
+        })
+          .bindPopup(branchName || "الفرع")
+          .addTo(map);
 
-        const focusBranch = () => {
-          triggerMapResize(map);
-          try {
-            map.setCenter(mapCenter);
-            map.setZoom(BRANCH_ZOOM);
-          } catch {
-            /* ignore */
-          }
-        };
         requestAnimationFrame(() => {
-          focusBranch();
-          setTimeout(focusBranch, 150);
-          setTimeout(focusBranch, 450);
+          map.invalidateSize();
+          setTimeout(() => map.invalidateSize(), 200);
+          setTimeout(() => map.invalidateSize(), 500);
         });
-        window.google.maps.event.addListenerOnce(map, "idle", focusBranch);
 
         resizeObserver = new ResizeObserver(() => {
-          triggerMapResize(map);
+          map.invalidateSize();
         });
         resizeObserver.observe(host);
 
@@ -331,7 +268,7 @@ const DeliveryZonesEditor = ({
           setMapReady(true);
           setMapLoading(false);
         }
-      } catch (e: any) {
+      } catch (e) {
         console.error("[DeliveryZonesEditor] map init failed:", e);
         if (!cancelled) {
           setMapError("تعذر تهيئة الخريطة. أعد فتح النافذة.");
@@ -345,113 +282,129 @@ const DeliveryZonesEditor = ({
       cancelled = true;
       resizeObserver?.disconnect();
       removeClickListener();
-      clearPathListeners();
       clearDraftOverlays();
-      if (mapInstance.current && window.google?.maps?.event) {
+      if (mapInstance.current) {
         try {
-          window.google.maps.event.clearInstanceListeners(mapInstance.current);
+          mapInstance.current.remove();
         } catch {
           /* ignore */
         }
+        mapInstance.current = null;
       }
-      mapInstance.current = null;
-      if (branchMarkerRef.current) {
-        try {
-          branchMarkerRef.current.setMap(null);
-        } catch {
-          /* ignore */
-        }
-        branchMarkerRef.current = null;
-      }
+      branchMarkerRef.current = null;
+      polygonsRef.current.clear();
       outer?.replaceChildren();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [branchId, mapCenter.lat, mapCenter.lng]);
 
-  // Keep map centered on the branch so the admin can draw around it
   useEffect(() => {
     if (!mapReady || !mapInstance.current) return;
-    mapInstance.current.setCenter(mapCenter);
-    mapInstance.current.setZoom(BRANCH_ZOOM);
+    mapInstance.current.setView([mapCenter.lat, mapCenter.lng], BRANCH_ZOOM);
     if (branchMarkerRef.current) {
-      branchMarkerRef.current.setPosition(mapCenter);
+      branchMarkerRef.current.setLatLng([mapCenter.lat, mapCenter.lng]);
     }
   }, [mapReady, mapCenter.lat, mapCenter.lng]);
 
   // Render saved polygons
   useEffect(() => {
-    if (!mapReady || !mapInstance.current || !window.google?.maps) return;
-
+    if (!mapReady || !mapInstance.current || !window.L) return;
     const map = mapInstance.current;
+    const L = window.L;
     const existing = polygonsRef.current;
 
-    for (const [id, poly] of existing.entries()) {
+    for (const [id, layer] of existing.entries()) {
       if (!zones.find((z) => z.id === id)) {
-        poly.setMap(null);
+        map.removeLayer(layer);
         existing.delete(id);
       }
     }
 
     zones.forEach((zone) => {
-      let poly = existing.get(zone.id);
       const path =
         editingId === zone.id && editPath
-          ? editPath.map((p) => ({ lat: p.lat, lng: p.lng }))
-          : zone.polygon.map((p) => ({ lat: p.lat, lng: p.lng }));
+          ? editPath
+          : zone.polygon;
       const isSelected = selectedId === zone.id || editingId === zone.id;
       const isEditing = editingId === zone.id;
-      const opts = {
-        paths: path,
+      const latlngs = path.map((p) => [p.lat, p.lng] as [number, number]);
+      const style = {
+        color: isEditing ? "#2563eb" : zone.is_active ? zone.color : "#9ca3af",
+        weight: isSelected ? 3 : 2,
         fillColor: zone.is_active ? zone.color : "#9ca3af",
         fillOpacity: zone.is_active ? (isSelected ? 0.35 : 0.22) : 0.1,
-        strokeWeight: isSelected ? 3 : 2,
-        strokeColor: isEditing ? "#2563eb" : zone.is_active ? zone.color : "#9ca3af",
-        clickable: !isEditing && !drawing,
-        editable: isEditing,
-        zIndex: isSelected ? 10 : 1,
       };
 
-      if (poly) {
-        poly.setOptions(opts);
-        if (!isEditing) {
-          poly.setPaths(path);
-        }
+      let layer = existing.get(zone.id);
+      if (layer) {
+        layer.setLatLngs(latlngs);
+        layer.setStyle(style);
       } else {
-        poly = new window.google.maps.Polygon(opts);
-        poly.setMap(map);
-        existing.set(zone.id, poly);
-        window.google.maps.event.addListener(poly, "click", () => {
-          focusZone(zone);
+        layer = L.polygon(latlngs, style);
+        layer.on("click", () => {
+          if (!drawingRef.current && editingId !== zone.id) focusZone(zone);
         });
+        layer.addTo(map);
+        existing.set(zone.id, layer);
+      }
+
+      // Vertex markers while editing — click vertex to remove (min 3)
+      if (isEditing) {
+        if ((layer as any)._editMarkers) {
+          (layer as any)._editMarkers.forEach((m: any) => map.removeLayer(m));
+        }
+        const markers = path.map((p, idx) => {
+          const m = L.circleMarker([p.lat, p.lng], {
+            radius: 7,
+            color: "#fff",
+            weight: 2,
+            fillColor: "#2563eb",
+            fillOpacity: 1,
+            draggable: false,
+          });
+          m.on("mousedown", (ev: any) => {
+            L.DomEvent.stopPropagation(ev);
+            const start = ev.latlng;
+            const onMove = (e: any) => {
+              const next = [...(editPath || path)];
+              next[idx] = { lat: e.latlng.lat, lng: e.latlng.lng };
+              setEditPath(next);
+            };
+            const onUp = () => {
+              map.off("mousemove", onMove);
+              map.off("mouseup", onUp);
+            };
+            map.on("mousemove", onMove);
+            map.on("mouseup", onUp);
+            void start;
+          });
+          m.on("click", (ev: any) => {
+            L.DomEvent.stopPropagation(ev);
+            const cur = editPath || path;
+            if (cur.length <= 3) {
+              toast.error("يجب الإبقاء على 3 نقاط على الأقل");
+              return;
+            }
+            setEditPath(cur.filter((_, i) => i !== idx));
+          });
+          m.addTo(map);
+          return m;
+        });
+        (layer as any)._editMarkers = markers;
+      } else if ((layer as any)._editMarkers) {
+        (layer as any)._editMarkers.forEach((m: any) => map.removeLayer(m));
+        (layer as any)._editMarkers = null;
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zones, mapReady, selectedId, drawing, editingId, editPath]);
 
-  // Fit all zones once when map becomes ready
   useEffect(() => {
     if (!mapReady || !mapInstance.current || drawing || editingId || selectedId) return;
     if (zones.length === 0) return;
     const all = zones.flatMap((z) => z.polygon);
-    if (all.length > 0) fitPolygonOnMap(mapInstance.current, all);
-  }, [mapReady, zones.length]);
-
-  // Path listeners while editing saved polygon
-  useEffect(() => {
-    clearPathListeners();
-    if (!editingId || !window.google?.maps) return;
-    const poly = polygonsRef.current.get(editingId);
-    if (!poly) return;
-
-    poly.setEditable(true);
-    const path = poly.getPath();
-    const sync = () => setEditPath(pathToPolygon(path));
-    pathListenersRef.current.push(
-      window.google.maps.event.addListener(path, "set_at", sync),
-      window.google.maps.event.addListener(path, "insert_at", sync),
-      window.google.maps.event.addListener(path, "remove_at", sync)
-    );
-
-    return () => clearPathListeners();
-  }, [editingId, mapReady]);
+    if (all.length > 0) fitLatLngs(mapInstance.current, window.L, all);
+  }, [mapReady, zones.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const focusZone = useCallback((zone: DeliveryZone) => {
     if (!mapInstance.current) {
@@ -460,23 +413,20 @@ const DeliveryZonesEditor = ({
     }
     setSelectedId(zone.id);
     setEditingName(zone.name);
-    triggerMapResize(mapInstance.current);
-    fitPolygonOnMap(mapInstance.current, zone.polygon);
-    // Scroll map into view inside the dialog
+    mapInstance.current.invalidateSize();
+    fitLatLngs(mapInstance.current, window.L, zone.polygon);
     mapHostRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, []);
 
   const cancelEditing = () => {
-    clearPathListeners();
     const id = editingId;
     setEditingId(null);
     setEditPath(null);
     if (id) {
       const zone = zones.find((z) => z.id === id);
-      const poly = polygonsRef.current.get(id);
-      if (zone && poly) {
-        poly.setEditable(false);
-        poly.setPaths(zone.polygon.map((p) => ({ lat: p.lat, lng: p.lng })));
+      const layer = polygonsRef.current.get(id);
+      if (zone && layer) {
+        layer.setLatLngs(zone.polygon.map((p) => [p.lat, p.lng]));
       }
     }
   };
@@ -488,11 +438,11 @@ const DeliveryZonesEditor = ({
     setEditingName(zone.name);
     setEditPath(zone.polygon);
     if (mapInstance.current) {
-      triggerMapResize(mapInstance.current);
-      fitPolygonOnMap(mapInstance.current, zone.polygon);
+      mapInstance.current.invalidateSize();
+      fitLatLngs(mapInstance.current, window.L, zone.polygon);
     }
     mapHostRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    toast.message("اسحب نقاط المضلع على الخريطة ثم احفظ");
+    toast.message("اسحب النقاط الزرقاء لتعديل الحدود — انقر نقطة لحذفها");
   };
 
   const saveEditing = async () => {
@@ -515,7 +465,6 @@ const DeliveryZonesEditor = ({
       is_active: zone.is_active,
       color: zone.color,
     });
-    clearPathListeners();
     setEditingId(null);
     setEditPath(null);
   };
@@ -535,7 +484,7 @@ const DeliveryZonesEditor = ({
       toast.error("اختر فرعاً أولاً لربط نطاق التوصيل به");
       return;
     }
-    if (!mapReady || !mapInstance.current || !window.google?.maps) {
+    if (!mapReady || !mapInstance.current) {
       toast.error("انتظر حتى تظهر الخريطة ثم حاول مرة أخرى");
       return;
     }
@@ -550,7 +499,7 @@ const DeliveryZonesEditor = ({
     draftPointsRef.current = [];
     setDraftPath([]);
 
-    triggerMapResize(mapInstance.current);
+    mapInstance.current.invalidateSize();
     mapHostRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 
     const addPoint = (point: LatLng) => {
@@ -558,7 +507,8 @@ const DeliveryZonesEditor = ({
       const now = Date.now();
       const last = draftPointsRef.current[draftPointsRef.current.length - 1];
       if (lastAddAtRef.current && now - lastAddAtRef.current < 160) return;
-      if (last && Math.abs(last.lat - point.lat) < 1e-6 && Math.abs(last.lng - point.lng) < 1e-6) return;
+      if (last && Math.abs(last.lat - point.lat) < 1e-6 && Math.abs(last.lng - point.lng) < 1e-6)
+        return;
       lastAddAtRef.current = now;
       const next = [...draftPointsRef.current, point];
       draftPointsRef.current = next;
@@ -566,35 +516,12 @@ const DeliveryZonesEditor = ({
       renderDraftPreview(next);
     };
 
-    const map = mapInstance.current;
-    clickListenerRef.current.push(
-      window.google.maps.event.addListener(map, "click", (e: any) => {
-        if (!e?.latLng) return;
-        addPoint({ lat: e.latLng.lat(), lng: e.latLng.lng() });
-      }),
-    );
-
-    const div: HTMLElement | null = typeof map.getDiv === "function" ? map.getDiv() : null;
-    if (div) {
-      const onDomClick = (ev: MouseEvent) => {
-        if (!drawingRef.current || typeof map.getBounds !== "function") return;
-        const mapBounds = map.getBounds();
-        if (!mapBounds) return;
-        const rect = div.getBoundingClientRect();
-        if (rect.width < 8 || rect.height < 8) return;
-        const x = (ev.clientX - rect.left) / rect.width;
-        const y = (ev.clientY - rect.top) / rect.height;
-        if (x < 0 || x > 1 || y < 0 || y > 1) return;
-        const ne = mapBounds.getNorthEast();
-        const sw = mapBounds.getSouthWest();
-        addPoint({
-          lat: ne.lat() - y * (ne.lat() - sw.lat()),
-          lng: sw.lng() + x * (ne.lng() - sw.lng()),
-        });
-      };
-      div.addEventListener("click", onDomClick);
-      clickDomCleanupRef.current = () => div.removeEventListener("click", onDomClick);
-    }
+    const onClick = (e: any) => {
+      if (!e?.latlng) return;
+      addPoint({ lat: e.latlng.lat, lng: e.latlng.lng });
+    };
+    clickHandlerRef.current = onClick;
+    mapInstance.current.on("click", onClick);
 
     toast.message("انقر على الخريطة لإضافة نقاط الحدود");
   };
@@ -645,7 +572,7 @@ const DeliveryZonesEditor = ({
           {branchName ? ` — ${branchName}` : ""}
         </p>
         <p>
-          ارسم المضلع بدقة حول منطقة خدمة الفرع. انقر لإضافة نقاط الحدود، ثم اسحبها للتعديل.
+          ارسم المضلع حول منطقة خدمة الفرع (خريطة OpenStreetMap). انقر لإضافة نقاط الحدود، ثم احفظ.
           الطلبات خارج المناطق المفعّلة تُرفض تلقائياً.
         </p>
         {!branchId && (
@@ -709,19 +636,19 @@ const DeliveryZonesEditor = ({
           style={{ minHeight: 420 }}
         />
         {mapLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-muted/90 text-sm text-muted-foreground gap-2">
+          <div className="absolute inset-0 flex items-center justify-center bg-muted/90 text-sm text-muted-foreground gap-2 z-[500]">
             <Loader2 className="h-4 w-4 animate-spin" />
             جاري تحميل الخريطة...
           </div>
         )}
         {mapError && !mapLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-muted/95 text-sm text-destructive p-4 text-center">
+          <div className="absolute inset-0 flex items-center justify-center bg-muted/95 text-sm text-destructive p-4 text-center z-[500]">
             {mapError}
           </div>
         )}
         {editingId && mapReady && (
-          <div className="absolute top-3 right-3 left-3 sm:left-auto rounded-lg bg-background/95 border shadow-sm px-3 py-2 text-xs">
-            وضع التعديل — اسحب نقاط الحدود ثم احفظ
+          <div className="absolute top-3 right-3 left-3 sm:left-auto rounded-lg bg-background/95 border shadow-sm px-3 py-2 text-xs z-[500]">
+            وضع التعديل — اسحب النقاط ثم احفظ
           </div>
         )}
       </div>
@@ -790,7 +717,7 @@ const DeliveryZonesEditor = ({
                   )}
                   <p className="text-xs text-muted-foreground">
                     {(isEditing && editPath ? editPath.length : zone.polygon.length)} نقطة على المضلع
-                    {isEditing ? " · يمكن سحب النقاط على الخريطة" : ""}
+                    {isEditing ? " · اسحب النقاط أو انقر لحذفها" : ""}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">

@@ -41,3 +41,9 @@ verify_jwt = false
 
 [functions.geocode-national]
 verify_jwt = false
+
+[functions.ai-quick-order]
+verify_jwt = false
+
+[functions.partner-catalog]
+verify_jwt = false

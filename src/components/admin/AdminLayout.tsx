@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { PANEL_ROLE_BADGE, allowedAdminPaths, canAccessAdminPath } from "@/lib/staff-access";
 import { useAdminNotifications } from "@/hooks/useAdminNotifications";
+import SanamAiFab from "./SanamAiFab";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -87,6 +88,7 @@ const AdminShell = ({ children, title }: AdminLayoutProps) => {
             <AdminErrorBoundary>{children}</AdminErrorBoundary>
           </main>
         </div>
+        <SanamAiFab />
       </div>
     </SidebarProvider>
   );

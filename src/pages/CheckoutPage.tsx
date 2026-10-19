@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Clock, CheckCircle, CreditCard, Banknote, Loader2, Pencil, Lock } from "lucide-react";
+import { MapPin, Clock, CheckCircle, CreditCard, Banknote, Loader2, Pencil, Lock, AlertTriangle } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useCategories, useCategorySections } from "@/hooks/useCategories";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -66,6 +67,30 @@ const CheckoutPage = () => {
   const { toast } = useToast();
   const { verify: verifyRecaptcha } = useRecaptcha();
   const { active: activeZones } = useActiveDeliveryZones(selectedBranch?.id);
+  const { data: dbCategories = [] } = useCategories();
+  const { data: categorySections = [] } = useCategorySections();
+
+  const cartSectionRules = useMemo(() => {
+    const catById = new Map(dbCategories.map((c) => [c.id, c]));
+    const sectionById = new Map(categorySections.map((s) => [s.id, s]));
+    const involved = new Map<string, (typeof categorySections)[number]>();
+    for (const { product } of items) {
+      const catId = (product as { categoryId?: string }).categoryId;
+      if (!catId) continue;
+      const cat = catById.get(catId);
+      const sectionId = cat?.section;
+      if (!sectionId) continue;
+      const section = sectionById.get(sectionId);
+      if (section) involved.set(section.id, section);
+    }
+    const sections = [...involved.values()];
+    const allowCash = sections.every((s) => s.allowCashOnDelivery !== false);
+    const notices = sections
+      .filter((s) => s.checkoutNoticeEnabled)
+      .map((s) => (s.checkoutNotice || "").trim())
+      .filter(Boolean);
+    return { allowCash, notices };
+  }, [items, dbCategories, categorySections]);
   const [selectedTime, setSelectedTime] = useState("");
   const [phone, setPhone] = useState("");
   const [savedPhone, setSavedPhone] = useState("");
@@ -92,6 +117,12 @@ const CheckoutPage = () => {
   const [customerDiscountPercent, setCustomerDiscountPercent] = useState(0);
 
   const ONLINE_PAYMENT_ENABLED = true;
+
+  useEffect(() => {
+    if (!cartSectionRules.allowCash && paymentMethod === "cash") {
+      setPaymentMethod("online");
+    }
+  }, [cartSectionRules.allowCash, paymentMethod]);
 
   useEffect(() => {
     markCheckoutReached();
@@ -481,6 +512,9 @@ const CheckoutPage = () => {
   const placeOrder = async () => {
     if (!selectedBranch || !user) return;
 
+    const effectivePayment =
+      !cartSectionRules.allowCash && paymentMethod === "cash" ? "online" : paymentMethod;
+
     const national = normalizeNationalAddress(nationalAddress || selectedAddress?.national_address || "");
     const hasNational = isValidNationalAddress(national);
     const hasCoords = selectedAddress ? addressHasCoords(selectedAddress) : false;
@@ -522,10 +556,14 @@ const CheckoutPage = () => {
         delivery_fee: delivery,
         total,
         status: "pending",
-        payment_method: paymentMethod === "cash" ? "cash" : "online",
+        payment_method: effectivePayment === "cash" ? "cash" : "online",
         branch_id: selectedBranch.id,
         national_address: hasNational ? national : null,
-        notes: `وقت التوصيل: ${selectedTime} | الفرع: ${selectedBranch.name}`,
+        notes: [
+          `وقت التوصيل: ${selectedTime}`,
+          `الفرع: ${selectedBranch.name}`,
+          ...cartSectionRules.notices.map((n) => `تنبيه: ${n}`),
+        ].join(" | "),
       } as any)
       .select()
       .single();
@@ -555,7 +593,7 @@ const CheckoutPage = () => {
     await supabase.from("order_items").insert(orderItems);
 
     // Cash on delivery → done
-    if (paymentMethod === "cash") {
+    if (effectivePayment === "cash") {
       setOrderId(order.id);
       setSubmitted(true);
       markConverted();
@@ -895,22 +933,51 @@ const CheckoutPage = () => {
               </div>
             </div>
 
+            {/* Section notices */}
+            {cartSectionRules.notices.length > 0 && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
+                <h3 className="font-heading font-semibold text-sm flex items-center gap-2 text-amber-900">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  تنبيهات قبل تأكيد الطلب
+                </h3>
+                <ul className="space-y-1.5 text-sm text-amber-900/90 list-disc list-inside">
+                  {cartSectionRules.notices.map((note, i) => (
+                    <li key={i}>{note}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Payment method */}
             <div className="bg-card rounded-xl border p-6">
               <h3 className="font-heading font-semibold text-lg mb-4 flex items-center gap-2">
                 <CreditCard className="h-5 w-5 text-primary" />
                 طريقة الدفع
               </h3>
+              {!cartSectionRules.allowCash && (
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3">
+                  سلة التسوق تتضمن منتجات تتطلب الدفع الإلكتروني — الدفع عند الاستلام غير متاح
+                </p>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
-                  onClick={() => setPaymentMethod("cash")}
+                  type="button"
+                  disabled={!cartSectionRules.allowCash}
+                  onClick={() => cartSectionRules.allowCash && setPaymentMethod("cash")}
                   className={`p-4 rounded-lg border-2 text-right transition-all flex items-center gap-3 ${
-                    paymentMethod === "cash" ? "border-primary bg-primary/5" : "hover:border-primary/30"
+                    !cartSectionRules.allowCash
+                      ? "opacity-50 cursor-not-allowed border-border bg-muted/20"
+                      : paymentMethod === "cash"
+                      ? "border-primary bg-primary/5"
+                      : "hover:border-primary/30"
                   }`}
+                  title={!cartSectionRules.allowCash ? "الدفع الإلكتروني إلزامي لهذا الطلب" : ""}
                 >
-                  <Banknote className="h-6 w-6 text-primary" />
+                  <Banknote className={`h-6 w-6 ${cartSectionRules.allowCash ? "text-primary" : "text-muted-foreground"}`} />
                   <div>
-                    <p className="font-semibold text-sm">الدفع عند الاستلام</p>
+                    <p className={`font-semibold text-sm ${cartSectionRules.allowCash ? "" : "text-muted-foreground"}`}>
+                      الدفع عند الاستلام
+                    </p>
                     <p className="text-xs text-muted-foreground">نقداً للمندوب</p>
                   </div>
                 </button>

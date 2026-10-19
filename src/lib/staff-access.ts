@@ -3,6 +3,9 @@ export type AdminPanelRole = StaffRole | "store_admin";
 
 export const STAFF_ROLES: StaffRole[] = ["site_admin", "accountant", "inventory", "support"];
 
+/** مناصب تُنشأ من إعدادات الموقع → «مستخدمي الموقع». */
+export const SITE_STAFF_CREATABLE_ROLES: StaffRole[] = ["accountant", "inventory", "support"];
+
 export const PANEL_ROLES: AdminPanelRole[] = [
   "site_admin",
   "store_admin",
@@ -22,7 +25,7 @@ export const STAFF_ROLE_META: Record<
   },
   accountant: {
     label: "محاسب",
-    hint: "الحسابات والمبيعات والمدفوعات",
+    hint: "التحصيل والحسابات والمبيعات والمدفوعات",
     color: "bg-amber-100 text-amber-800",
   },
   inventory: {
@@ -32,7 +35,7 @@ export const STAFF_ROLE_META: Record<
   },
   support: {
     label: "شكاوى العملاء",
-    hint: "العملاء والشكاوى",
+    hint: "العملاء والشكاوى والتقييمات",
     color: "bg-sky-100 text-sky-800",
   },
 };
@@ -56,18 +59,30 @@ const ALL_ADMIN_PATHS = [
   "/admin/delivery",
   "/admin/complaints",
   "/admin/sales",
+  "/admin/collections",
   "/admin/payments",
   "/admin/email-logs",
+  "/admin/ratings",
   "/admin/announcements",
+  "/admin/home",
   "/admin/settings",
+  "/admin/pos",
 ];
 
 const ROLE_PATHS: Record<AdminPanelRole, string[]> = {
   site_admin: ALL_ADMIN_PATHS,
   store_admin: ALL_ADMIN_PATHS,
-  accountant: ["/admin", "/admin/sales", "/admin/payments"],
+  accountant: [
+    "/admin",
+    "/admin/sales",
+    "/admin/payments",
+    "/admin/pos",
+    "/admin/collections",
+    "/admin/ratings",
+    "/admin/drivers",
+  ],
   inventory: ["/admin", "/admin/products", "/admin/categories"],
-  support: ["/admin", "/admin/customers", "/admin/complaints"],
+  support: ["/admin", "/admin/customers", "/admin/complaints", "/admin/ratings"],
 };
 
 export function isPanelRole(role: string | null | undefined): role is AdminPanelRole {
@@ -80,8 +95,9 @@ export function allowedAdminPaths(role: AdminPanelRole | null): string[] {
 }
 
 export function canAccessAdminPath(role: AdminPanelRole | null, pathname: string): boolean {
+  const path = pathname.replace(/\/+$/, "") || "/";
   const allowed = allowedAdminPaths(role);
-  return allowed.some((p) => (p === "/admin" ? pathname === "/admin" : pathname.startsWith(p)));
+  return allowed.some((p) => (p === "/admin" ? path === "/admin" : path.startsWith(p)));
 }
 
 export function pickAdminRole(roles: { role: string }[] | null | undefined): AdminPanelRole | null {
@@ -92,4 +108,67 @@ export function pickAdminRole(roles: { role: string }[] | null | undefined): Adm
   if (set.has("inventory")) return "inventory";
   if (set.has("support")) return "support";
   return null;
+}
+
+export function defaultAdminHome(_role: AdminPanelRole | null): string {
+  return "/admin";
+}
+
+/** Legacy: cash wallet settle from drivers page — hub only now. */
+export function canSettleDriverWallet(_role: AdminPanelRole | null): boolean {
+  return false;
+}
+
+/** سداد أجور التوصيل للمندوب. */
+export function canSettleDriverWages(role: AdminPanelRole | null): boolean {
+  if (!role) return false;
+  return role === "site_admin" || role === "store_admin" || role === "accountant";
+}
+
+export function hasFullCollectionHubTabs(role: AdminPanelRole | null): boolean {
+  if (!role) return false;
+  return role === "site_admin" || role === "store_admin" || role === "accountant";
+}
+
+/** استلام نقد المناديب في مركز التحصيل. */
+export function canSettleDriverCashAtHub(
+  role: AdminPanelRole | null,
+  channel?: "wholesale" | "retail",
+): boolean {
+  if (!role) return false;
+  if (channel === "wholesale") return false;
+  return role === "site_admin" || role === "store_admin" || role === "accountant";
+}
+
+/** استلام نقد كاشير POS في مركز التحصيل — سنام يبقي الكاشير مفعّلاً. */
+export function canCollectPosCashAtHub(role: AdminPanelRole | null): boolean {
+  if (!role) return false;
+  return role === "site_admin" || role === "accountant";
+}
+
+export function canAccessCollectionsHub(role: AdminPanelRole | null): boolean {
+  if (!role) return false;
+  return canAccessAdminPath(role, "/admin/collections");
+}
+
+export function canViewDriverCashCollectionTab(
+  role: AdminPanelRole | null,
+  channel?: "wholesale" | "retail",
+): boolean {
+  if (!canAccessCollectionsHub(role)) return false;
+  if (channel === "wholesale") return false;
+  if (hasFullCollectionHubTabs(role)) return true;
+  return canSettleDriverCashAtHub(role, channel ?? "retail");
+}
+
+export function canViewCashierCashCollectionTab(role: AdminPanelRole | null): boolean {
+  return canAccessCollectionsHub(role);
+}
+
+export function canViewCollectionRegistryTab(role: AdminPanelRole | null): boolean {
+  return canAccessCollectionsHub(role);
+}
+
+export function canViewWholesaleSalesCollection(_role: AdminPanelRole | null): boolean {
+  return false;
 }

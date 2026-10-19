@@ -19,7 +19,7 @@ const ProductPage = () => {
   const [activeImage, setActiveImage] = useState<string | null>(null);
 
   const category = categories?.find((c) => c.id === product?.category_id);
-  const { data: similarProducts } = useProducts(product?.category_id || undefined);
+  const { data: similarProducts } = useProducts(product?.category_id || undefined, { limit: 8 });
   const similar = (similarProducts || []).filter((p) => p.id !== product?.id).slice(0, 6);
 
   const gallery = product

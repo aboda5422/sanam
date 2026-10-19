@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useProducts } from "@/hooks/useProducts";
+import { HOME_RAIL_LIMIT, useProducts } from "@/hooks/useProducts";
 import ProductCard from "@/components/product/ProductCard";
 import type { Category } from "@/types/product";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,7 +9,7 @@ interface CategorySectionProps {
 }
 
 const CategorySection = ({ category }: CategorySectionProps) => {
-  const { data: products, isLoading } = useProducts(category.id);
+  const { data: products, isLoading } = useProducts(category.id, { limit: HOME_RAIL_LIMIT });
 
   if (isLoading) {
     return (
@@ -35,7 +35,7 @@ const CategorySection = ({ category }: CategorySectionProps) => {
         </Link>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-2">
-        {products.slice(0, 7).map((product) => (
+        {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>

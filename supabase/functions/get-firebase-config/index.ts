@@ -16,7 +16,6 @@ Deno.serve(async (req) => {
     });
   }
 
-  // Non-secret project identifiers (safe defaults for this Sanam Firebase project)
   const config = {
     apiKey,
     authDomain: Deno.env.get("FIREBASE_AUTH_DOMAIN") || "sanamapp-4cfc0.firebaseapp.com",

@@ -1,0 +1,1403 @@
+﻿[
+    {
+        "id":  "b3bf7468-298b-46c3-982a-75f5885296f0",
+        "slug":  "latest-offers",
+        "name":  "أحدث العروض",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e9240efd54b878033220ee0176d9198f9eaf01997a5c1d2a62a5f55b646d7bfb.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/217900d3ca38512c71ab30fa9170bb17d4670c27d94a942aa4dca71460bbba03.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/66b06c101b43bac881a8d2f87b967db1ec4ec46d2e75938854faaf788d141553.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/43d2aae241d4454d4a0906b71bf16786db18e4d17f7c71155639027a63cc280d.webp"
+                   ]
+    },
+    {
+        "id":  "2a96eb7a-ae7c-483a-853e-114f486f30fc",
+        "slug":  "daily-cheese",
+        "name":  "أجبان",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/727a980bf4c2bae46a23c080c5c58d686fb109e6ef844c84f097a7b20b862ada.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3390214da59fcaa6c7ac789e555e2fe88db09ca334f9c2058942b9c43efdef8f.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/b8be8eb075ebf37d1f1b3c47d73ef9da9763c91d433f12a88dbc4fd5254f394b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/9e5f1f95db5e3a5382cca9c48fcee1538fa77238a07a1a99c627ab1969c09b87.webp"
+                   ]
+    },
+    {
+        "id":  "3b41b259-1bcf-4f92-92c0-f6ec489442e1",
+        "slug":  "daily-fish",
+        "name":  "أسماك",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3297dcf69d48583dc7df6fa8d95a40fa509518ea85a7e9de1bc3ab5e770f8267.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b76dff1c8c0637ace27ed54551bd2f724a80468440c90875b3d986941515c8b2.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/26894e3c7df04268134c38360e9365574266ba9608032b447dc8e76f9b329e50.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b8dcfe19f6c30623b0b8331470da4d1f6e7859a6d2fb4993855a25685d46efb4.webp"
+                   ]
+    },
+    {
+        "id":  "fdad876d-87e0-486d-b7ea-64ea65ac5780",
+        "slug":  "daily-herbs",
+        "name":  "أعشاب",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/85239fa69bc40343663aa1970b794497bcaec77f4b9ef5b952bc9b25ddf64bf8.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/26b7db47c8379f4dcf1a62e79de011beb488429cb06f8e7c35d8b50f98e9d78b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/caf8e58190216582696d27a2ee12ad08ea0a114049c3f260a0e1162d21398e85.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/42c1f37b604e24af3f46dd058f98c1607d4a44ed7fbf876a6be060623b78f4fc.webp"
+                   ]
+    },
+    {
+        "id":  "d4995129-f3d3-44f0-bdd1-f6841d355401",
+        "slug":  "daily-dairy",
+        "name":  "ألبان",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/23124af677e39d3044880fa297cd45f31d6d1fa891be515e4d5e0a8f24889143.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/6accaed389234021555a04733b5cc6c4193e34785b495af79aa89b37a7cc8c00.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/5d05b0871ab29a28d6acc044a4ed27aff99e6bc1bd8e0aee4402a973571df9e5.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d5c59c03eadd6bf3b0502e2b9ff0af9e361aad435b5b953fcb5562c8ef800c8a.webp"
+                   ]
+    },
+    {
+        "id":  "96b4eb80-5233-44e4-a084-e4a05a062b36",
+        "slug":  "daily-eggs",
+        "name":  "بيض",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3dcc95233f05b5cc8221e724c6563e175ea32b09a516eff50d57e0fb8444ceaa.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/74011da6fbfbcff52591855feb05698543d7b355ca38f443ffa2411c6febbf1a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6ce83968359bc44c1623dbb84ad7da7b685b5b4c96506898eb659276fea3c1f1.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/d6a243d95eddff2221f95b338842b8c33b9d88af24ac4cc31d8edc2aac144653.webp"
+                   ]
+    },
+    {
+        "id":  "b8bb4c96-841a-4578-9a3f-9fc87b983654",
+        "slug":  "daily-vegetables",
+        "name":  "خضروات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fb4ad446973dee7b7127e3617a360eb7c20a2c9107d1b122b8f472df5b96a211.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6855c1345192c540bf83130aff1dd8cc72daf36f1eebcae6556218dfb0f41d1f.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c5404e8899a50619343841f6c86a3f28b234e75c56f36571b35ac405a4230e86.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0bfe8127532c3b539c7bd2224950c02b9f9d0810996b1bd353985368de63a84a.webp"
+                   ]
+    },
+    {
+        "id":  "4c1e4774-c497-488b-8d97-34479d5ae26f",
+        "slug":  "daily-poultry",
+        "name":  "دواجن",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fde8d12fa6ee17a5baa1a5a5a2d9ea4ecfb17def0e3d821dbcf84ac5e3bd4e47.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/2194ab8a155ca1614ac6443d2e01c6a476b5ee91119279d347dc52805576d045.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/79881e0c1887d228946e2446740522ee1b4cd728c85feeac9f16deaa8150233c.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/62e2014641541e029dacd4a344dbad4b7f11156a5d41b5d55129cafa7a9783e0.webp"
+                   ]
+    },
+    {
+        "id":  "86ae0aff-cd8a-432c-a52f-c199c0960794",
+        "slug":  "daily-fresh-juices",
+        "name":  "عصائر طازجة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/043df678245227e219c48fe343066966fd31b29f562edda4c7e22b7fb7c14017.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/ca16756b88bb61619d4b4b0607d265282820196a0ead6033ee418071e255c685.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/8344e70a922c9076184e29e97d6fac4b0b6fb3337ea49247ca4f63d8dfb0f67d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/398de151ce347d390d053ab72073c51c57cd8c3a3213831670e366fdf33eced2.webp"
+                   ]
+    },
+    {
+        "id":  "ba53a3f5-a93b-4f8d-acc1-0e163ed8375c",
+        "slug":  "daily-fruits",
+        "name":  "فواكه",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/0a762347b99eed60dce6e415c48a48af2d84f237a16297bc08855b74adac271a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fff54d4e3ce92f0b36f39f2d08ea32fc7e596431c2742e18c85c91dad5172241.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/82271c79ed7cb1509a1f4212b518d17e559fa0015ff7e208ae3e14cbe3a75a33.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/96701566c6ad5fccceb6aa43d8942699a388d21cb25b8d0931fcc63182ccf045.webp"
+                   ]
+    },
+    {
+        "id":  "91d1f785-8073-4996-b9bc-527c0a17b9fc",
+        "slug":  "daily-meat",
+        "name":  "لحوم",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/233fa816c46f66f6dbb2ef6e6e0a85660b6014d7a82387fff8ec9e39a896948e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/2fa417b6b323c3a9c2172b5693e53fd0ff84edf3e51715ed4772f8d487aecd1d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/482ec00ecbd62c4927074306dc33443604ebf4eb1bfb4be1230827bd5f26042a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/11985a14fe58e385e7e5731aa44dfeb03e7625d27d406b1e674e92644315bbc6.webp"
+                   ]
+    },
+    {
+        "id":  "5ca099cf-57fd-477e-ab67-1a4ac3e3e8d2",
+        "slug":  "daily-seafood",
+        "name":  "مأكولات بحرية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3c06cb67e087d95a87e62b999753efd8c4d66ec465cc4b72dacb535c0faaba4b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/033e6e2b60c25840d495239211dd74fe805bddfdb0507aee50a4a23daa65f671.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/63f88de91fe39d6de3fe571ec21f5c17238d2ce13362cb5f77f71d6f92132707.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4657b34458f64bebd0c05284ffb38ab509f755a9408da6384ff6d0150f7a21c4.webp"
+                   ]
+    },
+    {
+        "id":  "cf727ff6-0399-46bd-8a9b-9b453d9f336f",
+        "slug":  "daily-chilled",
+        "name":  "منتجات مبردة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/92ce13f0dc75b2511746e91fde985ab39a7bfc98e2e6979893c8860c65b04f09.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/79de6689cc2f4203840094cafbbd0bbe489ecc7a5f96f2976a85a62e69ff214d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/1f21ecd7929efd90b92ace74d0facea5565b2d36fc0dd2fbac9ae034c3a32e93.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/980f3bd028c7e8a022bef04e5110e3f4ae1c13ff8eb00359495f75a6ef310a15.webp"
+                   ]
+    },
+    {
+        "id":  "090d5bc0-8233-403d-b04c-88324e5c0459",
+        "slug":  "daily-ready-meals",
+        "name":  "وجبات جاهزة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/072608b35160469c0cb5f7755234b10910e5352c45c2cb41eb2b67d18ed4acb3.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/45ec161c01872bb3f11b5fe3d2607d64ae5922c534909319101db01cda56996b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/ec0c1d2ee132fb3956ec3a7fd7f3c89605f6136b294da7b9725369c5d07e3310.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/55f5f62a3a1bc8948dd7c601d0926747abceef78aa870b0b431f5801b5861004.webp"
+                   ]
+    },
+    {
+        "id":  "58799a79-1b17-4653-a71d-cfe1c6e05808",
+        "slug":  "pantry-ice-cream",
+        "name":  "آيس كريم",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/82f724696972f939a49bc4ff876a439ee7f1ceb157eb00c571c5f44dd662aceb.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/cb782b9067964d533f421140079207bdb2ca9e0669644c3d3c1e1fec390051f5.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f4cfa1cafa3871566491dbf8c364ee5bde437a5b2d296171e3dce99da51be9ac.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/87e0fc8357cfd32e6f299ba15800a7379fae67e568790a7357e9a7007515b4ad.webp"
+                   ]
+    },
+    {
+        "id":  "f045fa4c-73d9-4f34-ab5c-275c17221ff6",
+        "slug":  "pantry-rice",
+        "name":  "أرز",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6eb4861b18eec920422b1b3e4d7ee1864d086606a294a111ec5d527a78ea1762.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/35abb28a8d04ffd4c3c97dd53364349cc9c1e39bebd8954afa9d80b51c7a2748.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a1014abfa79996b3f4c32187fc7052d364db0ff12dae42b570abdfd1c101dc60.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/bfb4b163853cf4f4f4069b1930063481f56f28a6aff7153bce48e97d5a1432cc.webp"
+                   ]
+    },
+    {
+        "id":  "6934739d-9867-4262-bef0-a315bf49610e",
+        "slug":  "pantry-frozen-fish",
+        "name":  "أسماك مجمدة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/19c676cf5c6fe3665d6a48cc1e7a22f18218a6d8b131a8651dc0fb9a4e5e87c8.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/146a0ff888820d99b9841919fc32fc6d946db6720ab6b06d7a5a88ed30c68048.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e7cb0560b316b2dd979c8b99399d540cfce3681b77c86f33e8210494b265049a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/79d6f949786e41b5499f083034e6fce3bda862b2c494dfa9d573ed7245760bb2.webp"
+                   ]
+    },
+    {
+        "id":  "e9691a7a-e24a-4433-8d12-48666f33117e",
+        "slug":  "pantry-world-foods",
+        "name":  "أغذية عالمية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/270b881640a1f99a71da51b87dbd2ebfb295bc4a89ac00cb1e823eef86e3df35.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/5d6847c9ba5f28efd3709683b072da9e9e145e72d60916ebb23e46607011aefc.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/1de85a93d5822d76177c7c1e627a714ee11c1ed5e195190227c4926ff1d623f6.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0a6a66234edd2730897712a378ad22117d5024b4d190f48bf5f23f18edda33ea.webp"
+                   ]
+    },
+    {
+        "id":  "8c35e1f9-a328-48d2-ad37-6bba23c791bc",
+        "slug":  "pantry-frozen-fries-sides",
+        "name":  "بطاطس ومقبلات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/5199ec7978923033c67b51cd724859453957db657519bfa50762e2d64d64f264.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a6fe104247dd5a3325dd5c9d1d4bc4fa707253c8a1a248648f5282e5e365eb9d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b1ae57124c1ea1c4b127a896f68041d83b365a6312d10e01a797bc1c00568b9a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b621cf50afa45653f5c46f30d91254aa7d88da54a26f3ca002d47ca3f3a57a35.webp"
+                   ]
+    },
+    {
+        "id":  "1215d69a-202f-4b72-ae6e-07d82e3638c1",
+        "slug":  "pantry-pulses",
+        "name":  "بقوليات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0fcfdd869374177c7b719633b8fea917716ba446b02a50c31a910929332782de.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/22e06766582ee28b8496c3141074dfb2ca13d5aaa6716742b196869bf3173af1.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0607a9bdc61578a056aacc3d4edd32341b16fe243fa1839491c61dc36fa4c18d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0b9a79c81916fbc6d3b655b9c29c64ffe39836cef05feaa754075eeaac363c99.webp"
+                   ]
+    },
+    {
+        "id":  "39b875df-4804-4a70-a3e3-df74d5aa940c",
+        "slug":  "pantry-spices",
+        "name":  "بهارات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0ee508958851bd808245416864a2fc9307635340c693383909288bedc608929b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4720880f017cec2e2ad8359dc9c6d0644063dae7c5fdffa57b04ccce47149f62.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fd803b13a45c9cd50aa6aa5738ad6b2266ff2713fc401b514e35d381076075bb.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f7850fe4c7cd7b1ece023116a95230329c7710832b31b0e4e848754f84051806.webp"
+                   ]
+    },
+    {
+        "id":  "120af63f-2f81-49c6-b4b9-76fc85788c3c",
+        "slug":  "pantry-pizza",
+        "name":  "بيتزا",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/50aeaa4d665014c443aa71d7cb2ade8c00fe4ccbb0ff092e7d747279efa40bf0.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ff3a002859d0761272554009cb0986e7c7ca1921110b2bb8613d054eaee69647.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ebe5c13a843496a8d24468e82160a05f151e0fa972339e51b7befb5a931042cc.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ba1d20c66a1d8b2a66cb271267ee07bc93b1a00b449fbc6bdca724bca5822e20.webp"
+                   ]
+    },
+    {
+        "id":  "541c424b-6c89-4c9e-b71c-6cd1aa92fa50",
+        "slug":  "pantry-tuna",
+        "name":  "تونة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fbf09c6504946684f9641a958069b38025b8b345fd19fb110aea85f54737b72a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f642c070940937bebbc751f3d923310809d4b156587c50957afacfbce4ff4fd8.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/060dd910deb7d4e1676e0ce4584409c7098edf21ce1b295d12ba7286a0bee6b8.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/788cda10f656a708ea309eb08a2b7627ee589c506e1dde0b95533a84bcc23fb6.webp"
+                   ]
+    },
+    {
+        "id":  "60d39acd-cda7-4c3a-9a1d-d0ca28a3560c",
+        "slug":  "pantry-frozen-vegetables",
+        "name":  "خضروات مجمدة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e427f916605d820d27518cd5ad588ce88c5d5fc153ec0e2e328a769a33701cd4.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d46eeed943203751ca0fe0243956c900994d30947c02e53e3557f184b732b25a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f0c5385695fa37f64b2b1ee6e730508853fb6b13142dd768074d51f7b18f9f90.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/76faeffe74696d8e4516c5ca6e54c1245393f680e680ad0eba6c93dc5bd5f997.webp"
+                   ]
+    },
+    {
+        "id":  "c7fa99b3-e5cc-4be2-a983-18c79d9f9c1a",
+        "slug":  "pantry-flour",
+        "name":  "دقيق",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f353bbca4de0efa97924fac29aeb6df79c7088edc927a6e6556663ddcb18043a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f000dc9ca1efb15d5a5172f5c39625b70597fa0495678b73a42b77f65932b8ac.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/795d03485f447cb23fd1f9a05d3a6ce0be4575f2e48bd05bd33edd23ffdeb561.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3ac98118b6ba29ca632fd05ca972720c1d9327f29fdb67bb8882d151f165e1bf.webp"
+                   ]
+    },
+    {
+        "id":  "879c1b43-3a96-4491-a680-6c590369f630",
+        "slug":  "pantry-frozen-poultry",
+        "name":  "دواجن مجمدة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/cd0410bf918650ae652852f01e0ffa03e4d1e9db196a8e06cbd7fb397f53bf7b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/13f2964ade5ed158e1ce07042fc8b25b403d41bf842f8476d685165bc5750158.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a882336a591c7b632a5a835e14885d130affe6d9d410031fcfc1d6523a2425a9.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a82e0b392fe6bce995218e9d1f9d34ff118ed4dae17110f5f7312f95fa53c7e9.webp"
+                   ]
+    },
+    {
+        "id":  "53e455ad-c520-457b-8b0d-53f9602af179",
+        "slug":  "pantry-oils",
+        "name":  "زيوت",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fc84717ca4befe5c1fd838763080a08a73ea248d3f7148cddbd4028dd72b82eb.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/55c546ca7008af79a53468f125d355788dd4d1552a00888dcb674ca5af76ed91.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0204aecbbd96838eaaabf0487eddbeed0a5cbb6e7a8764e27e1018ca17e268da.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/855a63fd3c58cd02750a013f5d8c85af9b9d4821cd1d1a103cf72e56711e6eb7.webp"
+                   ]
+    },
+    {
+        "id":  "0fab43c5-c8f1-4027-900c-f54ca0ad1802",
+        "slug":  "pantry-sugar",
+        "name":  "سكر",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c8ceb5b0ed7cb04b3bd6a6bb6c4f15d246779e8c01b56a505db192e0e05a32f7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b9bf54065dc5a6ff30833addb7e23822f4bf2fa351ff0481250ed19c30ea993e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c80030b2f165049c2d2669754e4952637507cea4ce6f6fa1ad6fd8ef2095c165.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/03958bb395ad4827eba3eca15a2c7d56b78782b25af1ad9f022600a647a078ef.webp"
+                   ]
+    },
+    {
+        "id":  "003a9f87-019f-49e4-8467-dc6d03f355d6",
+        "slug":  "pantry-ghee",
+        "name":  "سمن",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b9fb944af018f76054e997a3c2bc0d498f694b670b0d64d25841b9fa3bf5f294.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d97e251c62d9f9b806b58db7bb76d193914f75b6c71e7f0bfb5ceaa5d185802b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/dca67b9b0e78565b22ead23528d1ba33c4c29f78460a5d2c86922b3c7aea1472.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/217900d3ca38512c71ab30fa9170bb17d4670c27d94a942aa4dca71460bbba03.webp"
+                   ]
+    },
+    {
+        "id":  "b45b3781-f18c-4cfb-8783-e802c435f540",
+        "slug":  "pantry-soups",
+        "name":  "شوربات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/cac312deb747c070f13e6a0c055f8abdd7edf0599aa10f541db36d6e2c577e50.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b2fca637cb2e5e1e980f7dda5a9b9c7cfd41a75c351a04a22c96bd4f88f53ff8.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/296fddb5089e7e6f43c5208be35353002bcf9dc22fe960f5dedf0383884ac670.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/2c41965299754e7c73eb78c5446fcae7b6277515479dac55d67aac0c3dbf73af.webp"
+                   ]
+    },
+    {
+        "id":  "9fa65491-dde7-4ae3-8ab5-7bc2020cb5aa",
+        "slug":  "pantry-chips-snacks",
+        "name":  "شيبس ومقبلات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/94e85c3cf925913eaade502ab681d810ae6fffc4f59f9295a73fbaf360463f73.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/edf689cac9b3730ca31909f013e0ff6f3406a60891a61aa03744bf58ec5d8582.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/048a266a2aaea31bb7c29c1e3a8ed04e217fc57f0795a6895e51a654c54059cd.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f9b9c5dedb5394e4336902e8f3ed5fbeb396fd1ac5727eb653420820c6964541.webp"
+                   ]
+    },
+    {
+        "id":  "9c8fdbdd-7944-49b5-95cb-3c75a93486f9",
+        "slug":  "pantry-sauces",
+        "name":  "صلصات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/87ed477b3cff864f9b84e4c8585adb9b3502501d88b252573688e81e29c5b3d9.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0503bbbecc5bdf154e7ad7da4b12aaf2a1cbea525d1f290883d231add08ba6f3.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f2ceac5c7d5e5cbea6f14626d7dd48a26cc0e6ec30c5e86933f06cbad96899a4.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/24bae0289493b4c2c7f397d2cc9421ec526271d2d455bd5eace532b11806f54d.webp"
+                   ]
+    },
+    {
+        "id":  "71d18736-350e-4655-bdd1-fb7b80565d0a",
+        "slug":  "pantry-frozen-meat",
+        "name":  "لحوم مجمدة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a32dc1b8c298c9c559ed01ade6f09fd065945cb5a4f1e608691e9ee5c3759e86.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/2cef50af0a293d3ee77e3adf2f17d757b25c7495e62920c883233705afd0bff8.webp"
+                   ]
+    },
+    {
+        "id":  "d2f6e926-a215-4529-9311-1699bc8f008d",
+        "slug":  "pantry-pickles",
+        "name":  "مخللات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/05c88ef0935b3bda2cfa3799096e2fe2fa124f919a4f1196897ca7942979d29d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b85bd6716c0cf64e798da7324fff6a6ecf3e316edb40efa7aa42e3b984eb061a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ab19ee20083a406433eb0cd45e9f1ff6ac88e6c226aea2d852eb82011154dfe7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/10d339d41b33d70c000082d412ee386aaf9cde0beac1196583f910d3c0a106a6.webp"
+                   ]
+    },
+    {
+        "id":  "20f66ec6-dfbd-458f-8f49-6115abe66a61",
+        "slug":  "pantry-jam-honey",
+        "name":  "مربى وعسل",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/51b56e7c3a79bb63108b0d5dae35f22142978178eb8ae45579afbe7816ea9c1d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/172553b975a12f1b57ee50668e8b57028e7f6126052fc67c83d2d89528daf2c6.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/296d5932d4b2eac1733cd0cbee702428080864a2f4e7b2e88aaf66676a57181d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e0fa7c6103f250134eb62f8e9bc18cd2d4a0f98a04c59161ca5da6de57587c03.webp"
+                   ]
+    },
+    {
+        "id":  "ce99a7b7-4666-4dab-a46e-f83b9c513e19",
+        "slug":  "pantry-frozen-pastry",
+        "name":  "معجنات مجمدة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/468384b248cf4c97b92dfdab04ea8dc8b42fd5bc0114770dbb626fbf7d18bbb2.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a7ae9f65716ef3462b2b5f13f1e5d58e5c0ebc18465180051ee3462520ac6a3d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3bcbfabb3e5bbeac970bc48c92cdf444b0cf01ad75978360775d58170fbd99d0.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b351778511aae3339781382b5e9dfe95dfb5c6c00375013e8a9babfd43a029a9.webp"
+                   ]
+    },
+    {
+        "id":  "99c5048e-fa62-45f1-94b9-39ea9c63e1b2",
+        "slug":  "pantry-pasta",
+        "name":  "معكرونة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9788bad846f46dc6ea0ba25798f3005dfd94899a49a6d4cffad40387fab3b7a2.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/5fa9bdd1503bd66ebfd2c2eb96ce290e686a43d06e11e7434f7c8c6de359c4e0.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/7617f16bd0d3098d0329c66d81c41903bef628ae96a36f23e54e8885a90f60a4.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fcd3512e2417f64dadc030d3714254bde0b855e38f959ad27dab52381accb082.webp"
+                   ]
+    },
+    {
+        "id":  "623df475-8862-4724-9c26-4e1bb0985cde",
+        "slug":  "pantry-canned-food",
+        "name":  "معلبات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9c0f2315ad49a1c777613872982f0de61b0499129b30fd784dffe41509ed6527.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/2b09f28bfe245a202d6ee0a15821427a879bd2f2d28e6b13dae6867ccc72723e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/68b83cebd66726d1350d13ed23899f92128881a75725985f69994aee96f6efab.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/934a8f3ecc75ebdf175d7147c152928886267a4e755f4dea468dd2e56dc1ebb3.webp"
+                   ]
+    },
+    {
+        "id":  "4e0ad6e8-8b4e-4b65-b928-a5e24a3e6062",
+        "slug":  "pantry-other",
+        "name":  "منتجات أخرى",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/5b35eefbf0e57d7fe8f90f2fbb522a35dca15e8e4fa960478e08db010a2e84a5.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/78bea76562d1447127568e4b51c37b4bb3cf6863e9837eec6b4d2a1300ac22f0.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/813a125537b0cdfb2a0ac040353737ecd62f52764426ea93c226fd08aac0a104.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/198342d2e60fb26ee58075be1513d7c1b48d68242b72f26072f6c1dda91135b1.webp"
+                   ]
+    },
+    {
+        "id":  "14f4ca3b-cffc-4ca8-96aa-1d472e276e96",
+        "slug":  "pantry-breakfast",
+        "name":  "منتجات الفطور",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/d2ae60877029d12a1eed9c977ba04468243d8fabb6d0ff5848ec6edc4bb2ec8e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/09b17f8a33beef1730ee537dd68a8ec788aa0886a1cd1cd349015c02c40b1f86.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f0a366e3ecfe66cf441ae865b9af8af95f93b83d0ef373ee16b297cf162ee13a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ce1189fe849872eb32988ee7334420b8d72d6664e565a561ae616bc4c9b238ce.webp"
+                   ]
+    },
+    {
+        "id":  "3ca54b2c-354d-4641-8fa3-c0a10398d64a",
+        "slug":  "pantry-ready-meals",
+        "name":  "وجبات جاهزة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d7df36af584ed4ef17304cf46d935f5d4ec1c85dba3bca2b652f5a07f255f9bf.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/12e41378cf9f0ea238c0ac63eed250665bbf3c30a2ab33783bdee7aaf5b0560e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/664998d19267041bb0578796ec8453552b117796f2c16d78a79e5eb857e405bd.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/04469b6dfd9e9add3fc60da177b08cc310790123275bb5736553232ecdbaaa33.webp"
+                   ]
+    },
+    {
+        "id":  "0412d16c-41ab-4aa0-b912-09bc396c9b50",
+        "slug":  "drinks-tea",
+        "name":  "شاي",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/b951d1f3761f19648d40bb649ffc2f36bee93eab68b21e0db94a8d09f0729614.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/aa2458b5ce5061b9b0ee5c571f6d9f50a5d9f69bf2befe2d85c3f7a54927869f.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/8aeebf66d69f61c2223c8860fc45b5bdde3adf6449e1e01331e639f938999c02.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/76eee9331c29beef3d52f11dd44516d3e8f459c463046e6a34cc7c2384741084.webp"
+                   ]
+    },
+    {
+        "id":  "dd4e78af-52ae-412a-b543-4a7edec6fd9f",
+        "slug":  "drinks-concentrates",
+        "name":  "شراب مركز",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ac1465557f42c62519e7d24c8813ba2a68f278b337b03f9d1f14a8118de7c176.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4fe9731b967e797a208d4950b7d3c643f0011d88ec753bb6fd8a5e7546896b33.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6edf1b5f8d48efdd5416a18b3e1b684f291b0ec65fc6b06a2ebb6903c8687f84.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/966f850bdb9ab8df7e3da22b12f3254030b3776f464eea7f5b85f8ff06da2fd1.webp"
+                   ]
+    },
+    {
+        "id":  "ff0ded64-c530-40eb-a265-0e9b519900b1",
+        "slug":  "drinks-juices",
+        "name":  "عصائر",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b68b1e28ca753da07f50cbf33a35559ef6f0f97dfc92b48977e5211b3962abe8.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/be3db49986d3f942c82046c15991bc02aba40e96d1f090b83599b82b8af27b4e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b4d4064b7df46906b27fb43fe5cbd307b105e7716066e60403983f5ee197c49e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ad2a461381ef8e8a2814ad9679fd41f4f43c3806dec667d7c31db6d770595a21.webp"
+                   ]
+    },
+    {
+        "id":  "c8d60e60-872d-4a6e-8947-1cf4ce0da5c7",
+        "slug":  "drinks-coffee",
+        "name":  "قهوة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/dd114337015ddc1f11042b5ed932baf110825422f5378373bd93b1b20b790c05.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9b4518c8548fa4a117faa28f16b7f8b8fdf64d85c0afbd3419d8f7a3c2b45e71.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/deaa89b217dbbed515174dd5ae57beb8f5a09f5baf1ce5ce9f5832ffae7835f5.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4309ebd0fb6605735b8761bd76383c0d6e662c2a36039e833c50328b646660dd.webp"
+                   ]
+    },
+    {
+        "id":  "b81ec498-8faf-4ae4-8295-662467f5eaf2",
+        "slug":  "drinks-hot-drinks",
+        "name":  "مشروبات ساخنة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/623770aa47ccb2171aba03716db45ec69426a2985b359d6c3ded05e95451a139.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fb4b62091ca991b53cf8cb200d5c67e36c21483c078a1db648723e916e4872dd.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/47b8279b8ed447e3a4d79ea0901d361d6c0e6d13d41144f3150e0f772bba11b3.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/7d613f14b3d940c08498842ac6a76142f8c6605f29495ad0554a67ebfe1b60eb.webp"
+                   ]
+    },
+    {
+        "id":  "137c9170-edff-48d8-b070-1dd6a15b77d9",
+        "slug":  "drinks-energy-drinks",
+        "name":  "مشروبات طاقة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3eacff82289e04a673da366fc47f493b97d49dd951448ae57517d65ef1ba368a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/31ed9ff8d44ffe52c935bf91d538f811570b0dc8ea3e9a861ed48f4ced688fe7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c03a7a91d762288f81f6d28dd6d34b80d02c7a01cdb63bb6abe9002d5ffe1527.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3ad6c54f384353a6ec5b269e3e2552bcf2bb4007d4f7b10a7f5399450eef75e4.webp"
+                   ]
+    },
+    {
+        "id":  "8407ad85-db65-42c6-87c1-7a501eabbdc4",
+        "slug":  "drinks-soft-drinks",
+        "name":  "مشروبات غازية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/59e79f44b430315526263330bf10d3ba2a7c1e3be9e316a65189dca9c2e87b2c.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a7614afdacebe1eb9baf8ff2fa8722b4c1dd8ebe5c37a737ec7ecbb78c7c2b6c.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9ae42aa3eff5b0259c0e0cfcab1d4773891109b67b92742e540ecd2deb4d426d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3d6a9335b13ad16899d407b0259ea0a2f79f54606cd7f4359c8f7a9c08fc3c97.webp"
+                   ]
+    },
+    {
+        "id":  "5c18537e-8237-4ab4-93cd-b74a923bb78f",
+        "slug":  "drinks-water",
+        "name":  "مياه",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/660e0372518c7c883e4d7ff373792413ba166cbe0c317a7d7dafdcddc74bf8d7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/1cfac927fdd4abf920db28f137ef58af943d80bdc30335b28ff01b15c49ac1ef.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/82280a666441df134d219ad513ea79657720e16f8b00c3caa77b348f5effd351.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9454d6fbbe64a6e1dfdbb66dda0301883ab4bbbbbbeb8bef9604a20e7536b5a4.webp"
+                   ]
+    },
+    {
+        "id":  "4b21c52f-40e3-4ea7-af70-c35236dff83d",
+        "slug":  "snacks-biscuits",
+        "name":  "بسكويت",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0de286c6189eae56b83b061ea49fed56dfaa5678bf3f45926db69e8ece78ef04.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d5d3e939d66f9a9aaf7bcd848d34c09da4477b16567b6744ba182b8877c72150.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/96ebbb5788ebdf4c03af1a8d28e9958d379397ada00b628017461ec59c417e62.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b39c349c287ac5072401f627763bd74e5fb5781a1713e0329e1bced6b8613a64.webp"
+                   ]
+    },
+    {
+        "id":  "c16b4371-03b6-4bc4-af3a-633d7ab96cef",
+        "slug":  "snacks-dates",
+        "name":  "تمور",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/677673ed159d9d1492bca54a7e29c9811ebd42020beae95f65b9a0a0fd18024b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/992c2ed58ed66052ec51f26694527f0f1961b66cb392812ac6a1b4f653a42562.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4842ff2945c23a76f8eb48dea27a0f6d3a48124b1e5b7b0ab449732dd9def8c6.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ca9321c5afb79aa8a900c5acfeb500e2a35229052f3e1e5a3ac741950d28b687.webp"
+                   ]
+    },
+    {
+        "id":  "bd136ac5-8190-4d69-9f1f-33511ed956e8",
+        "slug":  "snacks-toast",
+        "name":  "توست",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9803a479cc1330b567251393cad1f78c9ff4398d7fd26f54fdc0a19deb8e8d0c.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/35f57d623a6dde2b8b7f4bec87c75c40d5adc07249e40ba74a0b92b8a1cb0da2.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a70e74d74f0430bd8376a327c672eee75e83d777becffd9c94165be90ec3afad.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f2729ac318e7676cfc03c361af2bc26133c7f7878d7a24053c1334c0c110d68c.webp"
+                   ]
+    },
+    {
+        "id":  "c9544fb2-5148-4105-9812-db96fcfdfdf7",
+        "slug":  "snacks-sweets",
+        "name":  "حلويات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/7fedf92c09ca8825df10eb087f3f7a67fbf2e63cd76d0f39110cf86eec0e3963.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/64b7fb1dca25755a6608784de608a257c254576b42931088a357be1df4b5024c.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e6caf9f3884c7488610ac2a28b6b9e0d7e7166dd3ecfb073b149244a311d3e43.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ac9e338ab7c81bb27d8634cfdd95219a08c0f670c987550e39bcf3023ee277bb.webp"
+                   ]
+    },
+    {
+        "id":  "2785f7c7-d5ab-4b0e-843e-5f5b3ddd284a",
+        "slug":  "snacks-bread",
+        "name":  "خبز",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e957a6cff9cbb8225ee83905d5752620452d078c8adcf7c3ce710ea16814f34d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/f02ec889f57c2793aaee7906c26b8e089fa9d23249d37267717578aac100c440.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/42bfe55b3fa3a9c06194bb8f0bd7f9ab4b62f042c93b9df70f61fddd5dab7e0c.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/5a77c230a4b2c81312064a8c8351e6c994e505d87a119ee0c19cc6eb86a68f14.webp"
+                   ]
+    },
+    {
+        "id":  "d06ce9d9-4086-48e2-9488-2cb098fb422b",
+        "slug":  "snacks-chocolate",
+        "name":  "شوكولاتة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c89b75617ea15fcb21f732d79dc5d12ebc98f746446caa528ed5866ab70782df.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/5c440de5464aa6ac6904a59a64cd8ffeaafcd9af401d7d64c1b3b50de98b0d6a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/cf2cbbe5ace2c6ffc3641776590d7908d11b82a1aadc6379083c5ec7b5a1fa75.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e2c81500d9439d879b31ded8b321283bbbf41befff0bf3ce170f5e2dee9b933c.webp"
+                   ]
+    },
+    {
+        "id":  "05284171-73b7-4b1f-ba1c-b0a927acea89",
+        "slug":  "snacks-croissant",
+        "name":  "كرواسون",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4a0f54e5090277613092cf55e7a0ef5aaca86a3a5158eb3d592464e289faf21b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9856f15fc0c47c3c9a8df10696f476939bc92c662a5bcfcb63da24b5b3d56d67.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/7791edf50fcf9e3d66afa19c3d117269580efe840adcf9bd312f163be7e86522.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/17003a5de12921fc90c330f5f6c15db84fc88f0b246995a704871fb8901c202c.webp"
+                   ]
+    },
+    {
+        "id":  "3f822578-48d5-42ba-bdae-c9e42c466ddc",
+        "slug":  "snacks-cake",
+        "name":  "كيك",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/835d32e75447af844bee5dce3685b19fcb180367c4e11d3d40c33729f67f8397.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/ninja/534578e8eec1579fc77565f06368d202004e4bd2ce83150724bacd8caa0f9735.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/30f5a7d2f71cd826c8347d6452aa9ae46527cce0ab8052aa9f29c02e63b6edb7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/1efc50ee475dc3729390abcd98fd13593807a6e68911e71e1d64b4d724824c12.webp"
+                   ]
+    },
+    {
+        "id":  "4eab561d-446c-4717-b2e2-7850d01e8113",
+        "slug":  "snacks-pastries",
+        "name":  "معجنات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/eacc7f73cee02599e61f5d3e7717f2bf9123237f0d91dff0383e613c2c213d28.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f400e4421b8f329049bc64b1a0db11b3ad5198b414206c868f94fc28acecd421.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/59c6597e3215f2b5015ab8ba99fdd176354e749df65220c68caacc45ec9e8ce8.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/955b95bc929dbb2e493d90ce33d0473b058a6a34d2abda7f7633df8a3e5ee33b.webp"
+                   ]
+    },
+    {
+        "id":  "5a7720a0-518f-45ef-8bcc-87f33bb3577f",
+        "slug":  "snacks-nuts",
+        "name":  "مكسرات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/518398ab6017e482582a5e1bf27203c19a1de566d5cde8e4ca8ad27c73f7ace2.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9d10600883e3af5da26597d4b9bc198d17ec152d16cbf34db5b8bc0fb1e5302c.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/cd0e109fe52648e0ea08ce7c172bb0ab899e60c56225eabbe73a2c237c011afe.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/859829aedcd4d002dcf217d6eae451b854dbb121530232200d820f79c8da8c66.webp"
+                   ]
+    },
+    {
+        "id":  "699519ef-f576-4858-bd6d-c1ecf62cb062",
+        "slug":  "makeup-cosmetics",
+        "name":  "مستحضرات التجميل",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/aa213b50b37b77e77ea0dcca377e8b33e2deae511f647f1bcc40d17c4a193d67.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3f7caad64e292210d8e6154f8b131bf5358e2650ddd29bf53098032a6c85f2b4.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ec9817b4f6fe5e70c3a7fa8d30cf5d15761d81f34976b69ed8b3dfd23f105c2f.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d2004f28f6e4e8ccc1f395ebd3e0e75dc63befc8db620e496888328e3795c31e.webp"
+                   ]
+    },
+    {
+        "id":  "e196d811-be31-4b5d-b5e6-83d18e0ba3ca",
+        "slug":  "beauty-men-s-shaving",
+        "name":  "الحلاقة الرجالية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/1a85aa3d9ec4525c92e4be609ab15afd82565001e868f33c1c95433f04f53221.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b495c5c904393fd9bb637ebc93c8eea3abd4b60a2269fc71c12e8cb0fc02725f.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f2e587f5a5f64d86328b73925a132fc088bbc07286b01c19d4b873c37d410aa0.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/57f8a8a6a7fdc7069b791702406399d8f06eb328a43fc2cb2862e319e10d541c.webp"
+                   ]
+    },
+    {
+        "id":  "4d7cdbe7-a46e-4047-9f83-6a0ae5758fb8",
+        "slug":  "beauty-women-s-shaving",
+        "name":  "الحلاقة النسائية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/862f3365576ef7ba04e127d8996e748126e6e5959814572b0e82477c95c6fa64.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/1cea126afbe085aa1116a57596485d6e5610271868244a3c399c571cd3a18903.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a3788965292756f9ada940eadca5d46ba45afcd14bf8fbad61b7bb58b1f8377c.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/63bdcb0d8e1e12249dbe888608ec37d3494fab172d4d067e6f22de705168b828.webp"
+                   ]
+    },
+    {
+        "id":  "48564f38-aa27-49c3-84e3-e68aefb2d7ff",
+        "slug":  "beauty-perfumes",
+        "name":  "العطور",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/cbba9199e850a2be7888ca54b7ab32df5eaa72b2902b2433eeba019604b11b9a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/42e87b94ed88c70bcb8695b443319667f8c3c2ef53fd2f8d835e5f3ec53a7238.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0e600f96ca2099cea7d8a0b8d91c2a2375f46ed9ecd523f434be5049a8646976.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c2fd6c09f206eaf17e3dd68cc71ce0943dfb737f54e515255a4e7bfc82e3a12d.webp"
+                   ]
+    },
+    {
+        "id":  "aa4762cb-b602-4362-8e72-e8ee3fc53a01",
+        "slug":  "beauty-skin-care",
+        "name":  "العناية بالبشرة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ca59aae91f9be63ec95c809c8a123c30b63f22c0cd195fccec7b3b490bf9da64.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f54d47ade324d081cf8f3d06f23aeed144c3e96638b6eca2d08051269479ba38.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/23871644add25bc990702137c1c91c659fc2b050c2c1498876453dd0a22656d7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a07ed6530d44d8a52041a29b3a8f74c24162c300ff5e1dc94402a337e7cf68bc.webp"
+                   ]
+    },
+    {
+        "id":  "2548f898-855c-4bf6-ae3e-a7228e13a490",
+        "slug":  "beauty-hair-care",
+        "name":  "العناية بالشعر",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3f52e848b0c847198e2d6286dedbc5d08cb1e21bdbf7b320e66425da35d37ea9.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/8c9391c62e3aea58d8bf269fdf3efb7bca12d04f2d92fff57404f996f2cdc8b7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/db5647c82fe343acf24d570840ec76eabcb54c910efc6be630ae83fe7b0702f1.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/231d62a07d8c3b8b3010be5f9e5c5a329613593f2d6efad36bf27012288a4f87.webp"
+                   ]
+    },
+    {
+        "id":  "57f0ceee-aa23-4c78-994d-b478a36644cc",
+        "slug":  "beauty-face-care",
+        "name":  "العناية بالوجه",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0501491fa24d6d59b6e09d579b0ba19a4886d233f0fefa8b654ade8330690695.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/382597344445b31ce77335f2cf5d291eea2a4921369a515dd76cd61b07ccbc35.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/716a113575658f0d7326f9bfaed525f72f5869a3951fdfb23495badfca411aa5.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f380d58850d0512ae3fffd9eff452582f8b905e515d0b1e7ab5f905f7d2dcc38.webp"
+                   ]
+    },
+    {
+        "id":  "80d9b528-eb32-4294-ba64-d706aade4cf8",
+        "slug":  "beauty-conditioner",
+        "name":  "بلسم",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ee4f0ee2b6b599fe43fe4fd954990e9e6036dda571abb26aeb5ef220e5fb2197.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/1026d7248cd85f64583facb0330d2fcdc1a79caac403f75a012c509a64e7a578.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/08a91a863ba5397a084a21a60c69f869944779c936507cae5dbd997235f02382.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b025210d3a6d40046aa50a1ebcd4f2705fd30eabeba5183262b1af5d704e3038.webp"
+                   ]
+    },
+    {
+        "id":  "5ea3e19a-5942-4ddf-bca1-022b6eb1b97d",
+        "slug":  "beauty-shampoo",
+        "name":  "شامبو",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e0eec0637a6acc3c3524fabefa46bf23fe00ef7ad7993f9642383900c9f958ce.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/835c6b6ea878b8227c17bccef5b57eb0864e6583496ef5bca6795bab01e8da7f.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/5e8af99d4f7d4bf4d29bbbe23660c2fd18742e4ac606de2737702813a13d07b7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/aa2d203a90ac2c19be299be2839425d1dc592c73d2136f8a6d178980b06e9729.webp"
+                   ]
+    },
+    {
+        "id":  "f1078cfb-1d47-4e20-9191-840954786964",
+        "slug":  "beauty-soap",
+        "name":  "صابون",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6c1801e723e27b201bd79b3de638075657b383e48a46c9f77d457ea38965a017.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/bfe1e4ddc665fcf19d72d7008274ce6ce9b3a2211a3f4b5b5398c8d803c09756.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d991f8759dd1f34b3b05d538f993b68869a8338bf3325bd78a383cfe2eec29c2.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/45d7752266f16bbe2d7e7e0c1fcf72ba74fdc2c9887bf493a4ca17772027cde4.webp"
+                   ]
+    },
+    {
+        "id":  "e29d86c5-43c5-4021-b3a8-79a550db8b60",
+        "slug":  "beauty-body-wash",
+        "name":  "غسول الجسم",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/70b396e45a12a8ebbd84c12566739787aa738d4fbb5b5334c25d1e0cd9f55043.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/345d784467cdadda87b4703db0e22ed7a5e3ac49e235daca39f8c41074b9dff4.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/cad6e5563b9374c24582b15dd212cf42074be5ad8310304bf02cfce43295132b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0759e21ebb3af9a4c146bbfcbbb642b6d4789f24198595d047f6659e1e3792b4.webp"
+                   ]
+    },
+    {
+        "id":  "ff54d3da-633b-49a0-9dc8-58d836ec5d78",
+        "slug":  "beauty-toothbrushes",
+        "name":  "فرش الأسنان",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c04c00c96441c2c3d1fc429277f00afecef5951b843df533cbe07d40335f9312.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0220351a701cd273e25bc774e3d6c741f64754fcd9c003d69c6341ed057d859d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ded264ce007e76dddb2eaafa3ca56bb53d2890cad7cd9436d7d8947fb4c569c1.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4d71691df855208947968c780b64abb2c44f61d6ef40573cae1ccce7c98d5ae2.webp"
+                   ]
+    },
+    {
+        "id":  "f8f6bbcc-7849-49b7-b9d1-7d50393f3290",
+        "slug":  "beauty-deodorants",
+        "name":  "مزيلات العرق",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9b2954277fecbd283ef6e4b44a435ec86b46580556edbfc350d746bfea2f5523.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3085c821e9787e33d4a3f3256dc3e63c850fad894f9b75c7fbe862f4a5e63eab.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/aec8fa0479189aaa2b95df1abad02d3206f2b586f64140f96f1a9b13b48ebf39.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/7d6dc12bb8c438c693973ccfdeb85c7b7f81e10eaf18b39b27e5dd53a9f1f1d6.webp"
+                   ]
+    },
+    {
+        "id":  "9167d405-cc18-4d6f-b85b-c5758b108cb5",
+        "slug":  "beauty-toothpaste",
+        "name":  "معجون الأسنان",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/26c726bd55cb3df1f0cdf3f75473ee7595b52c90c3a63a96e6cdf8c4b0febb21.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9f47278fab97da2b9b3f90c18d343ac6cf4331900abebfbd2b92f815e11ad72a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/7eee14cb4cd3c60e732da9a3eccd3159fbec0b11305da5e45ca839d1fc8a8973.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/da6869a441bad116a27b4c167dd7434be8416bc489e1bec9af27967a78f48f0e.webp"
+                   ]
+    },
+    {
+        "id":  "8421dec3-96be-4795-b74b-1fdf5f481e87",
+        "slug":  "home-storage",
+        "name":  "أدوات التخزين",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c0c7a6ded31389dba69f2df090354a1ac33b2d99c1be287030961d3cbaae5e3f.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/359d556d0c873bced67b8fb74a38623ee1ba5fce91847bd5e22ef590ae269145.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b5ab9f54169f1faa545a7caf77dd46243900711c1dd7575169731f3a19652b1f.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d4baad90d0478177afa4bc8bc6c2b94b6424e259141c43fafc24227087168813.webp"
+                   ]
+    },
+    {
+        "id":  "1a7ab489-17a2-42b6-aeb3-ced3e155b381",
+        "slug":  "home-cleaning-tools",
+        "name":  "أدوات التنظيف",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b8d52de2e5c3f23ae22197c195b9e22538c9cbea0fe200cc4b4b7daf5250edfb.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c5f0d9fa785219e1fc05b921cbe3a16c8ac99e8760e7cc13e922735ec6706bbb.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3c35cc184ad8faf1fbbe2f02587c92019afc046fb7cd40a4a10a44125f194376.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/cc78a8b452b9c20080341564693590fc131f76e44fb57aacdd96d6ff493673ce.webp"
+                   ]
+    },
+    {
+        "id":  "90082c89-180c-4521-a206-da15d5dc5655",
+        "slug":  "home-kitchen-tools",
+        "name":  "أدوات المطبخ",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0f6a149523e8e9375322808bdf95bae5fcbc14e8e917f203513fcd50a74f86e1.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/125ab0d267e21bf4ad31e7cfaff67ab562e3412006faaa4cf1954f3b81f48ff9.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/8a64c46d063bda4fb5f0345e614dd0d64ac59c6b6d88df8536f6cd08c89069e0.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/7f6a0e533cd8cc5070b90bdb526dab32a4c6dbda575312f4c105adb95eaa3fef.webp"
+                   ]
+    },
+    {
+        "id":  "e0ac6c82-14da-4b3f-a486-ea3817e3691c",
+        "slug":  "home-cups",
+        "name":  "أكواب",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d21cda0079e4482faf9a84a3586cd672a1dced00b032c8c900a7217d728c246f.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/40160118b2c57331194758e19d0d79af703650e3a2cca25b3e82755dbdb78afb.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9b5244619cecf69906aaafde4015cb7a60c1386dde34a5854202d20361e5825f.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/dd0891554e91cf4cc64866c938567b51c150545cd569a4a9ea7486b8f2d5e980.webp"
+                   ]
+    },
+    {
+        "id":  "b48becde-0060-47c7-b94d-1b5f81a69b5c",
+        "slug":  "home-shopping-bags",
+        "name":  "أكياس تسوق",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/53457b496f673f0345551f30fd09b041fff5478713eaf5b7b87f1aee08027513.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f3a077a8e3003b154b1081d553dbc41023b395255cca03e8c6ea6fd32a6c2c89.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/248ceab06089da2c6cef4461d8ea91aff00580777b9268241e2529987b49357b.webp"
+                   ]
+    },
+    {
+        "id":  "d533c108-f48c-4357-8474-ee1c31716f86",
+        "slug":  "home-garbage-bags",
+        "name":  "أكياس نفايات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/7f2da1aa214aaca0043d64bcb2ce20f348900cfb7730a3cdf4eb8a35d983a676.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/48f0c1c28125c567dd0e9320166ab790121736ad71629384f9e49e6fb36f5bdd.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c9c0be55f609f2c97cda57884e9dd923017d09d5e02dc5553cae7ae4877ec9c7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/159d8ce056aec510b8dfc8efb2a0763adc344486e7bef1698c7104d2c537fad1.webp"
+                   ]
+    },
+    {
+        "id":  "5234f3b5-57b7-4d95-b8d1-5ff65027773a",
+        "slug":  "home-sponges-brushes",
+        "name":  "إسفنج وفرش",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/dc0e46d375c6bbb5104118e38d05fa2dcbff65da1ef663eec035579aee024e4b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c8fdda1ffa28df4853b2733f67b9d8fc24b496fecbbbc9ceabdd6d08464c20a5.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/45b0c12eebd64b0ffe55c3d37adfeb82518bf083081f133db5452048feaa0de5.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b58f3cd5fa31dd0d3f481a103ecc244c3e65bb9419ce6d4d0fc5aafed027dfcf.webp"
+                   ]
+    },
+    {
+        "id":  "c1c884eb-93e6-4712-be84-e40e60804cb2",
+        "slug":  "home-outdoor-lighting",
+        "name":  "إضاءة خارجية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/5f2dffad9a5d3ad783949e364a7e12870060e008fcba05c2c2b33bb6b680ec90.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/59cf82b1ffade18d414a232a6e05bfc1aabf1342343ef8662b6e09f80b827647.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/52b4a75ee7842cd05850720e2082429cba2b83453efbd8c9d2f6e83d0461a405.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e605e3e5471b9ce7b9dfebf0546fcef466d14afc4e101fd9da22a53729a382bd.webp"
+                   ]
+    },
+    {
+        "id":  "5138f97f-f4a0-4c7e-9c61-d28322eaf868",
+        "slug":  "home-accessories",
+        "name":  "إكسسوارات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0014eb916d7ced442a30801fcab483a70f4505f98a3d51f932bd0bfe2de5f08c.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4d4b2ed701c0b993d8fbb36e584703c21d68ab650b669b24cd7e7082a9ffb987.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/8001b4297eaba788ceda6a4e107eff70b7337dcf7d112614774755876dee8d28.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a8a0503bd2a2ca0c2e3123e2b78e1ce148dcc591913dfed2b9464ec8f34acd9c.webp"
+                   ]
+    },
+    {
+        "id":  "2feb5929-b5dc-4ca4-b72f-ffd667535d1c",
+        "slug":  "home-camping",
+        "name":  "تخييم",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f4ccbf1d5b4fd2700862a8feda3c61d1e5983c4aaf0df4ad0daa95da011f1521.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9a510bd7fd4c61873603aefe91fb20125a7408586ae2933ce457bdeaa82c1a10.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e2281d9da65c38d327e43720e67ae95d3b40eefc991b6db174158525ce0c3ae3.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/44ab546f7c2ba7446583aeacdbe96ad786054fa0653e15e225308b64145cee53.webp"
+                   ]
+    },
+    {
+        "id":  "55cec3ca-3afe-433e-8980-d0b9565e891a",
+        "slug":  "home-food-wrap-storage",
+        "name":  "حفظ وتغليف الطعام",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b54805bd6f0d9819c6883e3212f6028580879355ee67ae866ace8b2a5467d901.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/8aaf46f1c09d0d7783c34bb8b4b268ebf70615a83e70e076ae148097b3dd164e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/16b035e4b054f3a879df28b6042d920be7b22e9eb60092d79f8280fdd65f49bc.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/19c2e8ac32481a8cb01e54d51133f2885e03f910e26912d2d5db14e9e8177ca3.webp"
+                   ]
+    },
+    {
+        "id":  "b22df2ec-133a-44aa-94c4-38b06a509795",
+        "slug":  "home-bags",
+        "name":  "حقائب",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6ef21ecf6b11be0e367fe25c570f292cd44d78aaf808ff69f2c69259b65959c0.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e78a8426d7e8f2eb2fd1797c2a0acdf0ddb574ea58670272f4086481e5118250.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fee8cb58ecb543b936e59c502272442b413d839f67d5c1585194ae0349a644d3.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/710bb6e859b383c11cdde74e2fbe4056e512406847d4d1bcd5d31358d169968a.webp"
+                   ]
+    },
+    {
+        "id":  "ed0f5789-71b2-4f5c-9d97-c0675711ce48",
+        "slug":  "home-home-decor",
+        "name":  "ديكور المنزل",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d030187f1d5084a393c5e944bf125ce4351f066e4249d604a2ae42039def6cbf.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f079830a8b910e8f8d84254ec3de511ac439e56dce36ed2feadf8341f73f1929.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/8513b8365de928682f1df553347244f57a8441fcf94d810cdbf79afcb6452f2d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/183221165ed87281377e8a80f8e6d7915d35e746ca010d062641a1e917899e86.webp"
+                   ]
+    },
+    {
+        "id":  "c33eb392-64e3-4fcc-9eb2-bc0d06e27907",
+        "slug":  "home-flowers-plants",
+        "name":  "زهور ونباتات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/de2af34998e61d818f9f11045a3e234cbbbcb847001d3f2ca39a562487e1776f.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/09fb59f8f288d7f14715b67b15259bd32f1ef68a1336c0420ac0d4a33855a351.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/5cbf78f0ad4916b657f90a43803deabf858d986c09d4469cc7e25488be75f3ad.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a3a06927b5196994c583c31ddffbaf995f01ca4a21a7797f30649cddc72bd1ce.webp"
+                   ]
+    },
+    {
+        "id":  "9d7137cb-810a-42ed-808c-38f23d5774aa",
+        "slug":  "home-grills",
+        "name":  "شوايات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c8e7941aa4ac9bb32b1c2ef3413b3b22c50581efe26dfbacd2910c633b70ffb3.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9713fcc7a46128f5d695cad694c02a1912dce53fc645c208c5ffa30b09c443f4.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/db1a7134a24535830e1ceeb1854e509c41bca5726d31659cdbfe50d7c5a299b6.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/abd30a397fa228018b8c57ca92f25fe7d6911d769d4c6b9874fd2b2fdbf862df.webp"
+                   ]
+    },
+    {
+        "id":  "2f3c3492-3a21-49e9-a67c-41a95554aca0",
+        "slug":  "home-plates",
+        "name":  "صحون",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/13ddb0a89c4b8cb49e8448aef32b2f94108f4524153d23d0b8bb480ed12eca06.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ced2d12678e08aa8bf819d82e206f95b192870cc686e9aae35f27f03a27d5aa8.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6bc99a61a9bebb9edb7cb20bd7830e722b55f3fa3ad599d4b4085c40fde7b529.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/754c0085beecbf6c757e1dd6ece0af813062ca5f832e90dae2707daead5e146d.webp"
+                   ]
+    },
+    {
+        "id":  "aefe4c0a-a7a2-4493-be9e-96b7fd21f3a4",
+        "slug":  "home-charcoal",
+        "name":  "فحم",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d7d78de79b3f08d0e14e468238b1280113ca7bef65d49af95d18ade930c0e074.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/efe6cc51aa6d5ce03ac9cbcd5c8b861aa9d9fbc8fe92bec7c99ab3313a25d305.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a212dbcab2e4f45ba70d2eb3b31e3a21d15d00d212816ba667a30f55072247ea.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b3eac87335c10c45647ac82d6d6092ac15372945430998466c30733301f99a62.webp"
+                   ]
+    },
+    {
+        "id":  "270dbfea-d475-4a04-a909-ed213e6658c9",
+        "slug":  "home-garden-supplies",
+        "name":  "مستلزمات الحديقة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/132cc93156b1aacb65e49febc3077583971aea3e057bea00df377e35d9f9ece9.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/eda160f89b825799639d6c9e30b641efe9b735842f2fee5d2500157149382ad7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/de2a61d049a5551c456206d5b3a30895c083966f17dfdc92cf1213925f754b9a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/cec57e7613779c9c275f73f68f5418261e43fd0585b8380d1af5358fa5839d2f.webp"
+                   ]
+    },
+    {
+        "id":  "63404c8e-409a-408d-a482-a6888d03101b",
+        "slug":  "home-bathroom-essentials",
+        "name":  "مستلزمات الحمام",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/8f8167099dac6b5f8a3b3c622560fdb15dbaa20533c132ad5e4f3e41a1149239.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/bd33e6491c698340aafdd0a95f7117430ec2b2eb1d140d15b024d4e327a088e1.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ade0318f0a0a651ae7f6eb35b3607690908e515100798f8fc86f4ac386b20020.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f088f4dc413f10e00c0ff529cf7d4c89cd1621873c45f7745a5ad0f4c33cc928.webp"
+                   ]
+    },
+    {
+        "id":  "4f057686-eab6-4a1f-8764-48d3e6b4b6ea",
+        "slug":  "home-air-fresheners",
+        "name":  "معطرات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/722731c01e3038d114dc7a3f32dbc0c1e595c1d84f7116eac29161be15c1d39a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b93ad2ab18245a5c9ee020fa3f7d0f1ac9b644d3b20933c2226e89072651a8f2.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3ae92cd444a2555aca5400a51766e8ec88c1551dcc05d2adf9471ea6cc955b6b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a11ddb3b84c5499178181e07f7aacb5219e0bd77d4b3a9415c594ac21d2c37b4.webp"
+                   ]
+    },
+    {
+        "id":  "e4d0c838-364a-4306-b2f8-87b4d445da99",
+        "slug":  "home-insect-control",
+        "name":  "مكافحة الحشرات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/68b6538a216ea3553632a7ffdb9d47b2dcf6b2c40c61ec097fb2476ce40de7b4.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3a52edba1f8910dfd0646d7a9f402d53417061f39c8a74a0c1d29cb2abcc8feb.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/84d0b68f743e16e0624305e55ea6164bcd3bfbc9c12e8fc30d582710cdf91bd2.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/177b471856b1ba9908b81a3377f63ff567fa4d495a6f19eb15b62a65622df060.webp"
+                   ]
+    },
+    {
+        "id":  "d95f46ac-80fb-4b13-8368-a8144b4e5235",
+        "slug":  "home-men-clothing",
+        "name":  "ملابس رجالية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b01f3763cc4df177e23940c677f4ca80023f3f2400ff33fd6f7ebe88c7b9c0b6.webp"
+                   ]
+    },
+    {
+        "id":  "b7524e7f-dec7-4cb4-a2cd-2a6d812c7b8a",
+        "slug":  "home-women-clothing",
+        "name":  "ملابس نسائية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/40efbc2bdade33fa03635c312498d726eb3f1b7b7d8b11a1a1c16fad8b8e9a86.webp"
+                   ]
+    },
+    {
+        "id":  "eb865957-02f1-4ba9-98fa-e07eec2d57c6",
+        "slug":  "home-tissues",
+        "name":  "مناديل",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c6297c25c4bc4b2bdbe475141d540492df6b366a79f7ade9db2de029bd3bf205.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/dce46f347006c6079bbc87a1692ca353e944f69610e4ab2bf6b59818f98236bf.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/da765c9ddaff707d6997e0624dbb13ac3ce5886197fc7f40804688ca94e33fd4.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d6f908440001f25978b36bfa5509004e39b9c4a543c488cca610fcd2404fcf06.webp"
+                   ]
+    },
+    {
+        "id":  "0437951f-6071-40da-bf8d-31c25c27e12e",
+        "slug":  "home-floor-cleaners",
+        "name":  "منظفات الأرضيات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/46fe7813d369d768082e85c75d6473c42a73769cb6108535d3fd4d19dd9fb879.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6af60c3e9fb570e6fc6cec15de882a7d3fd9053641656553fe189a433d7e8620.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/da7309dfe69bfa4fbb2da751d66a5f366636986a57f90436396bd8ce9152a1e7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/2c9e42fbd29bd30ad7bfb4622c692264ffd71fac6454873986a82b6a6ce440b5.webp"
+                   ]
+    },
+    {
+        "id":  "2413c0cb-43f1-4865-af6b-e1e0acb3945b",
+        "slug":  "home-bathroom-cleaners",
+        "name":  "منظفات الحمام",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/42fba7d5eaee2baf91b5c6024a6e36ff47f66879085864c1f814eda4b775f006.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/185de5c786d8c3a98fe72738999c52be077056cd5280dda56cb7f5eb71436432.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c9b3ffefd57b82349864f18885fdc93bc592bbac07fe0cf17d46a360d24044d7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d46f67de0c76a00596db2de9bd4b0042cea34d44ae0f229dae21d1009bf78ddc.webp"
+                   ]
+    },
+    {
+        "id":  "c6e82c7d-0567-4c8a-a808-019b10cafcf7",
+        "slug":  "home-kitchen-cleaners",
+        "name":  "منظفات المطبخ",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ffcf1775574592b2f821d51acd08164d6342bdf6d94f3ac11319753057158d34.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/05d6f3c7828e26b5bd9fb62db9167a6d7ca3869a8a43859489b05cd4cd51c2c2.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/211f1b2e7a4e80823990c8fc9da0ede3187f342f5aa58da3acc763744b4c9e15.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3a21af10556b4898b1f8408cda46c3a319bf76927f98bb3aee7e4ca793a249b6.webp"
+                   ]
+    },
+    {
+        "id":  "ad160d3e-1219-4d2f-aefe-ad66fe5eda78",
+        "slug":  "home-laundry",
+        "name":  "منظفات الملابس",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/08e5ae6e547c2e96e156d1930b7f574ce5d570268759c8b478d7881de3d2e4fe.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/bb0f1c4d888e6cc396ac78a8fdb5a117bfb80c9b8c968954095f9f2457289c06.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a416a7002dc09f9f16cdc7ce70e66abf278fff20410fb77dcbe700d40e38f11e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4a7cd747ebcb9373e8a6dd0c179890b7aabae68c68c21a4ae5aaad00a5924a9d.webp"
+                   ]
+    },
+    {
+        "id":  "363fc53f-3642-4d5f-9b0a-dd15013f8cbe",
+        "slug":  "electronics-small-appliances",
+        "name":  "أجهزة صغيرة",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/bc3326d2c76280047382d2335cb2fe2f84ed7e2c36c1a577707ac05b461c6e7a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/2d9db2bc6f4f93294b1c0ad7887fff309c82c5b64cb6a026167bb54e36d70e87.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c3f7f99d6353d75fbbf6d032393b2116c30f9e6c23f12a49b4a18c89fbfd58a3.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/daba72d11c1a377982d74a2b2eb967a346eeb5d5a2d253133526d4160cfd641a.webp"
+                   ]
+    },
+    {
+        "id":  "5d0c90d4-42dc-4494-9472-4cb49365c40e",
+        "slug":  "electronics-phone-accessories",
+        "name":  "إكسسوارات جوال",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/1f7d65d8f7d03df4c9a79559362871c407ad0a9c1b8b5e7e308db469d65fb685.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3027852e8620251a060597202be48a6cecc3a5ae90e742f71895920ec20935dd.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/473aa0d3e0347aca10c7130ae80bc7984e9460b32f5307da0ae1e1de722c10be.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fb30d7469a78edb4e8ffa08c17e125177095007d1299511a6b73b71c42c0e83d.webp"
+                   ]
+    },
+    {
+        "id":  "04234980-05b3-468f-b296-0e738e743018",
+        "slug":  "electronics-car-accessories",
+        "name":  "إكسسوارات سيارات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/927f38529eaeef255b7ab936ea1a8c7b3d31bb858df821229ef17821183f8d8a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a75cc1a820bc794c4630a86b603ba15a9a0cd721e13b8e4dd7b8b2af4a18daa0.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/aa971b292283f2bd550d249c9bdef930ae5f32adaaba4ad89ef9cea63cd2ddf7.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a637af18d48fb8fae4f28c8d8cd560edb346a2a9e400155306e005d277c5b5af.webp"
+                   ]
+    },
+    {
+        "id":  "ff1e5c23-860a-42a2-8d7c-1c449bc12dba",
+        "slug":  "electronics-batteries",
+        "name":  "بطاريات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0ec128eb11a866f31e1434c50cb7103c3448791479d8398eb062df39ad2e3fd4.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c861a1d83d1071906b2e59511c1cc70c8fd21dcf26e1bfbff9677329a5a68366.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d4c7a2c919ccf5a8e437b24b64b6a0142f975f38a31deefb0d0cb45b73a81eb3.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/631dd9035313ee7582386527b25cdcc4182dceb0401c665fa6667bf7951d3092.webp"
+                   ]
+    },
+    {
+        "id":  "e0d8b4e8-8ad2-426a-bf79-9f2a9d1d6257",
+        "slug":  "electronics-mobiles",
+        "name":  "جوالات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d9be4c3f9fca1fed31154ed5ab362fd0495b6bbb8da1d85bf12e8477c8cfe347.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/dfee39b73cb6922b78dc74c2444ef05cc0cd3e3eecfc647a6d8ce6091b036193.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6b5be447fc8148a6291883d5e597804d8c2e8ee1948842b9c361fcb5a5092e24.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/25e85c78579e412b68361c21c3121d2d6f3ca0b2ed32f8d8ec741d8bb8533162.webp"
+                   ]
+    },
+    {
+        "id":  "60705e99-0779-48c0-bbe0-0e58c61c8d84",
+        "slug":  "electronics-smartwatches",
+        "name":  "ساعات ذكية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a026723509f49e0f541de6cb775a3aa197b86f4b5136b1d744cffce5e32be5fd.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d110375bc3bd0f8ddd0ae8d37d31c14ae017ed789cbf7a6d5145bcfcbb07cd7d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/063217b1f7066226669e081596f9884442b48b77e7f5f14ec2e1568204fc352d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/1f98493a8d7ad7c68133ed7542686798c897ae62dbb65a623dba6e3ca26d7497.webp"
+                   ]
+    },
+    {
+        "id":  "0e050a6b-5de0-46c9-8116-9ace9f5c1ad8",
+        "slug":  "electronics-headphones",
+        "name":  "سماعات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/2a470e03cce7a8a112705ce30d223c0fb5b7dbcfab7f5c39cb24a1f6587e6297.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/676e89805d378e3b2593d89c107de18aa58602356e1715f601d6d3e8637cb695.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0d4bacd720481cd7b0f7586cdb621d9d3cbaaa610a140f6b85ee21d8b3576a7e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/06f9908e662f2e84781b362a3f3b607d56ad1d4e7ac146fd040099ad6d159937.webp"
+                   ]
+    },
+    {
+        "id":  "6cafa212-5679-4a29-8076-45ada9cfd68c",
+        "slug":  "electronics-chargers",
+        "name":  "شواحن",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ea3b2916a013f3aa3286478c19a70b7068ce48361245fab04ccbece6766b50c2.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/77b73762611d4c84b5202e14fc2cce22d64bea30daae2de330e8667e0d57a857.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/62a51c89ec9ebfbef16f8abd3c65fdf7dad5735220b918da40baceba1b525d36.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b1a4618bfbb0adf6d0ac9b5beb3086ef3b7dc390deb0f1c080b48f1465293deb.webp"
+                   ]
+    },
+    {
+        "id":  "42655a7f-2d2d-4248-a986-1dfcad8b40f5",
+        "slug":  "electronics-cables",
+        "name":  "كيابل",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/23911b410592a7528656ddb1b9d0129b43edacfb516cd379a9d83ca8979a305e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4a3e93be96035e33f045404f17696a6103cd58f4c1ac4c3a96b30c622fc6595c.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c4f888484f0119da64e364afd857a6ad174ae85f82192b03ef13e2dfef513a21.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/eda115a05130d03aad4527b5a30101671ba3b066cec28e93aef4a62888b626cd.webp"
+                   ]
+    },
+    {
+        "id":  "42ba0fda-1456-443c-9a94-1bc641d69e4f",
+        "slug":  "electronics-car-fresheners",
+        "name":  "معطرات سيارات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f1e9172d6d84a7d58c31f4882d4dc1d3cebcc5b4aaeab7de9afb78f79df9a7ca.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b517ed450e56bac06d27e3ed155aebf8f254bbd966e9f805cebd99afd802271e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/185cb26c91d7644646e50538a7df4f17dbbe71ab10064430ad9fd362d624908a.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6e3b3a77111bbbde67a17e6b2b1bdee7a16df995c7363d84e934c6cefa4cd3de.webp"
+                   ]
+    },
+    {
+        "id":  "d5f98946-2581-4f05-bff1-2d4b8c13cd0b",
+        "slug":  "electronics-car-cleaners",
+        "name":  "منظفات سيارات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e14cbd45101077f441c2447d206da4c08a21025057b40a950d419b34e0215eee.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/48026fbdf1ce1ea2ed422b1b98ed1ab1d34244a7bf920cf8446c9e4b3a59fa37.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/f19b8ed62510584135b1290aeb54ecaf1d54be67058d7e9f0000d0f10c565801.webp"
+                   ]
+    },
+    {
+        "id":  "0ec81593-94b6-4dea-a9ee-445358f30c18",
+        "slug":  "baby-diapers",
+        "name":  "حفاضات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/1f3243fad94d6b6ae635112cda4e083b51d7167f47f38a29b6f90ffad9cbd164.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b7f2ba4d2b24734c9969239e54654bb99a2baed7de73f0f85568f2edb5633a50.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/436d815658149ff556e8c255eaa5b2a56c685f7cc5303247599f4ec5ed740aa6.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/5e68bb8b5bcbd62a26b76a191c2c820bff042a1a617ac681795fda7d740455a0.webp"
+                   ]
+    },
+    {
+        "id":  "4c166825-9dbc-4537-9c76-578e4d390a8e",
+        "slug":  "baby-baby-wipes",
+        "name":  "مناديل أطفال",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/64b1a63ca56c259e7b0d30545afcf80fb1a81256e9f79097a547929e9797ef93.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fdd40d3c08ff471684556738c7924c3fd646c4d936b38f80bdbe275285077758.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6d8810a6055f62c090715e37eef56a3c97373eea1bf41520aadf893182a8dbf1.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/7a44cd098d40510e211d8e00c34f4eedd409bfeabead4161a9da9ad78ad19c9e.webp"
+                   ]
+    },
+    {
+        "id":  "d7d7c61f-4c97-4966-87ce-4d8436b94eb6",
+        "slug":  "pets-pet-accessories",
+        "name":  "إكسسوارات الحيوانات",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6df38255b9f9e50e51cdfca24e6d9b37555f96b062064addfe42aacc8d03f103.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/ce93e76c6a5c6eeee0a8ff66d2350b87458b3eed76bb9ee9f91c80f325199cdb.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/7b4b3e542c1772ad025fa139f9c0b3d8fcbd6234bb38244b53c6f12224f44f6d.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/8566c557c71da909e597fc8ccddc18ac0eb9b21819ae6558b0c717410896a21a.webp"
+                   ]
+    },
+    {
+        "id":  "c7443f3e-bb81-409e-a15c-003ed33c19ec",
+        "slug":  "pets-cat-litter",
+        "name":  "رمل القطط",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a29a33277722922d623a0d95f371284eca19ca09edb8bb215246e8d75edcd4ce.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/766e72b479bf7a3ebb1e6d563230870e388d124de3d1c29e0b6470e97f992522.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b3e66d4cba415193bb157e219b95c33f1d60bd48b9d8d75c7e97b5c3e8c81623.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e3cdb013a19d7ccfb597234f2163692a660d89a4d9c55c7ea462a309ddcc6e32.webp"
+                   ]
+    },
+    {
+        "id":  "784902c6-bb2a-4cd0-8ee5-4efb22de487f",
+        "slug":  "pets-cat-food",
+        "name":  "طعام القطط",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e0a7a6855a0985746bf8d0172882b8b24780eb24c511470de567dc87db2547b1.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c7deab12d7a6c693611dd1c745f6dabf6f0ffdd61ccc6c339b36114bc6fd42a8.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/2085e65b5be8f2714cc6bb6b9861fd58a35d90da0417913bff3aa159aee73835.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/04d39e8e885b0261b406bee2b4ccc41dba50052f7586a7ca0846ac7f2dc19ee4.webp"
+                   ]
+    },
+    {
+        "id":  "582e3233-ac6e-450c-9720-4202bb966c97",
+        "slug":  "toys-kids-toys",
+        "name":  "ألعاب أطفال",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4bd3956d7f16950a89dd15c6477f64e98ca896140e4504d416c80f827ddfbffe.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/edb200754088b8416785d7be865c2296a9ded4d01ad28b7111942e57abe2d6bf.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fd239e8e5e474d733797bbee470f3edb2b381b2d89d51e3b460664bed57c18e4.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/518d33c6c0f4787765421a2764188e9f8dbb70f68d3cb41315c4e499a94f2a38.webp"
+                   ]
+    },
+    {
+        "id":  "00b29e86-cc15-46e7-b094-901ff46efb29",
+        "slug":  "toys-electronic-toys",
+        "name":  "ألعاب إلكترونية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4d788454c41fe6eb87aa87f07d7732bbed9c3016ad14ea0e2bf81948760829ba.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/89c8b36c3a91bdc1037334a6d871aad18b2eb8f7506b9192477d37ef120f5d6e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/90146564bf8535e526b9cd98e7a3e0b5c528cd6e5b53fd1e1bcaf5eb5a0a9586.webp"
+                   ]
+    },
+    {
+        "id":  "ecd91444-56df-40a3-a75d-9df642d64745",
+        "slug":  "toys-educational-toys",
+        "name":  "ألعاب تعليمية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/981e900fea3637559ea3462c514e93c67c187709a5eb71479f0949cbf0224183.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/2eaf78e211c07609203734adf474851abd04c84cb71a836b479a8f3735d8b397.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/e861004e7824daa27fbc63d1b65ce411f5fe672057086e32cd64f8552da8965c.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/1a6929a2ff0e10526a8ab0bd4a5515934b2664c5fad1898980c8f1c5d6b83bc1.webp"
+                   ]
+    },
+    {
+        "id":  "a777b30e-dd54-4cac-b45b-4022cc674920",
+        "slug":  "stationery-office-supplies",
+        "name":  "أدوات مكتبية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/16f207255f980d82e4d6aec6faab41f131dfb2314bb432a530e3394b9f24a76e.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/0f75afd1fa36dbd026f7797bd54df81b191af2643bd7ccd331424f3f6f7f5de6.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d9abbaad8ada6921bc71a7a3e66566764c4b253688e42d5d2f85d36728897a50.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/4b17d04c63370e371a6103fc2ba40198c5510bd6f570d8fecc0017be05275f9a.webp"
+                   ]
+    },
+    {
+        "id":  "739e6410-769e-4f00-8d63-47b6cf832cde",
+        "slug":  "stationery-pens",
+        "name":  "أقلام",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/fc32883f7c13410a5982503c2d851ee29919b8fcc4a4fb9fae2d9bd1d4aabd7b.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/c4ac38de1050834d82789e35daa0f0694d6dc59b93436ccec2d5cf754db0e101.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/a9bf9ae834786434fd326b1e95f9a85f20de0ddeb384227b66717c87bce49c55.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/7958c9a0552666c4719ecb50cc0015d80d24c900e40f61e3688a313dbd5f91e8.webp"
+                   ]
+    },
+    {
+        "id":  "35286a10-93c1-4c44-b1b0-5e5c110a48ee",
+        "slug":  "stationery-notebooks",
+        "name":  "دفاتر",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d0e5d18504e9a39a18de6461efa9190d90fa655e52b0fde53a6baed2fc37d4dd.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/6c2bc13a584b46df4ece2d72ac6f30e1bee9dafafcd1e85e83487e4cda06c098.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/9d5973031f4908dfb782492fa5595634f2a41ab87f4dbfb5298286dfe9a05440.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/04bc86c6c7cdd2a3205a4682b533961373549848f335bbc8c90bb84599367880.webp"
+                   ]
+    },
+    {
+        "id":  "c61a46b2-5a5c-4c41-823b-53b8b0168b8e",
+        "slug":  "stationery-school-supplies",
+        "name":  "مستلزمات مدرسية",
+        "images":  [
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/b69de2ab0983ce2ead20fdca9f1a1d12c7deb76cb42bfdbddd9ceb9f9b9fd6b5.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/d25da08090e16aa3de49cdcfb6d83a528c1a88f2c854f808a18f253481cba518.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/3631a9c15981eb2c55653030853eac7aaf76224a9674057d8f542982d1f09afc.webp",
+                       "https://pub-424a70e731134c5ea35a180514df542e.r2.dev/products/carrefour/65e9c0b4158e8cdd2c6c990a9ec49313d9ba8ad04decab9b6271352eb001340b.webp"
+                   ]
+    },
+    {
+        "id":  "c13fc237-f376-4cbf-a025-f1dcd2ca2277",
+        "slug":  "plastics-section",
+        "name":  "قسم البلاستيكات",
+        "images":  [
+
+                   ]
+    },
+    {
+        "id":  "2f75b2cf-2db4-47e6-8d98-f6ec9327df9e",
+        "slug":  "charcoal-gas",
+        "name":  "قسم الفحم والغاز",
+        "images":  [
+
+                   ]
+    },
+    {
+        "id":  "e06e483b-b75d-420f-8cbb-4c19de81e0a2",
+        "slug":  "roastery-weighed",
+        "name":  "قسم المحمصة (بالميزان)",
+        "images":  [
+
+                   ]
+    },
+    {
+        "id":  "0640beb5-b353-41a1-bade-b4a59cd7aca6",
+        "slug":  "cheese-pickles-weighed",
+        "name":  "قسم الأجبان والمخللات (بالميزان)",
+        "images":  [
+
+                   ]
+    },
+    {
+        "id":  "976e91dc-a7a0-4db8-9bd0-e785d7defdaa",
+        "slug":  "cooking-tools",
+        "name":  "قسم أدوات الطهي",
+        "images":  [
+
+                   ]
+    },
+    {
+        "id":  "a635fe42-8b9a-4ec0-ab7a-804762f42718",
+        "slug":  "summer-resort-goods",
+        "name":  "قسم خردوات المصيف",
+        "images":  [
+
+                   ]
+    }
+]

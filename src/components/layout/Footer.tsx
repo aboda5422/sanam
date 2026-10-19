@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { Phone, MapPin, MessageCircle, MessageSquare, Truck, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import { categories, categorySections } from "@/data/store-data";
+import { useCategories, useCategorySections } from "@/hooks/useCategories";
 import logoFull from "@/assets/logo-full.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useBranch } from "@/contexts/BranchContext";
@@ -33,6 +33,8 @@ const Footer = () => {
   const { t, lang } = useLanguage();
   const { openPicker } = useBranch();
   const navigate = useNavigate();
+  const { data: dbCategories } = useCategories();
+  const { data: categorySections = [] } = useCategorySections();
   const mainSections = categorySections.slice(0, 5);
   const whatsappNumber = BRAND.whatsapp;
   const [staffOpen, setStaffOpen] = useState(false);
@@ -111,7 +113,7 @@ const Footer = () => {
         {/* Category sections */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 mb-8 pb-8 border-b border-background/10">
           {mainSections.map((section) => {
-            const sectionCats = categories.filter((c) => c.section === section.id).slice(0, 6);
+            const sectionCats = (dbCategories || []).filter((c) => c.section === section.id).slice(0, 6);
             return (
               <div key={section.id}>
                 <h4 className="font-heading font-semibold text-sm mb-3">{t(section.title, section.titleEn)}</h4>
@@ -119,10 +121,10 @@ const Footer = () => {
                   {sectionCats.map((cat) => (
                     <Link
                       key={cat.id}
-                      to={`/category/${cat.id}`}
+                      to={`/category/${cat.slug}`}
                       className="block text-xs text-background/60 hover:text-primary transition-colors"
                     >
-                      {t(cat.name, cat.nameEn)}
+                      {t(cat.name, cat.name_en || cat.name)}
                     </Link>
                   ))}
                 </div>

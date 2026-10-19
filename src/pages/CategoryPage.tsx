@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ProductCard from "@/components/product/ProductCard";
-import { useProducts } from "@/hooks/useProducts";
+import { useCategoryProductsInfinite } from "@/hooks/useProducts";
 import { useCategories, useCategorySections } from "@/hooks/useCategories";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { categories as staticCategories } from "@/data/store-data";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -37,7 +38,34 @@ const CategoryPage = () => {
       c.slug === staticCat?.id
   );
 
-  const { data: products, isLoading } = useProducts(dbCategory?.id);
+  const {
+    data: productPages,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useCategoryProductsInfinite(dbCategory?.id);
+
+  const products = useMemo(
+    () => productPages?.pages.flatMap((p) => p.rows) ?? [],
+    [productPages],
+  );
+
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el || !hasNextPage) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting) && hasNextPage && !isFetchingNextPage) {
+          void fetchNextPage();
+        }
+      },
+      { rootMargin: "400px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, dbCategory?.id]);
 
   const categoryName = staticCat
     ? lang === "ar"
@@ -70,6 +98,16 @@ const CategoryPage = () => {
   }, [dbCategories, categorySections]);
 
   const subCategories = useMemo(() => {
+    const fromDb = (dbCategories || [])
+      .filter((c) => c.section === activeSectionId)
+      .map((c) => ({
+        slug: c.slug,
+        name: c.name,
+        nameEn: c.name_en || c.name,
+        dbId: c.id,
+      }));
+    if (fromDb.length) return fromDb;
+
     const fromStatic = staticCategories
       .filter((c) => c.section === activeSectionId)
       .map((c) => {
@@ -81,21 +119,6 @@ const CategoryPage = () => {
           dbId: db?.id,
         };
       });
-
-    const extras = (EXTRA_BY_SECTION[activeSectionId] || [])
-      .map((slug) => dbCategories?.find((c) => c.slug === slug))
-      .filter(Boolean)
-      .map((c) => ({
-        slug: c!.slug,
-        name: c!.name,
-        nameEn: c!.name_en || c!.name,
-        dbId: c!.id,
-      }));
-
-    const seen = new Set(fromStatic.map((c) => c.slug));
-    for (const extra of extras) {
-      if (!seen.has(extra.slug)) fromStatic.push(extra);
-    }
     return fromStatic;
   }, [activeSectionId, dbCategories]);
 
@@ -117,11 +140,9 @@ const CategoryPage = () => {
 
   const selectSection = (sectionId: string) => {
     if (sectionId === activeSectionId) return;
+    const firstDb = dbCategories?.find((c) => c.section === sectionId);
     const firstStatic = staticCategories.find((c) => c.section === sectionId);
-    const firstExtra = (EXTRA_BY_SECTION[sectionId] || [])
-      .map((slug) => dbCategories?.find((c) => c.slug === slug))
-      .find(Boolean);
-    const targetSlug = firstStatic?.id || firstExtra?.slug;
+    const targetSlug = firstDb?.slug || firstStatic?.id;
     if (targetSlug) navigate(`/category/${targetSlug}`);
   };
 
@@ -262,12 +283,31 @@ const CategoryPage = () => {
                 <Skeleton key={i} className="aspect-square rounded-xl" />
               ))}
             </div>
-          ) : products && products.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-2">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+          ) : products.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-2">
+                {products.map((product, i) => (
+                  <ProductCard key={product.id} product={product} priority={i < 8} />
+                ))}
+              </div>
+              <div ref={loadMoreRef} className="flex justify-center py-6">
+                {isFetchingNextPage ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                ) : hasNextPage ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void fetchNextPage()}
+                  >
+                    {t("عرض المزيد", "Load more")}
+                  </Button>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    {t(`عرض ${products.length} منتج`, `Showing ${products.length} products`)}
+                  </p>
+                )}
+              </div>
+            </>
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground text-sm">

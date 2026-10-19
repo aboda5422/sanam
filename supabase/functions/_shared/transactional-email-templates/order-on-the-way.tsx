@@ -4,7 +4,7 @@ import {
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
 
-const SITE_NAME = 'سنام سوبر ماركت'
+const SITE_NAME = 'سنام'
 
 interface OrderOnTheWayProps {
   customerName?: string
@@ -73,7 +73,7 @@ export const template = {
   previewData: {
     customerName: 'محمد',
     orderNumber: 1024,
-    trackingUrl: 'https://sanam.xbarawa.com/order/abc-123',
+    trackingUrl: 'https://sanam.sa/order/abc-123',
     driverName: 'أحمد',
     estimatedMinutes: 25,
   },

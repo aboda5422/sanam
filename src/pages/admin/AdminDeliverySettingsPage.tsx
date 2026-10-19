@@ -28,6 +28,9 @@ type BranchRow = {
   delivery_fee?: number | null;
   free_delivery_threshold?: number | null;
   min_order?: number | null;
+  service_commission_percent?: number | null;
+  /** رسوم لكل طلب / نقطة شراء بعد الأولى */
+  extra_stop_fee?: number | null;
   delivery_zones?: { id: string; name: string; is_active: boolean }[];
   branch_delivery_rates?: {
     id: string;
@@ -44,23 +47,35 @@ const BranchFeeEditor = ({
 }: {
   branch: BranchRow;
   saving: boolean;
-  onSave: (vals: { delivery_fee: number; free_delivery_threshold: number; min_order: number }) => void;
+  onSave: (vals: {
+    delivery_fee: number;
+    free_delivery_threshold: number;
+    min_order: number;
+    service_commission_percent: number;
+    extra_stop_fee: number;
+  }) => void;
 }) => {
   const [deliveryFee, setDeliveryFee] = useState(String(Number(branch.delivery_fee ?? 10)));
   const [freeOver, setFreeOver] = useState(String(Number(branch.free_delivery_threshold ?? 100)));
   const [minOrder, setMinOrder] = useState(String(Number(branch.min_order ?? 20)));
+  const [commissionPct, setCommissionPct] = useState(
+    String(Number(branch.service_commission_percent ?? 8)),
+  );
+  const [extraStop, setExtraStop] = useState(String(Number(branch.extra_stop_fee ?? 0)));
 
   const dirty =
     Number(deliveryFee) !== Number(branch.delivery_fee ?? 10) ||
     Number(freeOver) !== Number(branch.free_delivery_threshold ?? 100) ||
-    Number(minOrder) !== Number(branch.min_order ?? 20);
+    Number(minOrder) !== Number(branch.min_order ?? 20) ||
+    Number(commissionPct) !== Number(branch.service_commission_percent ?? 8) ||
+    Number(extraStop) !== Number(branch.extra_stop_fee ?? 0);
 
   return (
     <div className="rounded-lg bg-muted/50 p-3 space-y-2">
       <p className="text-xs font-semibold">رسوم الطلب لهذا الفرع</p>
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className="grid gap-2 sm:grid-cols-2">
         <div>
-          <Label className="text-[11px]">رسوم التوصيل (ر.س)</Label>
+          <Label className="text-[11px]">رسوم احتياطية إن لم تُضبط شرائح (ر.س)</Label>
           <Input
             type="number"
             min={0}
@@ -68,6 +83,10 @@ const BranchFeeEditor = ({
             value={deliveryFee}
             onChange={(e) => setDeliveryFee(e.target.value)}
           />
+          <p className="mt-1 text-[10px] text-muted-foreground leading-relaxed">
+            ليست الشريحة الأولى. عند وجود شرائح مسافة يُستخدم سعر الشريحة المناسبة؛ هذا الحقل فقط إن لم توجد شرائح.
+            عند حفظ الشرائح تُزامَن هذه القيمة تلقائياً مع رسوم أصغر شريحة (الأولى).
+          </p>
         </div>
         <div>
           <Label className="text-[11px]">توصيل مجاني فوق (ر.س)</Label>
@@ -89,7 +108,42 @@ const BranchFeeEditor = ({
             onChange={(e) => setMinOrder(e.target.value)}
           />
         </div>
+        <div>
+          <Label className="text-[11px]">عمولة الخدمة (%)</Label>
+          <Input
+            type="number"
+            min={0}
+            max={100}
+            step={0.1}
+            className="h-9"
+            value={commissionPct}
+            onChange={(e) => setCommissionPct(e.target.value)}
+          />
+        </div>
       </div>
+
+      <div className="rounded-md border border-dashed border-border/80 bg-background/60 p-2.5 space-y-2">
+        <p className="text-[11px] font-bold text-foreground">معادلة الطلبات المتعددة</p>
+        <p className="text-[10px] text-muted-foreground leading-relaxed">
+          نجمع مسافات كل أماكن الشراء (متجر → العميل)، ثم نطبّق شريحة واحدة على الإجمالي.
+          وكل نقطة شراء بعد الأولى تُضاف لها «رسوم الطلب الإضافي» فقط.
+        </p>
+        <div>
+          <Label className="text-[11px]">رسوم الطلب الإضافي للعميل (ر.س / نقطة)</Label>
+          <Input
+            type="number"
+            min={0}
+            step={0.5}
+            className="h-9"
+            value={extraStop}
+            onChange={(e) => setExtraStop(e.target.value)}
+          />
+          <p className="mt-1 text-[10px] text-muted-foreground">
+            للنقطة الثانية والثالثة… أجور المندوب تُضبط في بطاقة كل مندوب بشكل مستقل.
+          </p>
+        </div>
+      </div>
+
       <Button
         type="button"
         size="sm"
@@ -100,6 +154,8 @@ const BranchFeeEditor = ({
             delivery_fee: Number(deliveryFee) || 0,
             free_delivery_threshold: Number(freeOver) || 0,
             min_order: Number(minOrder) || 0,
+            service_commission_percent: Math.min(100, Math.max(0, Number(commissionPct) || 0)),
+            extra_stop_fee: Math.max(0, Number(extraStop) || 0),
           })
         }
       >
@@ -132,7 +188,7 @@ const DeliverySettingsBody = () => {
       let q = supabase
         .from("branches")
         .select(
-          "id, name, city, lat, lng, is_active, delivery_fee, free_delivery_threshold, min_order, delivery_zones(id, name, is_active), branch_delivery_rates(id, max_distance_km, fee, sort_order)",
+          "id, name, city, lat, lng, is_active, delivery_fee, free_delivery_threshold, min_order, service_commission_percent, extra_stop_fee, delivery_zones(id, name, is_active), branch_delivery_rates(id, max_distance_km, fee, sort_order)",
         )
         .order("name");
       if (scopedBranchIds && scopedBranchIds.length > 0) {
@@ -189,12 +245,26 @@ const DeliverySettingsBody = () => {
           if (error) throw error;
         }
       }
+
+      // Keep branch.delivery_fee aligned with the first (smallest km) customer tier —
+      // used only as fallback when no rates match / rates missing.
+      const firstTier = [...rates].sort(
+        (a, b) => Number(a.max_distance_km) - Number(b.max_distance_km),
+      )[0];
+      if (firstTier) {
+        const { error: feeErr } = await supabase
+          .from("branches")
+          .update({ delivery_fee: Number(firstTier.fee) || 0 } as any)
+          .eq("id", branchId);
+        if (feeErr) throw feeErr;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-branches-delivery"] });
       queryClient.invalidateQueries({ queryKey: ["admin-branches"] });
       queryClient.invalidateQueries({ queryKey: ["branch-delivery-rates"] });
-      toast.success("تم حفظ شرائح التوصيل");
+      queryClient.invalidateQueries({ queryKey: ["active-branches"] });
+      toast.success("تم حفظ شرائح التوصيل للعميل");
       setRatesBranch(null);
     },
     onError: (e: any) => toast.error(e?.message || "تعذر حفظ الأسعار"),
@@ -206,15 +276,26 @@ const DeliverySettingsBody = () => {
       delivery_fee,
       free_delivery_threshold,
       min_order,
+      service_commission_percent,
+      extra_stop_fee,
     }: {
       id: string;
       delivery_fee: number;
       free_delivery_threshold: number;
       min_order: number;
+      service_commission_percent: number;
+      extra_stop_fee: number;
     }) => {
       const { error } = await supabase
         .from("branches")
-        .update({ delivery_fee, free_delivery_threshold, min_order })
+        .update({
+          delivery_fee,
+          free_delivery_threshold,
+          min_order,
+          service_commission_percent,
+          extra_stop_fee,
+          extra_km_fee: 0,
+        } as any)
         .eq("id", id);
       if (error) throw error;
     },
@@ -253,7 +334,8 @@ const DeliverySettingsBody = () => {
         <div>
           <h2 className="font-semibold text-lg">التوصيل حسب الفرع</h2>
           <p className="text-sm text-muted-foreground">
-            كل فرع يضبط رسومه، الحد الأدنى للطلب، شرائح المسافة، ومضلعات التوصيل
+            كل فرع يضبط شرائح المسافة الإجمالية، رسوم الطلب الإضافي للنقاط المتعددة، والحد الأدنى،
+            ومضلعات التغطية
           </p>
         </div>
 
@@ -286,7 +368,7 @@ const DeliverySettingsBody = () => {
                   </div>
 
                   <BranchFeeEditor
-                    key={`${b.id}-${b.delivery_fee}-${b.free_delivery_threshold}-${b.min_order}`}
+                    key={`${b.id}-${b.delivery_fee}-${b.free_delivery_threshold}-${b.min_order}-${b.service_commission_percent}-${b.extra_stop_fee}`}
                     branch={b}
                     saving={saveFeesMutation.isPending && saveFeesMutation.variables?.id === b.id}
                     onSave={(vals) => saveFeesMutation.mutate({ id: b.id, ...vals })}
@@ -294,7 +376,7 @@ const DeliverySettingsBody = () => {
 
                   <div className="rounded-lg bg-muted/50 p-3 text-xs space-y-1">
                         <div className="flex items-center justify-between mb-1">
-                          <p className="font-semibold">أسعار التوصيل حسب المسافة</p>
+                          <p className="font-semibold">شرائح مسافة الطريق (كم) — العميل</p>
                           <Button
                             type="button"
                             size="sm"
@@ -306,11 +388,14 @@ const DeliverySettingsBody = () => {
                             تعديل
                           </Button>
                         </div>
+                        <p className="text-[10px] text-muted-foreground pb-1">
+                          أجور المندوب تُعدَّل في بطاقة كل مندوب (نفس المسافات، أسعار خاصة)
+                        </p>
                         {rates.length === 0 ? (
                           <p className="text-muted-foreground">لا توجد شرائح بعد</p>
                         ) : (
                           rates.map((r) => (
-                            <div key={r.id} className="flex justify-between">
+                            <div key={r.id} className="flex justify-between gap-2">
                               <span>حتى {r.max_distance_km} كم</span>
                               <span className="font-medium">{r.fee} ر.س</span>
                             </div>
@@ -366,10 +451,13 @@ const DeliverySettingsBody = () => {
       </Dialog>
 
       <Dialog open={!!ratesBranch} onOpenChange={(open) => !open && setRatesBranch(null)}>
-        <DialogContent className="max-w-md" dir="rtl">
+        <DialogContent className="max-w-lg" dir="rtl">
           <DialogHeader>
-            <DialogTitle>شرائح التوصيل — {ratesBranch?.name}</DialogTitle>
+            <DialogTitle>شرائح التوصيل للعميل — {ratesBranch?.name}</DialogTitle>
           </DialogHeader>
+          <p className="text-[11px] text-muted-foreground -mt-1">
+            عند إضافة/حذف شريحة تظهر/تختفي مسافاتها في بطاقات المناديب تلقائياً. أسعار أجر كل مندوب تُضبط عنده فقط.
+          </p>
           <div className="space-y-3">
             {rateDrafts.map((r, idx) => (
               <div key={r.id || `new-${idx}`} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-end">
@@ -389,7 +477,7 @@ const DeliverySettingsBody = () => {
                   />
                 </div>
                 <div>
-                  <Label className="text-xs">الرسوم (ر.س)</Label>
+                  <Label className="text-xs">رسوم العميل (ر.س)</Label>
                   <Input
                     type="number"
                     min={0}

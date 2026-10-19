@@ -47,7 +47,11 @@ import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminCustomersPage from "./pages/admin/AdminCustomersPage";
 import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
 import AdminPaymentsPage from "./pages/admin/AdminPaymentsPage";
+import AdminHomePage from "./pages/admin/AdminHomePage";
 import AdminEmailLogsPage from "./pages/admin/AdminEmailLogsPage";
+import AdminPosPage from "./pages/admin/AdminPosPage";
+import AdminCollectionsHubPage from "./pages/admin/AdminCollectionsHubPage";
+import AdminRatingsPage from "./pages/admin/AdminRatingsPage";
 // Driver pages
 import DriverLoginPage from "./pages/driver/DriverLoginPage";
 import DriverDashboard from "./pages/driver/DriverDashboard";
@@ -56,6 +60,15 @@ import DriverOrderDetailPage from "./pages/driver/DriverOrderDetailPage";
 import DriverHistoryPage from "./pages/driver/DriverHistoryPage";
 import DriverEarningsPage from "./pages/driver/DriverEarningsPage";
 import DriverProfilePage from "./pages/driver/DriverProfilePage";
+// Cashier / POS
+import CashierLoginPage from "./pages/cashier/CashierLoginPage";
+import CashierLayout from "./pages/cashier/CashierLayout";
+import CashierSellPage from "./pages/cashier/CashierSellPage";
+import CashierShiftPage from "./pages/cashier/CashierShiftPage";
+import PreparerLoginPage from "./pages/preparer/PreparerLoginPage";
+import PreparerLayout from "./pages/preparer/PreparerLayout";
+import PreparerOrdersPage from "./pages/preparer/PreparerOrdersPage";
+import PreparerOrderDetailPage from "./pages/preparer/PreparerOrderDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -109,15 +122,33 @@ const App = () => (
             <Route path="/admin/complaints" element={<AdminComplaintsPage />} />
             <Route path="/admin/customers" element={<AdminCustomersPage />} />
             <Route path="/admin/announcements" element={<AdminAnnouncementsPage />} />
+            <Route path="/admin/home" element={<AdminHomePage />} />
             <Route path="/admin/drivers" element={<AdminDriversPage />} />
             <Route path="/admin/branches" element={<AdminBranchesPage />} />
             <Route path="/admin/settings" element={<AdminSettingsPage />} />
             <Route path="/admin/delivery" element={<AdminDeliverySettingsPage />} />
             <Route path="/admin/sales" element={<AdminSalesPage />} />
+            <Route path="/admin/collections" element={<AdminCollectionsHubPage />} />
             <Route path="/admin/payments" element={<AdminPaymentsPage />} />
+            <Route path="/admin/ratings" element={<AdminRatingsPage />} />
             <Route path="/admin/email-logs" element={<AdminEmailLogsPage />} />
+            <Route path="/admin/pos" element={<AdminPosPage />} />
             <Route path="/admin/tracking" element={<Navigate to="/admin/drivers" replace />} />
             <Route path="/admin/wallets" element={<Navigate to="/admin/drivers" replace />} />
+            </Route>
+
+            {/* Cashier / POS Routes */}
+            <Route path="/cashier/login" element={<CashierLoginPage />} />
+            <Route path="/cashier" element={<CashierLayout />}>
+              <Route index element={<CashierSellPage />} />
+              <Route path="shift" element={<CashierShiftPage />} />
+            </Route>
+
+            {/* Order preparer Routes */}
+            <Route path="/preparer/login" element={<PreparerLoginPage />} />
+            <Route path="/preparer" element={<PreparerLayout />}>
+              <Route index element={<PreparerOrdersPage />} />
+              <Route path="order/:id" element={<PreparerOrderDetailPage />} />
             </Route>
 
             {/* Driver Routes */}

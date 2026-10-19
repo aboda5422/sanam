@@ -4,11 +4,11 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
 
 // Configuration baked in at scaffold time — do NOT change these manually.
-const SITE_NAME = "sanam"
+const SITE_NAME = "Sanam"
 // Verified sender domain in Resend (staging subdomain until client domain is ready).
-const SENDER_DOMAIN = "sanam.xbarawa.com"
-const FROM_DOMAIN = "sanam.xbarawa.com"
-const SITE_URL = "https://sanam.xbarawa.com"
+const SENDER_DOMAIN = "sanam.sa"
+const FROM_DOMAIN = "sanam.sa"
+const SITE_URL = "https://sanam.sa"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
