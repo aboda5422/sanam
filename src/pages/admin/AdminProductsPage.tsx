@@ -255,6 +255,18 @@ const AdminProductsPage = () => {
     done: number;
     total: number;
   } | null>(null);
+  const [bulkUpdateOpen, setBulkUpdateOpen] = useState(false);
+  const [bulkUpdateForm, setBulkUpdateForm] = useState({
+    setStatus: false,
+    is_active: true,
+    setCategory: false,
+    category_id: "",
+    section_id: "",
+    setPrice: false,
+    price: "",
+    setStock: false,
+    stock_quantity: "",
+  });
 
   const { scopedBranchIds, filterBranchId, branches } = useAdminAuth();
   const deferredSearch = useDeferredValue(search);
@@ -273,10 +285,31 @@ const AdminProductsPage = () => {
     null;
   const anchorBranchName = ((branches || []).find((b: any) => b.id === catalogAnchorBranchId)?.name || "")
     .replace(/^سنام\s+/, "");
-  const { data: categories, refetch: refetchCategories } = useAllCategories(scopedBranchIds);
+  const { data: categories, refetch: refetchCategories } = useAllCategories(
+    scopedBranchIds,
+    filterBranchId || catalogAnchorBranchId,
+  );
   const { data: categorySectionsData } = useCategorySections();
   const categorySections = categorySectionsData ?? [];
-  const categoryNameMap = new Map((categories || []).map((c: any) => [c.id, c.name]));
+  const categoryNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const c of categories || []) {
+      map.set(c.id, c.name);
+      if ((c as any).catalog_id) map.set(String((c as any).catalog_id), c.name);
+    }
+    return map;
+  }, [categories]);
+
+  /** Expand selected subcategory ids to include catalog_id aliases for product filters. */
+  const expandedCategoryIdsFilter = useMemo(() => {
+    const out = new Set(categoryIdsFilter);
+    for (const c of categories || []) {
+      if (!categoryIdsFilter.includes(c.id)) continue;
+      out.add(c.id);
+      if ((c as any).catalog_id) out.add(String((c as any).catalog_id));
+    }
+    return [...out];
+  }, [categories, categoryIdsFilter]);
 
   const sectionSubs = useMemo(() => {
     if (sectionFilter === "all") return [];
@@ -378,6 +411,13 @@ const AdminProductsPage = () => {
       .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name, "ar"));
   }, [categories, offerSectionId]);
 
+  const bulkUpdateSectionSubs = useMemo(() => {
+    if (!bulkUpdateForm.section_id) return [];
+    return [...(categories || [])]
+      .filter((c) => c.section === bulkUpdateForm.section_id)
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name, "ar"));
+  }, [categories, bulkUpdateForm.section_id]);
+
   const resolveSectionForCategory = (categoryId: string) =>
     (categories || []).find((c) => c.id === categoryId)?.section || "";
 
@@ -397,12 +437,26 @@ const AdminProductsPage = () => {
       if (key in patch) overlay[key] = patch[key];
     }
     if (row.catalog_id && row.branch_id && Object.keys(overlay).length > 0) {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("product_branch" as any)
         .update(overlay)
         .eq("product_id", row.catalog_id)
-        .eq("branch_id", row.branch_id);
+        .eq("branch_id", row.branch_id)
+        .select("id, legacy_product_id");
       if (error) throw error;
+      if (!data?.length) {
+        throw new Error("تعذر حفظ العرض على فرع المنتج — تأكد من اختيار الفرع");
+      }
+      // Dual-write legacy products row so storefront (still on products) and
+      // catalog sync keep the same discounted prices / offer_channel.
+      const legacyId = (data[0] as any).legacy_product_id || row.id;
+      if (legacyId) {
+        const { error: legacyErr } = await supabase
+          .from("products")
+          .update(overlay as any)
+          .eq("id", legacyId);
+        if (legacyErr) throw legacyErr;
+      }
       return;
     }
     const { error } = await supabase.from("products").update(patch as any).eq("id", row.id);
@@ -423,6 +477,7 @@ const AdminProductsPage = () => {
     deferredSearch,
     sectionFilter,
     categoryIdsFilter,
+    expandedCategoryIdsFilter,
     statusFilter,
     featuredFilter,
     stockFilter,
@@ -460,8 +515,8 @@ const AdminProductsPage = () => {
       }
 
       if (sectionFilter !== "all") {
-        if (categoryIdsFilter.length > 0) {
-          q = q.in("category_id", categoryIdsFilter);
+        if (expandedCategoryIdsFilter.length > 0) {
+          q = q.in("category_id", expandedCategoryIdsFilter);
         } else {
           q = q.eq("category_id", "00000000-0000-0000-0000-000000000000");
         }
@@ -706,6 +761,17 @@ const AdminProductsPage = () => {
 
   const toggleMutation = useMutation({
     mutationFn: async ({ id, field, value }: { id: string; field: "is_active" | "is_featured"; value: boolean }) => {
+      const branchId = catalogAnchorBranchId;
+      if (branchId) {
+        const { error } = await supabase.rpc("catalog_admin_set_branch_flag" as any, {
+          p_branch_id: branchId,
+          p_product_id: id,
+          p_field: field,
+          p_value: value,
+        });
+        if (error) throw error;
+        return;
+      }
       const updateData = field === "is_active" ? { is_active: value } : { is_featured: value };
       const { error } = await supabase.from("products").update(updateData).eq("id", id);
       if (error) throw error;
@@ -714,7 +780,7 @@ const AdminProductsPage = () => {
       invalidateProductQueries();
       toast.success("تم التحديث");
     },
-    onError: () => toast.error("حدث خطأ"),
+    onError: (e: any) => toast.error(e?.message || "حدث خطأ"),
   });
 
   const bulkToggleMutation = useMutation({
@@ -931,12 +997,22 @@ const AdminProductsPage = () => {
           await applyToRows((data || []) as any[]);
         }
       } else if (mode === "category" && catId) {
+        const catIds = (() => {
+          const out = new Set<string>([catId]);
+          for (const c of categories || []) {
+            if (c.id === catId || String((c as any).catalog_id || "") === catId) {
+              out.add(c.id);
+              if ((c as any).catalog_id) out.add(String((c as any).catalog_id));
+            }
+          }
+          return [...out];
+        })();
         let from = 0;
         while (true) {
           let fq = supabase
             .from(CATALOG_BRANCH_VIEW as "products")
             .select("id, catalog_id, branch_id, price, original_price, alt_price, alt_original_price, alt_unit, units_per_pack, offer_unit")
-            .eq("category_id", catId)
+            .in("category_id", catIds)
             .range(from, from + PAGE - 1);
           fq = scopeOfferBranch(fq);
           const { data, error } = await fq;
@@ -951,13 +1027,17 @@ const AdminProductsPage = () => {
     },
     onSuccess: (count) => {
       invalidateProductQueries();
+      if (count === 0) {
+        toast.error("لم يتم تطبيق العرض على أي منتج — تحقق من الفرع والقسم");
+        return;
+      }
       toast.success(`تم تطبيق العرض على ${count} منتج`);
       setSelectedIds(new Set());
       setOfferDialogOpen(false);
       setOfferChannel("both");
       setOfferUnitTarget("primary");
     },
-    onError: () => toast.error("حدث خطأ"),
+    onError: (e: any) => toast.error(e?.message || "حدث خطأ"),
   });
 
   // Remove offers (restore original price)
@@ -965,6 +1045,7 @@ const AdminProductsPage = () => {
     mutationFn: async () => {
       const ids = Array.from(selectedIds);
       const PAGE = 500;
+      let removed = 0;
       for (let i = 0; i < ids.length; i += PAGE) {
         const chunk = ids.slice(i, i + PAGE);
         let fq = supabase
@@ -980,16 +1061,18 @@ const AdminProductsPage = () => {
           const hasAlt = patch.alt_price != null;
           if (!hasPrimary && !hasAlt && !product.original_price && !product.alt_original_price) continue;
           await writeBranchOffer(product, patch);
+          removed++;
         }
       }
+      return removed;
     },
-    onSuccess: () => {
+    onSuccess: (count) => {
       invalidateProductQueries();
-      toast.success("تم إزالة العروض");
+      toast.success(count > 0 ? `تم إزالة العروض عن ${count} منتج` : "لا توجد عروض لإزالتها");
       setSelectedIds(new Set());
       setRemoveOfferDialogOpen(false);
     },
-    onError: () => toast.error("حدث خطأ"),
+    onError: (e: any) => toast.error(e?.message || "حدث خطأ"),
   });
 
   const bulkDeleteMutation = useMutation({
@@ -1011,10 +1094,38 @@ const AdminProductsPage = () => {
   // Move selected products to a different category
   const moveCategoryMutation = useMutation({
     mutationFn: async (targetCatId: string) => {
+      const branchId = catalogAnchorBranchId;
+      if (!branchId) throw new Error("اختر فرعاً من أعلى الصفحة");
       const ids = Array.from(selectedIds);
-      const { error } = await supabase.from("products").update({ category_id: targetCatId }).in("id", ids);
-      if (error) throw error;
-      return ids.length;
+      const PAGE = 500;
+      let updated = 0;
+      for (let i = 0; i < ids.length; i += PAGE) {
+        const chunk = ids.slice(i, i + PAGE);
+        let fq = supabase
+          .from(CATALOG_BRANCH_VIEW as "products")
+          .select("id, catalog_id, branch_id")
+          .in("id", chunk);
+        fq = scopeOfferBranch(fq);
+        const { data, error } = await fq;
+        if (error) throw error;
+        for (const row of data || []) {
+          if ((row as any).catalog_id && (row as any).branch_id) {
+            const { error: pbErr } = await supabase
+              .from("product_branch" as any)
+              .update({ category_id: targetCatId })
+              .eq("product_id", (row as any).catalog_id)
+              .eq("branch_id", (row as any).branch_id);
+            if (pbErr) throw pbErr;
+          }
+          const { error: pErr } = await supabase
+            .from("products")
+            .update({ category_id: targetCatId })
+            .eq("id", row.id);
+          if (pErr) throw pErr;
+          updated++;
+        }
+      }
+      return updated;
     },
     onSuccess: (count) => {
       invalidateProductQueries();
@@ -1023,7 +1134,106 @@ const AdminProductsPage = () => {
       setMoveCategoryDialogOpen(false);
       setMoveTargetCategoryId("");
     },
-    onError: () => toast.error("فشل نقل المنتجات"),
+    onError: (e: any) => toast.error(e?.message || "فشل نقل المنتجات"),
+  });
+
+  const bulkUpdateMutation = useMutation({
+    mutationFn: async () => {
+      const branchId = catalogAnchorBranchId;
+      if (!branchId) throw new Error("اختر فرعاً من أعلى الصفحة قبل التحديث الجماعي");
+      const {
+        setStatus,
+        is_active,
+        setCategory,
+        category_id,
+        setPrice,
+        price,
+        setStock,
+        stock_quantity,
+      } = bulkUpdateForm;
+      if (!setStatus && !setCategory && !setPrice && !setStock) {
+        throw new Error("اختر حقلاً واحداً على الأقل للتحديث");
+      }
+      if (setCategory && !category_id) throw new Error("اختر القسم الفرعي");
+      if (setPrice && price === "") throw new Error("أدخل السعر");
+      if (setStock && stock_quantity === "") throw new Error("أدخل المخزون");
+
+      const ids = Array.from(selectedIds);
+      const PAGE = 500;
+      let updated = 0;
+      for (let i = 0; i < ids.length; i += PAGE) {
+        const chunk = ids.slice(i, i + PAGE);
+        let fq = supabase
+          .from(CATALOG_BRANCH_VIEW as "products")
+          .select("id, catalog_id, branch_id, price, original_price")
+          .in("id", chunk);
+        fq = scopeOfferBranch(fq);
+        const { data, error } = await fq;
+        if (error) throw error;
+
+        for (const row of (data || []) as any[]) {
+          if (setStatus) {
+            const { error: flagErr } = await supabase.rpc("catalog_admin_set_branch_flag" as any, {
+              p_branch_id: branchId,
+              p_product_id: row.id,
+              p_field: "is_active",
+              p_value: is_active,
+            });
+            if (flagErr) throw flagErr;
+          }
+
+          const overlay: Record<string, unknown> = {};
+          const legacyPatch: Record<string, unknown> = {};
+          if (setCategory) {
+            overlay.category_id = category_id;
+            legacyPatch.category_id = category_id;
+          }
+          if (setPrice) {
+            const nextPrice = Number(price);
+            // Keep an existing offer ratio: if original_price is set, only change sale price.
+            overlay.price = nextPrice;
+            legacyPatch.price = nextPrice;
+            if (row.original_price != null && Number(row.original_price) > Number(row.price)) {
+              // leave original_price as the list price
+            } else {
+              overlay.original_price = null;
+              legacyPatch.original_price = null;
+            }
+          }
+          if (setStock) {
+            const nextStock = Math.max(0, Math.floor(Number(stock_quantity) || 0));
+            overlay.stock_quantity = nextStock;
+            legacyPatch.stock_quantity = nextStock;
+          }
+
+          if (Object.keys(overlay).length > 0) {
+            if (!row.catalog_id || !row.branch_id) {
+              throw new Error("تعذر تحديد فرع أحد المنتجات");
+            }
+            const { error: pbErr } = await supabase
+              .from("product_branch" as any)
+              .update(overlay)
+              .eq("product_id", row.catalog_id)
+              .eq("branch_id", row.branch_id);
+            if (pbErr) throw pbErr;
+            const { error: pErr } = await supabase
+              .from("products")
+              .update(legacyPatch as any)
+              .eq("id", row.id);
+            if (pErr) throw pErr;
+          }
+          updated++;
+        }
+      }
+      return updated;
+    },
+    onSuccess: (count) => {
+      invalidateProductQueries();
+      toast.success(`تم تحديث ${count} منتج`);
+      setSelectedIds(new Set());
+      setBulkUpdateOpen(false);
+    },
+    onError: (e: any) => toast.error(e?.message || "فشل التحديث الجماعي"),
   });
 
   // Fetch image by barcode for the form
@@ -1604,6 +1814,29 @@ const AdminProductsPage = () => {
               تعطيل كل المنتجات
             </Button>
           )}
+
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={selectedIds.size === 0}
+            onClick={() => {
+              setBulkUpdateForm({
+                setStatus: false,
+                is_active: true,
+                setCategory: false,
+                category_id: "",
+                section_id: "",
+                setPrice: false,
+                price: "",
+                setStock: false,
+                stock_quantity: "",
+              });
+              setBulkUpdateOpen(true);
+              void refetchCategories();
+            }}
+          >
+            <Pencil className="ml-1 h-4 w-4" />تحديث جماعي
+          </Button>
 
           <Button
             size="sm"
@@ -2429,7 +2662,163 @@ const AdminProductsPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Move Category Dialog */}
+      {/* Bulk field update */}
+      <Dialog
+        open={bulkUpdateOpen}
+        onOpenChange={(open) => {
+          setBulkUpdateOpen(open);
+          if (open) void refetchCategories();
+        }}
+      >
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>تحديث جماعي ({selectedIds.size} منتج)</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              فعّل الحقول التي تريد تحديثها فقط. التحديث يُطبَّق على الفرع المحدد في أعلى الصفحة.
+            </p>
+
+            <div className="rounded-lg border p-3 space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <Checkbox
+                  checked={bulkUpdateForm.setStatus}
+                  onCheckedChange={(v) => setBulkUpdateForm((f) => ({ ...f, setStatus: !!v }))}
+                />
+                الحالة (تفعيل / تعطيل)
+              </label>
+              {bulkUpdateForm.setStatus && (
+                <div className="flex gap-2 ps-6">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={bulkUpdateForm.is_active ? "default" : "outline"}
+                    onClick={() => setBulkUpdateForm((f) => ({ ...f, is_active: true }))}
+                  >
+                    مفعّل
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={!bulkUpdateForm.is_active ? "default" : "outline"}
+                    onClick={() => setBulkUpdateForm((f) => ({ ...f, is_active: false }))}
+                  >
+                    معطّل
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-lg border p-3 space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <Checkbox
+                  checked={bulkUpdateForm.setCategory}
+                  onCheckedChange={(v) => setBulkUpdateForm((f) => ({ ...f, setCategory: !!v }))}
+                />
+                القسم الفرعي
+              </label>
+              {bulkUpdateForm.setCategory && (
+                <div className="space-y-2 ps-6">
+                  <Select
+                    value={bulkUpdateForm.section_id || undefined}
+                    onValueChange={(v) =>
+                      setBulkUpdateForm((f) => ({ ...f, section_id: v, category_id: "" }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="القسم الرئيسي" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categorySections.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={bulkUpdateForm.category_id || undefined}
+                    onValueChange={(v) => setBulkUpdateForm((f) => ({ ...f, category_id: v }))}
+                    disabled={!bulkUpdateForm.section_id}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={bulkUpdateForm.section_id ? "القسم الفرعي" : "اختر الرئيسي أولاً"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {bulkUpdateSectionSubs.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-lg border p-3 space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <Checkbox
+                  checked={bulkUpdateForm.setPrice}
+                  onCheckedChange={(v) => setBulkUpdateForm((f) => ({ ...f, setPrice: !!v }))}
+                />
+                السعر
+              </label>
+              {bulkUpdateForm.setPrice && (
+                <Input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  className="ps-6"
+                  value={bulkUpdateForm.price}
+                  onChange={(e) => setBulkUpdateForm((f) => ({ ...f, price: e.target.value }))}
+                  placeholder="السعر الجديد"
+                />
+              )}
+            </div>
+
+            <div className="rounded-lg border p-3 space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <Checkbox
+                  checked={bulkUpdateForm.setStock}
+                  onCheckedChange={(v) => setBulkUpdateForm((f) => ({ ...f, setStock: !!v }))}
+                />
+                المخزون
+              </label>
+              {bulkUpdateForm.setStock && (
+                <Input
+                  type="number"
+                  min={0}
+                  className="ps-6"
+                  value={bulkUpdateForm.stock_quantity}
+                  onChange={(e) => setBulkUpdateForm((f) => ({ ...f, stock_quantity: e.target.value }))}
+                  placeholder="الكمية"
+                />
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkUpdateOpen(false)}>
+              إلغاء
+            </Button>
+            <Button
+              onClick={() => bulkUpdateMutation.mutate()}
+              disabled={
+                bulkUpdateMutation.isPending ||
+                selectedIds.size === 0 ||
+                (!bulkUpdateForm.setStatus &&
+                  !bulkUpdateForm.setCategory &&
+                  !bulkUpdateForm.setPrice &&
+                  !bulkUpdateForm.setStock)
+              }
+            >
+              {bulkUpdateMutation.isPending && <Loader2 className="ml-1 h-4 w-4 animate-spin" />}
+              تطبيق التحديث
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog
         open={moveCategoryDialogOpen}
         onOpenChange={(open) => {

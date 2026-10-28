@@ -15,6 +15,7 @@ const steps = [
   { key: "pending", label: "تم استلام الطلب", icon: Clock, description: "تم استلام طلبك بنجاح وبانتظار التجهيز" },
   { key: "assigned", label: "تم تعيين المندوب", icon: User, description: "تم تعيين مندوب لتجهيز طلبك" },
   { key: "preparing", label: "جاري التجهيز", icon: Package, description: "المندوب يجهز طلبك الآن" },
+  { key: "ready", label: "جاهز للتوصيل", icon: Package, description: "طلبك جاهز وبانتظار المندوب" },
   { key: "on_the_way", label: "في الطريق إليك", icon: Truck, description: "المندوب في الطريق إليك 🚗" },
   { key: "delivered", label: "تم التوصيل", icon: CheckCircle, description: "تم توصيل طلبك بنجاح ✅" },
 ];
@@ -40,12 +41,17 @@ const OrderTrackingPage = () => {
     if (data) {
       setOrder(data);
       if (data.driver_id) {
-        const { data: driverData } = await supabase
+        // drivers.full_name is on the row; no profiles embed (no FK relationship).
+        const { data: driverData, error: driverError } = await supabase
           .from("drivers")
-          .select("*, profiles:user_id(full_name)")
+          .select("id, full_name, phone, user_id")
           .eq("id", data.driver_id)
           .maybeSingle();
-        if (driverData) setDriver(driverData);
+        if (driverError) {
+          console.error("driver fetch failed", driverError);
+        } else if (driverData) {
+          setDriver(driverData);
+        }
       }
       // Check if already rated
       if (data.status === "delivered") {
@@ -90,13 +96,15 @@ const OrderTrackingPage = () => {
   const getCurrentStepIndex = () => {
     if (!order) return 0;
     if (order.status === "cancelled") return -1;
-    return steps.findIndex(s => s.key === order.status);
+    const idx = steps.findIndex((s) => s.key === order.status);
+    // Unknown/legacy statuses fall back to pending rather than breaking the tracker UI
+    return idx >= 0 ? idx : 0;
   };
 
   const currentStep = getCurrentStepIndex();
 
-  const driverPhone = driver?.phone || order?.customer_phone;
-  const driverName = (driver as any)?.profiles?.full_name || "المندوب";
+  const driverPhone = driver?.phone || null;
+  const driverName = driver?.full_name || "المندوب";
 
   if (loading) {
     return (
@@ -118,7 +126,7 @@ const OrderTrackingPage = () => {
         <main className="flex-1 container py-16 text-center">
           <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
           <h2 className="font-heading text-xl font-bold mb-2">الطلب غير موجود</h2>
-          <Button onClick={() => navigate("/profile")} variant="outline">
+          <Button onClick={() => navigate("/profile?tab=orders")} variant="outline">
             العودة لطلباتي
           </Button>
         </main>
@@ -133,7 +141,7 @@ const OrderTrackingPage = () => {
       <main className="flex-1 container py-6 max-w-2xl">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/profile")}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/profile?tab=orders")}>
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <div>
@@ -216,7 +224,7 @@ const OrderTrackingPage = () => {
         )}
 
         {/* Driver Contact - show when assigned or on_the_way */}
-        {driver && ["assigned", "preparing", "on_the_way"].includes(order.status) && (
+        {driver && ["assigned", "preparing", "ready", "on_the_way"].includes(order.status) && (
           <Card className="mb-6 border-primary/20 bg-primary/5">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -255,7 +263,7 @@ const OrderTrackingPage = () => {
         )}
 
         {/* Preparing message */}
-        {["assigned", "preparing"].includes(order.status) && (
+        {["assigned", "preparing", "ready"].includes(order.status) && (
           <Card className="mb-6 border-orange-200 bg-orange-50">
             <CardContent className="p-4 text-center">
               <Package className="h-8 w-8 mx-auto text-orange-500 mb-2 animate-bounce" />

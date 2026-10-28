@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { User, Package, MapPin, Mail, Save, Loader2, AlertTriangle, ShoppingCart, Settings, Trash2, ShieldAlert, LogOut, Plus, Pencil, X, KeyRound, FileText } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { User, Package, MapPin, Mail, Save, Loader2, AlertTriangle, ShoppingCart, Settings, LogOut, Plus, Pencil, X, KeyRound, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,10 +19,13 @@ import { notifyAddressesChanged } from "@/lib/branch";
 import { translateError } from "@/lib/error-messages";
 import { openOrderInvoice } from "@/lib/order-invoice";
 
+const PROFILE_TABS = new Set(["profile", "addresses", "orders", "settings"]);
+
 const statusMap: Record<string, { label: string; labelEn: string; color: string }> = {
   pending: { label: "قيد الانتظار", labelEn: "Pending", color: "bg-yellow-100 text-yellow-800" },
   assigned: { label: "تم التعيين", labelEn: "Assigned", color: "bg-blue-100 text-blue-800" },
   preparing: { label: "جاري التحضير", labelEn: "Preparing", color: "bg-orange-100 text-orange-800" },
+  ready: { label: "جاهز للتوصيل", labelEn: "Ready", color: "bg-teal-100 text-teal-800" },
   on_the_way: { label: "في الطريق", labelEn: "On the Way", color: "bg-purple-100 text-purple-800" },
   delivered: { label: "تم التوصيل", labelEn: "Delivered", color: "bg-green-100 text-green-800" },
   cancelled: { label: "ملغي", labelEn: "Cancelled", color: "bg-red-100 text-red-800" },
@@ -30,22 +33,21 @@ const statusMap: Record<string, { label: string; labelEn: string; color: string 
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t, lang } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState("profile");
+  const tabFromUrl = searchParams.get("tab");
+  const activeTab = tabFromUrl && PROFILE_TABS.has(tabFromUrl) ? tabFromUrl : "profile";
   const [form, setForm] = useState({ full_name: "", phone: "", address: "", city: "مكة المكرمة" });
   const [editingProfile, setEditingProfile] = useState(false);
   const [cancelOrderId, setCancelOrderId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelling, setCancelling] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteBlock, setDeleteBlock] = useState<{ pendingOrders: number; openComplaints: number } | null>(null);
-  const [deleteConfirmed, setDeleteConfirmed] = useState(false);
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [addressesRefreshKey, setAddressesRefreshKey] = useState(0);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
@@ -54,45 +56,11 @@ const ProfilePage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
 
-  const handleStartDelete = async () => {
-    setDeleteOpen(true);
-    setDeleteBlock(null);
-    setDeleteConfirmed(false);
-    setDeleting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("delete-account", { body: {} });
-      if (error) throw error;
-      if (data?.canDelete === false) {
-        setDeleteBlock({ pendingOrders: data.pendingOrders || 0, openComplaints: data.openComplaints || 0 });
-      } else {
-        setDeleteConfirmed(true);
-      }
-    } catch (e: any) {
-      toast.error(t("تعذر التحقق من الحساب", "Unable to verify account") + ": " + (e?.message || ""));
-      setDeleteOpen(false);
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  const handleConfirmDelete = async () => {
-    setDeleting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("delete-account", { body: { confirm: true } });
-      if (error) throw error;
-      if (data?.deleted) {
-        await supabase.auth.signOut();
-        toast.success(t("تم حذف حسابك نهائياً", "Your account has been permanently deleted"));
-        navigate("/auth", { replace: true });
-      } else if (data?.canDelete === false) {
-        setDeleteBlock({ pendingOrders: data.pendingOrders || 0, openComplaints: data.openComplaints || 0 });
-        setDeleteConfirmed(false);
-      }
-    } catch (e: any) {
-      toast.error(t("فشل حذف الحساب", "Failed to delete account") + ": " + (e?.message || ""));
-    } finally {
-      setDeleting(false);
-    }
+  const setActiveTab = (tab: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (tab === "profile") next.delete("tab");
+    else next.set("tab", tab);
+    setSearchParams(next, { replace: true });
   };
 
   const handleLogout = async () => {
@@ -169,7 +137,14 @@ const ProfilePage = () => {
       } else {
         setForm(f => ({ ...f, full_name: session.user.user_metadata?.full_name || "" }));
       }
-      setOrders(ordersRes.data || []);
+      if (ordersRes.error) {
+        console.error("orders fetch failed", ordersRes.error);
+        setOrders([]);
+        setOrdersError(ordersRes.error.message || "orders_fetch_failed");
+      } else {
+        setOrders(ordersRes.data || []);
+        setOrdersError(null);
+      }
       setLoading(false);
     };
     init();
@@ -452,7 +427,26 @@ const ProfilePage = () => {
 
           {/* Orders Tab */}
           <TabsContent value="orders">
-            {orders.length === 0 ? (
+            {ordersError ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <AlertTriangle className="h-12 w-12 mx-auto text-destructive mb-3" />
+                  <p className="text-muted-foreground mb-4">
+                    {t("تعذر تحميل الطلبات. حاول مرة أخرى.", "Could not load orders. Please try again.")}
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setLoading(true);
+                      setOrdersError(null);
+                      window.location.reload();
+                    }}
+                  >
+                    {t("إعادة المحاولة", "Retry")}
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : orders.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
                   <Package className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
@@ -675,86 +669,12 @@ const ProfilePage = () => {
                   </div>
                 )}
 
-                <div className="border border-destructive/30 bg-destructive/5 rounded-xl p-4 space-y-3">
-                  <div className="flex items-start gap-3">
-                    <ShieldAlert className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-                    <div className="space-y-1">
-                      <h3 className="font-bold text-sm">{t("حذف الحساب", "Delete Account")}</h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        {t(
-                          "سيتم حذف حسابك وجميع بياناتك نهائياً (العناوين، الطلبات السابقة، الشكاوى، الملف الشخصي). لا يمكن التراجع عن هذه العملية.",
-                          "Your account and all related data (addresses, past orders, complaints, profile, etc.) will be permanently deleted. This action cannot be undone."
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                  <Button variant="destructive" onClick={handleStartDelete} className="w-full gap-2">
-                    <Trash2 className="h-4 w-4" />
-                    {t("حذف حسابي", "Delete My Account")}
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </main>
       <Footer />
-
-      {/* Delete Account Dialog */}
-      {deleteOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => !deleting && setDeleteOpen(false)}>
-          <div className="bg-card rounded-xl p-6 max-w-sm w-full space-y-4" onClick={e => e.stopPropagation()} dir={lang === "ar" ? "rtl" : "ltr"}>
-            {deleting && !deleteBlock && !deleteConfirmed ? (
-              <div className="text-center py-6">
-                <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
-                <p className="text-sm text-muted-foreground mt-3">{t("جاري التحقق من حسابك...", "Verifying your account...")}</p>
-              </div>
-            ) : deleteBlock ? (
-              <>
-                <div className="text-center">
-                  <ShieldAlert className="h-10 w-10 mx-auto text-destructive mb-2" />
-                  <h3 className="font-heading font-bold text-lg">{t("لا يمكن حذف الحساب حالياً", "Account Deletion Not Available")}</h3>
-                </div>
-                <p className="text-sm text-muted-foreground text-center">
-                  {t("لديك عمليات معلقة يجب إنهاؤها قبل الحذف:", "You have pending items that must be resolved before deletion:")}
-                </p>
-                <ul className="text-sm space-y-1 bg-muted/30 rounded-lg p-3">
-                  {deleteBlock.pendingOrders > 0 && (
-                    <li>• {t("طلبات قيد التنفيذ", "Active orders")}: <span className="font-bold">{deleteBlock.pendingOrders}</span></li>
-                  )}
-                  {deleteBlock.openComplaints > 0 && (
-                    <li>• {t("شكاوى مفتوحة", "Open complaints")}: <span className="font-bold">{deleteBlock.openComplaints}</span></li>
-                  )}
-                </ul>
-                <Button variant="outline" onClick={() => setDeleteOpen(false)} className="w-full">
-                  {t("حسناً", "OK")}
-                </Button>
-              </>
-            ) : deleteConfirmed ? (
-              <>
-                <div className="text-center">
-                  <Trash2 className="h-10 w-10 mx-auto text-destructive mb-2" />
-                  <h3 className="font-heading font-bold text-lg">{t("هل أنت متأكد؟", "Are you sure?")}</h3>
-                </div>
-                <p className="text-sm text-muted-foreground text-center leading-relaxed">
-                  {t(
-                    "هل أنت متأكد أنك تريد حذف حسابك نهائياً؟ سيتم حذف جميع بياناتك ولن تتمكن من استعادتها.",
-                    "Are you sure you want to permanently delete your account? All your data will be erased and cannot be recovered."
-                  )}
-                </p>
-                <div className="flex gap-2">
-                  <Button onClick={handleConfirmDelete} disabled={deleting} variant="destructive" className="flex-1">
-                    {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("نعم، احذف الحساب", "Yes, Delete")}
-                  </Button>
-                  <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={deleting} className="flex-1">
-                    {t("تراجع", "Cancel")}
-                  </Button>
-                </div>
-              </>
-            ) : null}
-          </div>
-        </div>
-      )}
 
       {/* Cancel Order Dialog */}
       {cancelOrderId && (

@@ -17,7 +17,7 @@ export function invalidateCategoryQueries(queryClient: ReturnType<typeof useQuer
 }
 
 const CATEGORY_SELECT =
-  "id, catalog_id, name, name_en, image, slug, section, is_active, sort_order, branch_id";
+  "id, catalog_id, legacy_category_id, name, name_en, image, slug, section, is_active, sort_order, branch_id";
 
 /** Dedupe unified category rows (one per catalog_id) preferring an active overlay. */
 function dedupeCategories(rows: any[]): Category[] {
@@ -55,19 +55,40 @@ export const useCategories = () => {
   });
 };
 
-export const useAllCategories = (scopedBranchIds?: string[] | null) => {
+export const useAllCategories = (
+  scopedBranchIds?: string[] | null,
+  filterBranchId?: string | null,
+) => {
   return useQuery<Category[]>({
-    queryKey: ["all-categories", scopedBranchIds],
+    queryKey: ["all-categories", scopedBranchIds, filterBranchId],
     queryFn: async () => {
       let q = supabase
         .from("catalog_branch_categories" as "categories")
         .select(CATEGORY_SELECT)
         .order("sort_order");
-      q = applyBranchFilter(q, scopedBranchIds);
+      if (filterBranchId) {
+        q = q.eq("branch_id", filterBranchId);
+      } else {
+        q = applyBranchFilter(q, scopedBranchIds);
+      }
       const { data, error } = await q;
       if (error) throw error;
+      let rows = data || [];
+
+      // Selected branch has no unified overlays yet — fall back to legacy rows
+      // so product filters / bulk move still list that branch's subcategories.
+      if (filterBranchId && rows.length === 0) {
+        const { data: legacy, error: legacyErr } = await supabase
+          .from("categories")
+          .select("id, name, name_en, image, slug, section, is_active, sort_order, branch_id")
+          .eq("branch_id", filterBranchId)
+          .order("sort_order");
+        if (legacyErr) throw legacyErr;
+        rows = (legacy || []).map((r: any) => ({ ...r, catalog_id: r.id }));
+      }
+
       // Admin product filters need one entry per logical category when multi-branch
-      return dedupeCategories(data || []);
+      return filterBranchId ? (rows as Category[]) : dedupeCategories(rows);
     },
     staleTime: 0,
     refetchOnMount: "always",

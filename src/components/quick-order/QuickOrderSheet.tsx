@@ -49,7 +49,7 @@ const QuickOrderSheet = ({ open, onOpenChange }: QuickOrderSheetProps) => {
     }
   }, [open]);
 
-  // Live AI search with debounce
+  // Live smart search with debounce
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!query.trim() || query.trim().length < 2) {
@@ -121,7 +121,8 @@ const QuickOrderSheet = ({ open, onOpenChange }: QuickOrderSheetProps) => {
       <SheetContent
         side="bottom"
         hideClose
-        className="h-[92vh] p-0 rounded-t-3xl overflow-hidden flex flex-col"
+        overlayClassName="z-[100]"
+        className="h-[92vh] p-0 rounded-t-3xl overflow-hidden flex flex-col z-[100]"
       >
         {/* Header */}
         <div className="bg-gradient-to-l from-primary to-primary/80 text-primary-foreground p-4 pt-5 shrink-0">
@@ -132,10 +133,10 @@ const QuickOrderSheet = ({ open, onOpenChange }: QuickOrderSheetProps) => {
               </div>
               <div>
                 <h2 className="font-heading font-bold text-lg leading-tight">
-                  {t("الطلب السريع AI", "Quick Order AI")}
+                  {t("بحث ذكي", "Smart Search")}
                 </h2>
                 <p className="text-xs opacity-90">
-                  {t("اكتب اسم المنتج وسيقترح لك الذكاء الاصطناعي", "Type a product, AI suggests it")}
+                  {t("اكتب اسم المنتج وسنقترح لك أقرب النتائج", "Type a product name and we’ll suggest matches")}
                 </p>
               </div>
             </div>
@@ -174,7 +175,7 @@ const QuickOrderSheet = ({ open, onOpenChange }: QuickOrderSheetProps) => {
                   {t("ابدأ بكتابة المنتجات التي تريدها", "Start typing products you want")}
                 </p>
                 <p className="text-xs mt-1">
-                  {t("الذكاء الاصطناعي سيقترح أقرب الخيارات حتى لو الحجم مختلف", "AI suggests closest matches even with different sizes")}
+                  {t("البحث الذكي يقترح أقرب الخيارات حتى لو الحجم مختلف", "Smart search suggests closest matches even with different sizes")}
                 </p>
               </div>
             )}

@@ -16,18 +16,15 @@ import ImageUpload from "@/components/admin/ImageUpload";
 import { CATEGORY_SECTIONS_SETTING_KEY, invalidateCategoryQueries } from "@/hooks/useCategories";
 import { categorySections as defaultSections, type CategorySection } from "@/data/store-data";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import { applyBranchFilter, writeBranchId } from "@/lib/branch-scope";
+import { writeBranchId } from "@/lib/branch-scope";
+import {
+  fetchAdminCategories,
+  resolveCategoryWriteTarget,
+  setCategoryBranchActive,
+  type AdminCategoryRow,
+} from "@/lib/catalog-category-admin";
 
-type CategoryRow = {
-  id: string;
-  name: string;
-  name_en: string | null;
-  image: string | null;
-  slug: string;
-  section: string | null;
-  is_active: boolean;
-  sort_order: number;
-};
+type CategoryRow = AdminCategoryRow;
 
 type CategoryForm = {
   name: string;
@@ -86,26 +83,7 @@ const AdminCategoriesPage = () => {
 
   const { data: categories, isLoading: catsLoading } = useQuery({
     queryKey: ["admin-categories", scopedBranchIds, filterBranchId],
-    queryFn: async () => {
-      let q = supabase
-        .from("catalog_branch_categories" as "categories")
-        .select("id, catalog_id, name, name_en, image, slug, section, is_active, sort_order, branch_id")
-        .order("sort_order");
-      if (filterBranchId) q = q.eq("branch_id", filterBranchId);
-      else q = applyBranchFilter(q, scopedBranchIds);
-      const { data, error } = await q;
-      if (error) throw error;
-      // One row per logical category when viewing multiple branches
-      const byCatalog = new Map<string, CategoryRow>();
-      for (const row of (data || []) as (CategoryRow & { catalog_id?: string })[]) {
-        const key = String((row as any).catalog_id || row.id);
-        const prev = byCatalog.get(key);
-        if (!prev || (filterBranchId && row.branch_id === filterBranchId) || (!prev.is_active && row.is_active)) {
-          byCatalog.set(key, row);
-        }
-      }
-      return [...byCatalog.values()];
-    },
+    queryFn: () => fetchAdminCategories({ filterBranchId, scopedBranchIds }),
   });
 
   const { data: savedSections, isLoading: sectionsLoading } = useQuery({
@@ -174,8 +152,38 @@ const AdminCategoriesPage = () => {
 
       let savedId = editingSubId;
       if (editingSubId) {
-        const { error } = await supabase.from("categories").update(payload).eq("id", editingSubId);
+        const existing = (categories || []).find((c) => c.id === editingSubId);
+        const target = existing
+          ? resolveCategoryWriteTarget(existing, filterBranchId)
+          : null;
+        // Shared catalog fields on the categories row (prefer legacy / view id).
+        const { error } = await supabase
+          .from("categories")
+          .update({
+            name: payload.name,
+            name_en: payload.name_en,
+            slug: payload.slug,
+            image: payload.image,
+            section: payload.section,
+            sort_order: payload.sort_order,
+          })
+          .eq("id", editingSubId);
         if (error) throw error;
+        // Branch activation must hit category_branch for the selected branch.
+        if (target) {
+          await setCategoryBranchActive({
+            catalogId: target.catalogId,
+            branchId: target.branchId,
+            legacyCategoryId: target.legacyCategoryId,
+            value: payload.is_active,
+          });
+        } else {
+          const { error: activeErr } = await supabase
+            .from("categories")
+            .update({ is_active: payload.is_active })
+            .eq("id", editingSubId);
+          if (activeErr) throw activeErr;
+        }
       } else {
         const bid = writeBranchId(filterBranchId, scopedBranchIds);
         if (!bid) throw new Error("اختر فرعاً من أعلى الصفحة قبل إضافة قسم");
@@ -277,14 +285,24 @@ const AdminCategoriesPage = () => {
 
   const toggleMutation = useMutation({
     mutationFn: async ({ id, value }: { id: string; value: boolean }) => {
-      const { error } = await supabase.from("categories").update({ is_active: value }).eq("id", id);
-      if (error) throw error;
+      const row = (categories || []).find((c) => c.id === id);
+      if (!row) throw new Error("القسم غير موجود");
+      const target = resolveCategoryWriteTarget(row, filterBranchId);
+      if (!target) {
+        throw new Error("اختر فرعاً من أعلى الصفحة قبل تفعيل/تعطيل القسم الفرعي");
+      }
+      await setCategoryBranchActive({
+        catalogId: target.catalogId,
+        branchId: target.branchId,
+        legacyCategoryId: target.legacyCategoryId,
+        value,
+      });
     },
     onSuccess: () => {
       invalidateAll();
       toast.success("تم التحديث");
     },
-    onError: () => toast.error("حدث خطأ"),
+    onError: (e: any) => toast.error(e?.message || "حدث خطأ"),
   });
 
   const setMainOrderMutation = useMutation({
@@ -457,6 +475,11 @@ const AdminCategoriesPage = () => {
 
   return (
     <AdminLayout title="إدارة الأقسام">
+      {!filterBranchId && (scopedBranchIds == null || (scopedBranchIds?.length ?? 0) !== 1) && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          اختر فرعاً من أعلى الصفحة لعرض الأقسام الفرعية الخاصة به وتفعيلها أو تعطيلها لكل فرع على حدة.
+        </div>
+      )}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <Select value={searchScope} onValueChange={(v) => setSearchScope(v as "main" | "sub")}>
           <SelectTrigger className="w-[150px]">

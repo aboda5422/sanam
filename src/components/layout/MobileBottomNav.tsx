@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, LayoutGrid, ShoppingCart, User, Sparkles } from "lucide-react";
+import { Home, Package, ShoppingCart, User, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -13,10 +13,10 @@ const MobileBottomNav = () => {
   const [quickOrderOpen, setQuickOrderOpen] = useState(false);
 
   const items = [
-    { path: "/", icon: Home, label: t("الرئيسية", "Home") },
-    { path: "/categories", icon: LayoutGrid, label: t("الأقسام", "Categories") },
-    { path: "/cart", icon: ShoppingCart, label: t("السلة", "Cart"), badge: uniqueItems },
-    { path: "/profile", icon: User, label: t("حسابي", "Account") },
+    { path: "/", icon: Home, label: t("الرئيسية", "Home"), match: "home" as const },
+    { path: "/profile?tab=orders", icon: Package, label: t("الطلبات", "Orders"), match: "orders" as const },
+    { path: "/cart", icon: ShoppingCart, label: t("السلة", "Cart"), badge: uniqueItems, match: "cart" as const },
+    { path: "/profile", icon: User, label: t("حسابي", "Account"), match: "account" as const },
   ];
 
   // Hide on admin/driver routes
@@ -28,11 +28,21 @@ const MobileBottomNav = () => {
   const leftItems = items.slice(0, 2);
   const rightItems = items.slice(2);
 
+  const isItemActive = (match: (typeof items)[number]["match"]) => {
+    const tab = new URLSearchParams(location.search).get("tab");
+    if (match === "home") return location.pathname === "/";
+    if (match === "orders") {
+      return location.pathname.startsWith("/order/") || (location.pathname.startsWith("/profile") && tab === "orders");
+    }
+    if (match === "cart") return location.pathname.startsWith("/cart");
+    if (match === "account") {
+      return location.pathname.startsWith("/profile") && tab !== "orders";
+    }
+    return false;
+  };
+
   const renderItem = (item: (typeof items)[number]) => {
-    const isActive =
-      item.path === "/"
-        ? location.pathname === "/"
-        : location.pathname.startsWith(item.path);
+    const isActive = isItemActive(item.match);
     const Icon = item.icon;
     return (
       <Link
@@ -60,23 +70,25 @@ const MobileBottomNav = () => {
     <>
       {/* spacer so content isn't hidden behind the nav on mobile */}
       <div className="h-16 md:hidden" aria-hidden />
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+      <nav
+        className={cn(
+          "md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border shadow-[0_-2px_10px_rgba(0,0,0,0.05)]",
+          quickOrderOpen && "invisible pointer-events-none"
+        )}
+      >
         <div className="relative flex items-center justify-around h-16">
           {leftItems.map(renderItem)}
 
-          {/* Center AI Quick Order FAB */}
+          {/* Center Smart Search FAB */}
           <div className="flex-1 flex items-center justify-center">
             <button
               onClick={() => setQuickOrderOpen(true)}
-              aria-label={t("الطلب السريع AI", "Quick Order AI")}
+              aria-label={t("بحث ذكي", "Smart Search")}
               className="-mt-4 relative group"
             >
               <span className="absolute inset-0 rounded-full bg-primary/35 blur-md animate-pulse" aria-hidden />
               <span className="relative flex items-center justify-center w-[38px] h-[38px] rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-background transition-transform group-active:scale-95">
                 <Sparkles className="h-[18px] w-[18px]" />
-                <span className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 text-[8px] font-black px-1 py-0.5 rounded-full shadow leading-none">
-                  AI
-                </span>
               </span>
             </button>
           </div>
@@ -87,13 +99,16 @@ const MobileBottomNav = () => {
 
       <QuickOrderSheet open={quickOrderOpen} onOpenChange={setQuickOrderOpen} />
 
-      {/* Desktop: floating Quick Order — bottom-left, very soft pulse */}
+      {/* Desktop: floating Smart Search — bottom-left, very soft pulse */}
       <button
         type="button"
         onClick={() => setQuickOrderOpen(true)}
-        aria-label={t("الطلب السريع AI", "Quick Order AI")}
-        title={t("طلب سريع", "Quick Order")}
-        className="hidden md:flex fixed bottom-6 left-6 z-50 items-center justify-center group"
+        aria-label={t("بحث ذكي", "Smart Search")}
+        title={t("بحث ذكي", "Smart Search")}
+        className={cn(
+          "hidden md:flex fixed bottom-6 left-6 z-50 items-center justify-center group",
+          quickOrderOpen && "invisible pointer-events-none"
+        )}
       >
         <span
           className="absolute inset-[-6px] rounded-full bg-primary/25 blur-md animate-soft-glow"
@@ -101,9 +116,6 @@ const MobileBottomNav = () => {
         />
         <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/75 text-primary-foreground shadow-lg shadow-primary/25 ring-2 ring-background transition-transform group-hover:scale-105 group-active:scale-95">
           <Sparkles className="h-6 w-6" />
-          <span className="absolute -top-0.5 -right-0.5 bg-amber-400 text-amber-950 text-[9px] font-black px-1.5 py-0.5 rounded-full shadow">
-            AI
-          </span>
         </span>
       </button>
     </>

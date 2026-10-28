@@ -3,15 +3,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 /** Main storefront tabs — same order as MobileBottomNav */
-const TABS = ["/", "/categories", "/cart", "/profile"] as const;
+const TABS = ["/", "/profile?tab=orders", "/cart", "/profile"] as const;
 
 const MIN_DX = 72;
 const MAX_DURATION_MS = 700;
 const HORIZONTAL_RATIO = 1.35;
 
-function resolveTabIndex(pathname: string): number {
+function resolveTabIndex(pathname: string, search: string): number {
+  const tab = new URLSearchParams(search).get("tab");
   if (pathname === "/") return 0;
-  if (pathname.startsWith("/categories") || pathname.startsWith("/category/")) return 1;
+  if (pathname.startsWith("/order/")) return 1;
+  if (pathname.startsWith("/profile") && tab === "orders") return 1;
   if (pathname.startsWith("/cart")) return 2;
   if (pathname.startsWith("/profile")) return 3;
   return -1;
@@ -39,7 +41,7 @@ function isIgnoredTarget(target: EventTarget | null): boolean {
 }
 
 /**
- * Mobile-only horizontal swipe between main tabs (Home → Categories → Cart → Profile).
+ * Mobile-only horizontal swipe between main tabs (Home → Orders → Cart → Profile).
  * Ignores vertical scrolls, form fields, dialogs, and horizontal carousels.
  */
 const MobileSwipeNavigation = () => {
@@ -48,14 +50,16 @@ const MobileSwipeNavigation = () => {
   const navigate = useNavigate();
   const startRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const pathnameRef = useRef(location.pathname);
+  const searchRef = useRef(location.search);
   pathnameRef.current = location.pathname;
+  searchRef.current = location.search;
 
   useEffect(() => {
     if (!isMobile) return;
 
     const onStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
-      if (resolveTabIndex(pathnameRef.current) < 0) return;
+      if (resolveTabIndex(pathnameRef.current, searchRef.current) < 0) return;
       if (isIgnoredTarget(e.target)) return;
 
       const touch = e.touches[0];
@@ -67,7 +71,7 @@ const MobileSwipeNavigation = () => {
       startRef.current = null;
       if (!start || e.changedTouches.length !== 1) return;
 
-      const current = resolveTabIndex(pathnameRef.current);
+      const current = resolveTabIndex(pathnameRef.current, searchRef.current);
       if (current < 0) return;
 
       const touch = e.changedTouches[0];
