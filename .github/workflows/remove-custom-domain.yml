@@ -1,0 +1,100 @@
+# One-shot: remove a Cloudflare Pages custom domain using repo secrets.
+# Run: gh workflow run remove-custom-domain.yml -f domain=sanam.xbarawa.com
+name: Remove Cloudflare Pages domain
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: Custom domain to detach (e.g. sanam.xbarawa.com)
+        required: true
+        type: string
+      project:
+        description: Cloudflare Pages project name
+        required: true
+        default: sanam
+        type: string
+      delete_dns:
+        description: Also delete matching DNS record in Cloudflare zones (if found)
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  remove-domain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: List current domains
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ inputs.project }}
+        run: |
+          set -euo pipefail
+          curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PROJECT}" \
+            | jq '{success, name: .result.name, domains: .result.domains, subdomain: .result.subdomain}'
+
+      - name: Remove custom domain from Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ inputs.project }}
+          DOMAIN: ${{ inputs.domain }}
+        run: |
+          set -euo pipefail
+          RESP=$(curl -sS -X DELETE \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PROJECT}/domains/${DOMAIN}")
+          echo "$RESP" | jq .
+          echo "$RESP" | jq -e '.success == true or (.errors[]?.code == 8000007) or (.errors[]?.message | test("not found|does not exist"; "i"))'
+
+      - name: Delete DNS record if present
+        if: ${{ inputs.delete_dns }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          DOMAIN: ${{ inputs.domain }}
+        run: |
+          set -euo pipefail
+          # Find zone by walking parent domains (sanam.xbarawa.com -> xbarawa.com)
+          IFS='.' read -ra PARTS <<< "$DOMAIN"
+          ZONE_ID=""
+          ZONE_NAME=""
+          for ((i=0; i<${#PARTS[@]}-1; i++)); do
+            CAND=$(IFS='.'; echo "${PARTS[*]:i}")
+            RESP=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              "https://api.cloudflare.com/client/v4/zones?name=${CAND}")
+            ZID=$(echo "$RESP" | jq -r '.result[0].id // empty')
+            if [ -n "$ZID" ]; then
+              ZONE_ID="$ZID"
+              ZONE_NAME="$CAND"
+              break
+            fi
+          done
+          if [ -z "$ZONE_ID" ]; then
+            echo "No Cloudflare zone found for $DOMAIN — DNS skip (external DNS?)"
+            exit 0
+          fi
+          echo "Zone: $ZONE_NAME ($ZONE_ID)"
+          RECS=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records?name=${DOMAIN}")
+          echo "$RECS" | jq '{success, count: (.result|length), records: [.result[]|{id,type,name,content}]}'
+          echo "$RECS" | jq -r '.result[].id' | while read -r RID; do
+            [ -z "$RID" ] && continue
+            echo "Deleting DNS record $RID"
+            curl -sS -X DELETE -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records/${RID}" | jq '{success, errors}'
+          done
+
+      - name: Verify domain gone from Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ inputs.project }}
+          DOMAIN: ${{ inputs.domain }}
+        run: |
+          set -euo pipefail
+          curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PROJECT}" \
+            | jq --arg d "$DOMAIN" '{success, domains: .result.domains, still_present: ([.result.domains[]?] | index($d) != null)}'
