@@ -1,0 +1,60 @@
+# One-shot: add a Cloudflare Pages custom domain using repo secrets.
+# Run: gh workflow run add-custom-domain.yml -f domain=store.sanam.sa
+name: Add Cloudflare Pages domain
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: Custom domain to attach (e.g. store.sanam.sa)
+        required: true
+        type: string
+      project:
+        description: Cloudflare Pages project name
+        required: true
+        default: sanam
+        type: string
+
+jobs:
+  add-domain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: List current domains
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ inputs.project }}
+        run: |
+          set -euo pipefail
+          curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PROJECT}" \
+            | jq '{success, name: .result.name, domains: .result.domains, subdomain: .result.subdomain}'
+
+      - name: Add custom domain
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ inputs.project }}
+          DOMAIN: ${{ inputs.domain }}
+        run: |
+          set -euo pipefail
+          RESP=$(curl -sS -X POST \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data "{\"name\":\"${DOMAIN}\"}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PROJECT}/domains")
+          echo "$RESP" | jq .
+          echo "$RESP" | jq -e '.success == true or (.errors[]?.code == 8000014) or (.errors[]?.message | test("already|exists"; "i"))'
+
+      - name: Verify domain status
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ inputs.project }}
+          DOMAIN: ${{ inputs.domain }}
+        run: |
+          set -euo pipefail
+          curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PROJECT}/domains/${DOMAIN}" \
+            | jq .
