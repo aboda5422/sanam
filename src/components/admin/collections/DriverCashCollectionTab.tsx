@@ -147,6 +147,26 @@ export function DriverCashCollectionTab({ channel }: { channel: DriverChannel })
     },
   });
 
+  /** تحصيل المندوب من العملاء داخل الفترة المحددة — وليس الإجمالي التراكمي القديم_collected. */
+  const { data: periodCollectedByDriver = new Map<string, number>() } = useQuery({
+    queryKey: ["admin-driver-period-collections", channel, period, customFrom, customTo],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("wallet_transactions")
+        .select("driver_id, amount, created_at, type")
+        .eq("type", "collection")
+        .order("created_at", { ascending: false })
+        .limit(2000);
+      if (error) throw error;
+      const map = new Map<string, number>();
+      for (const tx of data || []) {
+        if (!tx.driver_id || !isoInRange(tx.created_at, range.from, range.to)) continue;
+        map.set(tx.driver_id, Math.round(((map.get(tx.driver_id) || 0) + Number(tx.amount || 0)) * 100) / 100);
+      }
+      return map;
+    },
+  });
+
   const { data: openPositions = new Map<string, DriverOpenPosition>() } = useQuery({
     queryKey: ["driver-open-positions"],
     queryFn: loadDriverOpenPositions,
@@ -225,6 +245,7 @@ export function DriverCashCollectionTab({ channel }: { channel: DriverChannel })
       qc.invalidateQueries({ queryKey: ["admin-kpi-stats"] });
       qc.invalidateQueries({ queryKey: ["admin-driver-wallet-log"] });
       qc.invalidateQueries({ queryKey: ["admin-driver-cash-settlements"] });
+      qc.invalidateQueries({ queryKey: ["admin-driver-period-collections"] });
       qc.invalidateQueries({ queryKey: ["collection-registry"] });
       qc.invalidateQueries({ queryKey: ["driver-open-positions"] });
       qc.invalidateQueries({ queryKey: ["admin-driver-wages"] });
@@ -306,9 +327,9 @@ export function DriverCashCollectionTab({ channel }: { channel: DriverChannel })
             <thead>
               <tr className="border-b bg-muted/30">
                 <th className="text-right p-3 font-medium">المندوب</th>
-                <th className="text-right p-3 font-medium">عليه للمحصل</th>
-                <th className="text-right p-3 font-medium">له من الشبكة</th>
                 <th className="text-right p-3 font-medium">إجمالي التحصيل</th>
+                <th className="text-right p-3 font-medium">له من الشبكة</th>
+                <th className="text-right p-3 font-medium">عليه للمحصل</th>
                 <th className="text-center p-3 font-medium">سجل</th>
                 <th className="text-center p-3 font-medium">استلام المحصل</th>
               </tr>
@@ -321,9 +342,16 @@ export function DriverCashCollectionTab({ channel }: { channel: DriverChannel })
                   "مندوب";
                 const phone = (w.drivers as { phone?: string })?.phone;
                 const pos = openPositions.get(w.driver_id) || { cashDue: 0, cardWage: 0 };
+                const periodCollected = periodCollectedByDriver.get(w.driver_id) || 0;
                 return (
                   <tr key={w.id} className="border-b last:border-0 hover:bg-muted/10">
                     <td className="p-3 font-medium">{name}</td>
+                    <td className="p-3">
+                      {periodCollected > 0 ? `${periodCollected.toFixed(2)} ر.س` : "—"}
+                    </td>
+                    <td className={`p-3 font-bold ${pos.cardWage > 0 ? "text-emerald-700" : ""}`}>
+                      {pos.cardWage > 0 ? `${pos.cardWage.toFixed(2)} ر.س` : "—"}
+                    </td>
                     <td className="p-3 font-bold text-amber-600">
                       {pos.cashDue > 0 ? (
                         <Link
@@ -337,10 +365,6 @@ export function DriverCashCollectionTab({ channel }: { channel: DriverChannel })
                         "—"
                       )}
                     </td>
-                    <td className={`p-3 font-bold ${pos.cardWage > 0 ? "text-emerald-700" : ""}`}>
-                      {pos.cardWage > 0 ? `${pos.cardWage.toFixed(2)} ر.س` : "—"}
-                    </td>
-                    <td className="p-3">{Number(w.total_collected).toFixed(2)} ر.س</td>
                     <td className="p-3 text-center">
                       <Button
                         size="sm"

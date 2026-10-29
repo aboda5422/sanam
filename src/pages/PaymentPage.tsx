@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import PaymentChrome from "@/components/layout/PaymentChrome";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -24,7 +23,6 @@ const PaymentPage = () => {
     const init = async () => {
       if (!orderId) return;
 
-      // Fetch order
       const { data: ord, error } = await supabase
         .from("orders").select("*").eq("id", orderId).maybeSingle();
       if (error || !ord) {
@@ -34,7 +32,6 @@ const PaymentPage = () => {
       }
       setOrder(ord);
 
-      // Fetch publishable key
       const { data: keyData } = await supabase.functions.invoke("get-moyasar-key");
       const publishableKey = keyData?.key;
       if (!publishableKey) {
@@ -42,7 +39,6 @@ const PaymentPage = () => {
         return;
       }
 
-      // Load Moyasar CSS + JS
       if (!document.querySelector("#moyasar-css")) {
         const link = document.createElement("link");
         link.id = "moyasar-css";
@@ -87,27 +83,24 @@ const PaymentPage = () => {
   }, [orderId, navigate, toast]);
 
   return (
-    <div className="min-h-screen flex flex-col" dir="rtl">
-      <Header />
-      <main className="flex-1 container py-8 max-w-2xl">
-        <h1 className="font-heading font-bold text-2xl mb-2">الدفع الإلكتروني</h1>
-        {order && (
-          <p className="text-muted-foreground mb-2">
-            طلب رقم {order.order_number} · المبلغ: <span className="font-bold text-primary">{Number(order.total).toFixed(2)} ر.س</span>
-          </p>
-        )}
-        <p className="text-xs text-muted-foreground mb-6">
-          أبل باي يظهر على سفاري/آيفون فقط. سامسونج باي يحتاج تفعيل الخدمة من لوحة ميسر (رقم Service ID).
+    <PaymentChrome>
+      <h1 className="font-heading font-bold text-2xl mb-2">الدفع الإلكتروني</h1>
+      {order && (
+        <p className="text-muted-foreground mb-2">
+          طلب رقم {order.order_number} · المبلغ:{" "}
+          <span className="font-bold text-primary">{Number(order.total).toFixed(2)} ر.س</span>
         </p>
-        {loading && (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        )}
-        <div ref={formRef} className="mysr-form" />
-      </main>
-      <Footer />
-    </div>
+      )}
+      <p className="text-xs text-muted-foreground mb-6">
+        أبل باي يظهر على سفاري/آيفون فقط. سامسونج باي يحتاج تفعيل الخدمة من لوحة ميسر (رقم Service ID).
+      </p>
+      {loading && (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      )}
+      <div ref={formRef} className="mysr-form" />
+    </PaymentChrome>
   );
 };
 

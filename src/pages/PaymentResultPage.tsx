@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import PaymentChrome from "@/components/layout/PaymentChrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -76,9 +75,8 @@ const PaymentResultPage = () => {
   }, [params]);
 
   return (
-    <div className="min-h-screen flex flex-col" dir="rtl">
-      <Header />
-      <main className="flex-1 container py-16 text-center">
+    <PaymentChrome showNavActions={state === "failed" || state === "loading"}>
+      <div className="py-8 text-center">
         {state === "loading" && (
           <>
             <Loader2 className="h-16 w-16 mx-auto animate-spin text-primary mb-4" />
@@ -118,7 +116,7 @@ const PaymentResultPage = () => {
             </div>
           </>
         )}
-      </main>
+      </div>
       <AlertDialog open={askGuestRegister} onOpenChange={setAskGuestRegister}>
         <AlertDialogContent dir="rtl">
           <AlertDialogHeader>
@@ -174,8 +172,7 @@ const PaymentResultPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <Footer />
-    </div>
+    </PaymentChrome>
   );
 };
 

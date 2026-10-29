@@ -276,7 +276,20 @@ const AdminOrdersContent = () => {
       const { data, error } = await supabase.functions.invoke("refund-moyasar-payment", {
         body: { order_id: refundOrder.id, amount: amt },
       });
-      if (error) throw error;
+      if (error) {
+        // Supabase wraps non-2xx as FunctionsHttpError; real reason is in the response body (ours or Moyasar).
+        let detail = error.message;
+        try {
+          const res = (error as any).context;
+          if (res && typeof res.json === "function") {
+            const body = await res.json();
+            if (body?.error) detail = body.error;
+          }
+        } catch {
+          /* keep generic message */
+        }
+        throw new Error(detail || "فشل الاسترداد");
+      }
       if (!data?.success) throw new Error(data?.error || "فشل الاسترداد");
       toast.success(`تم استرداد ${data.refund_amount} ر.س`);
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
