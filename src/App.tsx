@@ -31,6 +31,7 @@ import RouteTracker from "./components/RouteTracker";
 import ScrollToTop from "./components/ScrollToTop";
 import MobileBottomNav from "./components/layout/MobileBottomNav";
 import MobileSwipeNavigation from "./components/layout/MobileSwipeNavigation";
+import { CustomerOrderAlertsListener } from "./hooks/useCustomerOrderAlerts";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -91,6 +92,7 @@ const App = () => (
           <CartProvider>
           <ScrollToTop />
           <RouteTracker />
+          <CustomerOrderAlertsListener />
           <BranchPickerDialog />
           <Routes>
             {/* Customer Routes */}

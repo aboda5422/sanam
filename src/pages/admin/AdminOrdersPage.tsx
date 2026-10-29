@@ -9,12 +9,30 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Search, Loader2, Eye, XCircle, Undo2, MapPin } from "lucide-react";
+import { Search, Loader2, Eye, XCircle, Undo2, MapPin, MessageSquare } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { mapsLinkFromCoords, parseMapsCoords } from "@/lib/maps-link";
+import OrderChatPanel from "@/components/orders/OrderChatPanel";
 
-const OPEN_STATUSES = new Set(["pending", "assigned", "preparing"]);
+const OPEN_STATUSES = new Set(["pending", "assigned", "preparing", "ready"]);
+
+const CHAT_SEEN_KEY = "admin-order-chat-seen";
+
+function readChatSeen(): Record<string, string> {
+  try {
+    return JSON.parse(localStorage.getItem(CHAT_SEEN_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function markChatSeen(orderId: string) {
+  const map = readChatSeen();
+  map[orderId] = new Date().toISOString();
+  localStorage.setItem(CHAT_SEEN_KEY, JSON.stringify(map));
+}
 
 const statusMap: Record<string, { label: string; color: string }> = {
   pending: { label: "بانتظار", color: "bg-yellow-100 text-yellow-800" },
@@ -64,6 +82,8 @@ const AdminOrdersContent = () => {
   const [refundOrder, setRefundOrder] = useState<any | null>(null);
   const [refundAmount, setRefundAmount] = useState<string>("");
   const [refunding, setRefunding] = useState(false);
+  const [chatOrder, setChatOrder] = useState<any | null>(null);
+  const [chatSeenTick, setChatSeenTick] = useState(0);
 
   useEffect(() => {
     const status = searchParams.get("status");
@@ -88,6 +108,68 @@ const AdminOrdersContent = () => {
       return data;
     },
   });
+
+  const orderIds = (orders || []).map((o: any) => o.id);
+  const { data: chatFlags } = useQuery({
+    queryKey: ["admin-order-chat-flags", orderIds],
+    enabled: orderIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("order_messages" as any)
+        .select("order_id, message_type, sender_role, created_at")
+        .in("order_id", orderIds)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      const map: Record<string, { cancel?: boolean; edit?: boolean; lastCustomerAt?: string }> = {};
+      for (const row of (data || []) as unknown as {
+        order_id: string;
+        message_type: string;
+        sender_role: string;
+        created_at: string;
+      }[]) {
+        const cur = map[row.order_id] || {};
+        if (row.message_type === "cancel_request") cur.cancel = true;
+        if (row.message_type === "edit_request") cur.edit = true;
+        if (row.sender_role === "customer" && !cur.lastCustomerAt) {
+          cur.lastCustomerAt = row.created_at;
+        }
+        map[row.order_id] = cur;
+      }
+      return map;
+    },
+  });
+
+  useEffect(() => {
+    if (orderIds.length === 0) return;
+    const channel = supabase
+      .channel("admin-orders-chat-badge")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "order_messages" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["admin-order-chat-flags"] });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [orderIds.join(","), queryClient]);
+
+  const openChat = (o: any) => {
+    markChatSeen(o.id);
+    setChatSeenTick((t) => t + 1);
+    setChatOrder(o);
+  };
+
+  const hasUnreadCustomerMsg = (orderId: string) => {
+    void chatSeenTick;
+    const lastCustomerAt = chatFlags?.[orderId]?.lastCustomerAt;
+    if (!lastCustomerAt) return false;
+    const seenAt = readChatSeen()[orderId];
+    if (!seenAt) return true;
+    return new Date(lastCustomerAt).getTime() > new Date(seenAt).getTime();
+  };
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status, notes }: { id: string; status: string; notes?: string }) => {
@@ -222,9 +304,23 @@ const AdminOrdersContent = () => {
                 </tr>
               </thead>
               <tbody>
-                {filtered?.map((o) => (
+                {filtered?.map((o) => {
+                  const unreadChat = hasUnreadCustomerMsg(o.id);
+                  const flags = chatFlags?.[o.id];
+                  const needsAttention = unreadChat || flags?.cancel || flags?.edit;
+                  return (
                   <tr key={o.id} className="border-b last:border-0 hover:bg-muted/10">
-                    <td className="p-3 font-medium">#{o.order_number}</td>
+                    <td className="p-3 font-medium">
+                      <span className="inline-flex items-center gap-1.5">
+                        #{o.order_number}
+                        {needsAttention && (
+                          <span
+                            className="inline-block h-2 w-2 rounded-full bg-rose-500"
+                            title={unreadChat ? "رسالة جديدة من العميل" : "طلب يحتاج متابعة"}
+                          />
+                        )}
+                      </span>
+                    </td>
                     <td className="p-3">
                       <p>{o.customer_name || "—"}</p>
                       <p className="text-xs text-muted-foreground">{o.customer_phone}</p>
@@ -250,6 +346,18 @@ const AdminOrdersContent = () => {
                     <td className="p-3 text-center">
                       <div className="flex items-center justify-center gap-1">
                         <Button variant="ghost" size="icon" onClick={() => setSelectedOrder(o)} title="عرض التفاصيل"><Eye className="h-4 w-4" /></Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openChat(o)}
+                          title={unreadChat ? "رسالة جديدة من العميل" : "محادثة الطلب"}
+                          className={`relative ${unreadChat || needsAttention ? "text-rose-600" : ""}`}
+                        >
+                          <MessageSquare className="h-4 w-4" />
+                          {unreadChat && (
+                            <span className="absolute top-1 left-1 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-background" />
+                          )}
+                        </Button>
                         {o.payment_status === "paid" && o.payment_method !== "cash" && (
                           <Button variant="ghost" size="icon" onClick={() => { setRefundOrder(o); setRefundAmount(String(o.total)); }} title="استرداد المبلغ" className="text-purple-600 hover:text-purple-700">
                             <Undo2 className="h-4 w-4" />
@@ -258,7 +366,8 @@ const AdminOrdersContent = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -356,6 +465,48 @@ const AdminOrdersContent = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Sheet
+        open={!!chatOrder}
+        onOpenChange={(open) => {
+          if (!open && chatOrder?.id) {
+            markChatSeen(chatOrder.id);
+            setChatSeenTick((t) => t + 1);
+            queryClient.invalidateQueries({ queryKey: ["admin-order-chat-flags"] });
+          }
+          if (!open) setChatOrder(null);
+        }}
+      >
+        <SheetContent side="left" className="w-full sm:max-w-md flex flex-col" dir="rtl">
+          <SheetHeader>
+            <SheetTitle>محادثة الطلب #{chatOrder?.order_number}</SheetTitle>
+          </SheetHeader>
+          {chatOrder && (
+            <div className="flex-1 flex flex-col mt-4 min-h-0 gap-3">
+              <div className="text-xs text-muted-foreground space-y-0.5 border rounded-lg p-2 bg-muted/30">
+                <p>{chatOrder.customer_name} · {chatOrder.customer_phone}</p>
+                <p>الحالة: {statusMap[chatOrder.status]?.label || chatOrder.status} · {Number(chatOrder.total).toFixed(2)} ر.س</p>
+              </div>
+              <OrderChatPanel
+                orderId={chatOrder.id}
+                mode="staff"
+                orderStatus={chatOrder.status}
+                className="flex-1 min-h-0"
+                onOrderChanged={async () => {
+                  queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+                  queryClient.invalidateQueries({ queryKey: ["admin-order-chat-flags"] });
+                  const { data } = await supabase
+                    .from("orders")
+                    .select("*, order_items(*), branches(name, slug)")
+                    .eq("id", chatOrder.id)
+                    .maybeSingle();
+                  if (data) setChatOrder(data);
+                }}
+              />
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
 
       {/* Refund Dialog */}
       <Dialog open={!!refundOrder} onOpenChange={() => !refunding && setRefundOrder(null)}>

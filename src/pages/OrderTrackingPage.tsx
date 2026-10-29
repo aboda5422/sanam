@@ -10,6 +10,7 @@ import Footer from "@/components/layout/Footer";
 import DriverRatingDialog from "@/components/rating/DriverRatingDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
 import CustomerDriverTracker from "@/components/tracking/CustomerDriverTracker";
+import OrderChatPanel from "@/components/orders/OrderChatPanel";
 
 const steps = [
   { key: "pending", label: "تم استلام الطلب", icon: Clock, description: "تم استلام طلبك بنجاح وبانتظار التجهيز" },
@@ -287,6 +288,25 @@ const OrderTrackingPage = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Order chat with store */}
+        <Card className="mb-6">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <MessageCircle className="h-5 w-5 text-primary" />
+              <h3 className="font-bold text-sm">محادثة مع المتجر</h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">
+              راسلنا لطلب تعديل أو استفسار — ستصلك تنبيهات عند رد المتجر
+            </p>
+            <OrderChatPanel
+              orderId={order.id}
+              mode="customer"
+              orderStatus={order.status}
+              onOrderChanged={fetchOrder}
+            />
+          </CardContent>
+        </Card>
 
         {/* Order Items */}
         <Card>

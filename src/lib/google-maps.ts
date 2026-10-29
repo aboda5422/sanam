@@ -54,6 +54,8 @@ export function loadGoogleMaps(): Promise<boolean> {
       const key = await getMapsKey();
       if (!key) {
         console.error("[google-maps] no key returned");
+        loadPromise = null;
+        mapsKey = null;
         return false;
       }
 
@@ -71,6 +73,7 @@ export function loadGoogleMaps(): Promise<boolean> {
     } catch (e) {
       console.error("[google-maps] load failed:", e);
       loadPromise = null;
+      mapsKey = null;
       return false;
     }
   })();

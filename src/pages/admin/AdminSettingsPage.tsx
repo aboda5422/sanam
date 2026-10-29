@@ -194,6 +194,7 @@ const NotificationsSection = () => {
     { key: "driver_assigned", label: "تعيين مندوب" },
     { key: "low_stock", label: "نفاد المخزون" },
     { key: "new_complaint", label: "شكوى جديدة" },
+    { key: "order_chat", label: "رسالة محادثة من العميل" },
     { key: "sound_enabled", label: "تفعيل الصوت" },
   ];
 

@@ -1,21 +1,20 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Package, ShoppingCart, User, Sparkles } from "lucide-react";
+import { Home, Package, User, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import QuickOrderSheet from "@/components/quick-order/QuickOrderSheet";
+import CartNavLink from "@/components/layout/CartNavLink";
 
 const MobileBottomNav = () => {
   const location = useLocation();
-  const { uniqueItems } = useCart();
   const { t } = useLanguage();
   const [quickOrderOpen, setQuickOrderOpen] = useState(false);
 
   const items = [
     { path: "/", icon: Home, label: t("الرئيسية", "Home"), match: "home" as const },
     { path: "/profile?tab=orders", icon: Package, label: t("الطلبات", "Orders"), match: "orders" as const },
-    { path: "/cart", icon: ShoppingCart, label: t("السلة", "Cart"), badge: uniqueItems, match: "cart" as const },
+    { path: "/cart", match: "cart" as const, cart: true as const },
     { path: "/profile", icon: User, label: t("حسابي", "Account"), match: "account" as const },
   ];
 
@@ -32,9 +31,11 @@ const MobileBottomNav = () => {
     const tab = new URLSearchParams(location.search).get("tab");
     if (match === "home") return location.pathname === "/";
     if (match === "orders") {
-      return location.pathname.startsWith("/order/") || (location.pathname.startsWith("/profile") && tab === "orders");
+      return location.pathname.startsWith("/profile") && tab === "orders";
     }
-    if (match === "cart") return location.pathname.startsWith("/cart");
+    if (match === "cart") {
+      return location.pathname.startsWith("/cart") || location.pathname.startsWith("/order/");
+    }
     if (match === "account") {
       return location.pathname.startsWith("/profile") && tab !== "orders";
     }
@@ -43,7 +44,17 @@ const MobileBottomNav = () => {
 
   const renderItem = (item: (typeof items)[number]) => {
     const isActive = isItemActive(item.match);
-    const Icon = item.icon;
+    if ("cart" in item && item.cart) {
+      return (
+        <CartNavLink
+          key={item.path}
+          variant="nav"
+          label={t("السلة", "Cart")}
+          active={isActive}
+        />
+      );
+    }
+    const Icon = item.icon!;
     return (
       <Link
         key={item.path}
@@ -55,11 +66,6 @@ const MobileBottomNav = () => {
       >
         <div className="relative">
           <Icon className={cn("h-6 w-6", isActive && "text-primary")} />
-          {item.badge && item.badge > 0 ? (
-            <span className="absolute -top-1.5 -right-2 bg-primary text-primary-foreground text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">
-              {item.badge}
-            </span>
-          ) : null}
         </div>
         <span>{item.label}</span>
       </Link>

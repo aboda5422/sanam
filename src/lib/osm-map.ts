@@ -69,9 +69,11 @@ export type OsmMapHandle = {
   setZones: (zones: OsmZone[]) => void;
 };
 
+type BasemapMode = "street" | "satellite" | "hybrid";
+
 /**
- * Street (OSM) + satellite (Esri imagery) with a compact Arabic toggle.
- * OSM alone has no satellite tiles — Esri World Imagery is the free common layer.
+ * Street (OSM names) + satellite (Esri) + hybrid (imagery + place labels).
+ * Free tiles — no Google billing required.
  */
 export function attachBaseLayers(map: any, opts?: { defaultSatellite?: boolean }) {
   const L = window.L;
@@ -85,46 +87,119 @@ export function attachBaseLayers(map: any, opts?: { defaultSatellite?: boolean }
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     {
       attribution:
-        "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics",
+        "Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics",
       maxZoom: 19,
     },
   );
+  /** Place names over imagery. */
+  const placeLabels = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+    {
+      attribution: "Labels &copy; Esri",
+      maxZoom: 19,
+      opacity: 0.95,
+      pane: "overlayPane",
+    },
+  );
+  /** Road / street names over imagery. */
+  const roadLabels = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
+    {
+      attribution: "Roads &copy; Esri",
+      maxZoom: 19,
+      opacity: 0.9,
+      pane: "overlayPane",
+    },
+  );
 
-  let mode: "street" | "satellite" = opts?.defaultSatellite ? "satellite" : "street";
-  (mode === "satellite" ? satellite : street).addTo(map);
+  let mode: BasemapMode = opts?.defaultSatellite ? "hybrid" : "street";
+
+  const applyMode = (next: BasemapMode) => {
+    if (map.hasLayer(street)) map.removeLayer(street);
+    if (map.hasLayer(satellite)) map.removeLayer(satellite);
+    if (map.hasLayer(placeLabels)) map.removeLayer(placeLabels);
+    if (map.hasLayer(roadLabels)) map.removeLayer(roadLabels);
+    if (next === "street") {
+      street.addTo(map);
+    } else if (next === "satellite") {
+      satellite.addTo(map);
+    } else {
+      satellite.addTo(map);
+      roadLabels.addTo(map);
+      placeLabels.addTo(map);
+    }
+    mode = next;
+  };
+
+  applyMode(mode);
+
+  const cycle: BasemapMode[] = ["street", "hybrid", "satellite"];
+  const labelFor = (m: BasemapMode) =>
+    m === "street" ? "شوارع" : m === "hybrid" ? "قمر + أسماء" : "قمر صناعي";
 
   const Control = L.Control.extend({
     options: { position: "topright" },
     onAdd() {
-      const btn = L.DomUtil.create(
-        "button",
+      const wrap = L.DomUtil.create(
+        "div",
         "Sanam-map-basemap leaflet-bar leaflet-control",
-      ) as HTMLButtonElement;
-      btn.type = "button";
-      btn.title = "تبديل الخريطة / القمر الصناعي";
-      const syncLabel = () => {
-        btn.textContent = mode === "street" ? "قمر صناعي" : "خريطة";
-        btn.setAttribute("aria-label", btn.textContent);
-      };
-      syncLabel();
-      L.DomEvent.disableClickPropagation(btn);
-      L.DomEvent.on(btn, "click", (e: Event) => {
-        L.DomEvent.stop(e);
-        if (mode === "street") {
-          map.removeLayer(street);
-          satellite.addTo(map);
-          mode = "satellite";
-        } else {
-          map.removeLayer(satellite);
-          street.addTo(map);
-          mode = "street";
+      ) as HTMLDivElement;
+      wrap.style.display = "flex";
+      wrap.style.flexDirection = "column";
+      wrap.style.overflow = "hidden";
+      wrap.style.borderRadius = "8px";
+      wrap.style.boxShadow = "0 1px 4px rgba(0,0,0,.3)";
+
+      for (const m of cycle) {
+        const btn = L.DomUtil.create("button", "", wrap) as HTMLButtonElement;
+        btn.type = "button";
+        btn.textContent = labelFor(m);
+        btn.title = labelFor(m);
+        btn.style.cssText =
+          "display:block;border:0;background:#fff;padding:6px 10px;font-size:12px;cursor:pointer;min-width:88px;text-align:center";
+        if (m === mode) {
+          btn.style.background = "#EC8824";
+          btn.style.color = "#fff";
+          btn.style.fontWeight = "700";
         }
-        syncLabel();
-      });
-      return btn;
+        L.DomEvent.disableClickPropagation(btn);
+        L.DomEvent.on(btn, "click", (e: Event) => {
+          L.DomEvent.stop(e);
+          applyMode(m);
+          Array.from(wrap.querySelectorAll("button")).forEach((b) => {
+            const el = b as HTMLButtonElement;
+            const active = el.textContent === labelFor(mode);
+            el.style.background = active ? "#EC8824" : "#fff";
+            el.style.color = active ? "#fff" : "#111";
+            el.style.fontWeight = active ? "700" : "400";
+          });
+        });
+      }
+      return wrap;
     },
   });
   map.addControl(new Control());
+}
+
+/** Free reverse geocode via Nominatim (no API key). */
+export async function reverseGeocodeOsm(
+  lat: number,
+  lng: number,
+): Promise<string | null> {
+  try {
+    const url =
+      "https://nominatim.openstreetmap.org/reverse" +
+      `?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}` +
+      "&format=json&accept-language=ar&zoom=18&addressdetails=0";
+    const res = await fetch(url, {
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return typeof data?.display_name === "string" ? data.display_name : null;
+  } catch {
+    return null;
+  }
 }
 
 /** Interactive OSM map with a draggable pin (+ optional delivery zone polygons). */

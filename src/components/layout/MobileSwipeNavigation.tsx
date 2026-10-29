@@ -12,9 +12,9 @@ const HORIZONTAL_RATIO = 1.35;
 function resolveTabIndex(pathname: string, search: string): number {
   const tab = new URLSearchParams(search).get("tab");
   if (pathname === "/") return 0;
-  if (pathname.startsWith("/order/")) return 1;
   if (pathname.startsWith("/profile") && tab === "orders") return 1;
-  if (pathname.startsWith("/cart")) return 2;
+  // Active order tracking lives under the cart hub (same as CartNavLink)
+  if (pathname.startsWith("/cart") || pathname.startsWith("/order/")) return 2;
   if (pathname.startsWith("/profile")) return 3;
   return -1;
 }

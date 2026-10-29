@@ -3,6 +3,8 @@ import { Product } from "@/data/store-data";
 import { supabase } from "@/integrations/supabase/client";
 import { getSessionId } from "@/hooks/usePageTracking";
 import { useBranch } from "@/contexts/BranchContext";
+import { remapCartItemsToBranch, summarizeCartRemapNotices } from "@/lib/remap-cart";
+import { toast } from "sonner";
 
 export interface CartItem {
   product: Product;
@@ -29,13 +31,52 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { selectedBranch } = useBranch();
   const branchIdRef = useRef<string | null>(null);
+  const itemsRef = useRef<CartItem[]>(items);
+  itemsRef.current = items;
 
+  // Transfer cart to the new branch (match by catalog); warn on missing / price / stock changes.
   useEffect(() => {
-    const id = selectedBranch?.id || null;
-    if (branchIdRef.current && id && branchIdRef.current !== id) {
-      setItems([]);
+    const prev = branchIdRef.current;
+    const next = selectedBranch?.id || null;
+    if (!next) {
+      branchIdRef.current = next;
+      return;
     }
-    branchIdRef.current = id;
+    if (!prev || prev === next) {
+      branchIdRef.current = next;
+      return;
+    }
+
+    branchIdRef.current = next;
+    const snapshot = itemsRef.current;
+    if (snapshot.length === 0) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const result = await remapCartItemsToBranch(snapshot, next);
+        if (cancelled) return;
+        setItems(result.items);
+        const lines = summarizeCartRemapNotices(result.notices);
+        if (lines.length) {
+          toast.warning("تنبيه بعد تغيير الفرع", {
+            description: lines.join(" · "),
+            duration: 9000,
+          });
+        } else if (result.items.length > 0) {
+          toast.success("تم نقل سلة مشترياتك إلى الفرع الجديد");
+        }
+      } catch (e: any) {
+        if (cancelled) return;
+        console.error("[cart-remap]", e);
+        setItems([]);
+        toast.error("تعذر نقل السلة إلى الفرع الجديد؛ تم تفريغها");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [selectedBranch?.id]);
 
   const addItem = useCallback((product: Product, quantity = 1) => {

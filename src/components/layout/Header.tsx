@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, MapPin, LogOut, Menu, Globe, Search, ChevronDown } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
+import { User, MapPin, LogOut, Menu, Globe, Search, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import CartNavLink from "@/components/layout/CartNavLink";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -21,7 +21,6 @@ import { useBranch } from "@/contexts/BranchContext";
 import { ADDRESSES_CHANGED_EVENT, formatAddressLabel } from "@/lib/branch";
 
 const Header = () => {
-  const { uniqueItems } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [displayName, setDisplayName] = useState("");
@@ -372,19 +371,8 @@ const Header = () => {
           )}
         </div>
 
-        {/* Cart — icon only */}
-        <Link
-          to="/cart"
-          aria-label={t("عربتي", "Cart")}
-          className="relative flex items-center justify-center bg-primary/10 hover:bg-primary/15 text-primary rounded-full p-2.5 transition-colors"
-        >
-          <ShoppingCart className="h-5 w-5" />
-          {uniqueItems > 0 && (
-            <span className="absolute -top-1 -left-1 bg-primary text-primary-foreground text-[10px] font-bold min-w-5 h-5 px-1 rounded-full flex items-center justify-center">
-              {uniqueItems}
-            </span>
-          )}
-        </Link>
+        {/* Cart — also active-order / chat hub */}
+        <CartNavLink variant="header" />
 
         {/* Language — icon only (desktop) */}
         <button

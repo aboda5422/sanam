@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
@@ -11,6 +11,7 @@ export type NotificationPrefs = {
   driver_assigned: boolean;
   low_stock: boolean;
   new_complaint: boolean;
+  order_chat: boolean;
   sound_enabled: boolean;
 };
 
@@ -20,6 +21,7 @@ export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
   driver_assigned: true,
   low_stock: true,
   new_complaint: true,
+  order_chat: true,
   sound_enabled: true,
 };
 
@@ -46,6 +48,7 @@ function inScope(branchId: string | null | undefined, filterBranchId: string | n
 }
 
 export function useAdminNotifications() {
+  const queryClient = useQueryClient();
   const { filterBranchId, scopedBranchIds, loading } = useAdminAuth();
   const { data: prefs = DEFAULT_NOTIFICATION_PREFS } = useNotificationPrefs();
   const prefsRef = useRef(prefs);
@@ -90,6 +93,21 @@ export function useAdminNotifications() {
         if (!inScope(row?.branch_id, scopeRef.current.filterBranchId, scopeRef.current.scopedBranchIds)) return;
         alert(prefsRef.current.new_complaint, "شكوى جديدة من عميل");
       })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "order_messages" }, async (payload) => {
+        const row = payload.new as any;
+        if (row?.sender_role !== "customer") return;
+        const { data: ord } = await supabase
+          .from("orders")
+          .select("order_number, branch_id")
+          .eq("id", row.order_id)
+          .maybeSingle();
+        if (!inScope(ord?.branch_id, scopeRef.current.filterBranchId, scopeRef.current.scopedBranchIds)) return;
+        queryClient.invalidateQueries({ queryKey: ["admin-order-chat-flags"] });
+        alert(
+          prefsRef.current.order_chat,
+          `رسالة جديدة من العميل على الطلب #${ord?.order_number ?? ""}`.trim(),
+        );
+      })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "products" }, (payload) => {
         const row = payload.new as any;
         const prev = payload.old as any;
@@ -105,5 +123,5 @@ export function useAdminNotifications() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [loading]);
+  }, [loading, queryClient]);
 }

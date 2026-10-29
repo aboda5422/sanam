@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { MapPin, Clock, CheckCircle, CreditCard, Banknote, Loader2, Pencil, Lock, AlertTriangle } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { MapPin, Clock, CheckCircle, CreditCard, Banknote, Loader2, Pencil, Lock, AlertTriangle, ArrowRight, ShoppingCart } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -1057,6 +1057,18 @@ const CheckoutPage = () => {
                 totalPrice < minOrder ? `أقل طلب ${minOrder} ر.س` :
                 paymentMethod === "online" ? "متابعة للدفع" : "تأكيد الطلب"}
             </Button>
+            <Link to="/cart">
+              <Button variant="outline" className="w-full mt-2" size="lg">
+                <ShoppingCart className="h-4 w-4 ml-2" />
+                تعديل السلة
+              </Button>
+            </Link>
+            <Link to="/">
+              <Button variant="ghost" className="w-full mt-1 text-muted-foreground" size="lg">
+                <ArrowRight className="h-4 w-4 ml-2" />
+                متابعة التسوق
+              </Button>
+            </Link>
           </div>
         </div>
       </main>

@@ -20,6 +20,8 @@ import { translateError } from "@/lib/error-messages";
 import { openOrderInvoice } from "@/lib/order-invoice";
 
 const PROFILE_TABS = new Set(["profile", "addresses", "orders", "settings"]);
+const profileTabTriggerClass =
+  "group relative flex aspect-square h-auto w-full flex-col items-center justify-center gap-2.5 rounded-2xl border border-border/70 bg-card px-3 py-4 text-sm font-semibold text-muted-foreground shadow-sm transition-all hover:border-primary/30 hover:bg-primary/5 hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-md data-[state=active]:ring-2 data-[state=active]:ring-primary/20";
 
 const statusMap: Record<string, { label: string; labelEn: string; color: string }> = {
   pending: { label: "قيد الانتظار", labelEn: "Pending", color: "bg-yellow-100 text-yellow-800" },
@@ -214,11 +216,36 @@ const ProfilePage = () => {
           className="space-y-4"
           dir={lang === "ar" ? "rtl" : "ltr"}
         >
-          <TabsList className="!grid h-10 w-full grid-cols-4">
-            <TabsTrigger value="profile">{t("الملف الشخصي", "Profile")}</TabsTrigger>
-            <TabsTrigger value="addresses">{t("عناويني", "Addresses")}</TabsTrigger>
-            <TabsTrigger value="orders">{t("طلباتي", "Orders")} ({orders.length})</TabsTrigger>
-            <TabsTrigger value="settings">{t("الإعدادات", "Settings")}</TabsTrigger>
+          <TabsList className="!grid h-auto w-full grid-cols-2 gap-3 bg-transparent p-0 text-muted-foreground">
+            <TabsTrigger value="profile" className={profileTabTriggerClass}>
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/80 text-current transition-colors group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground">
+                <User className="h-6 w-6" aria-hidden />
+              </span>
+              <span>{t("حسابي", "Profile")}</span>
+            </TabsTrigger>
+            <TabsTrigger value="addresses" className={profileTabTriggerClass}>
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/80 text-current transition-colors group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground">
+                <MapPin className="h-6 w-6" aria-hidden />
+              </span>
+              <span>{t("عناويني", "Addresses")}</span>
+            </TabsTrigger>
+            <TabsTrigger value="orders" className={profileTabTriggerClass}>
+              <span className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/80 text-current transition-colors group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground">
+                <Package className="h-6 w-6" aria-hidden />
+                {orders.length > 0 && (
+                  <span className="absolute -end-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground ring-2 ring-background">
+                    {orders.length > 99 ? "99+" : orders.length}
+                  </span>
+                )}
+              </span>
+              <span>{t("طلباتي", "Orders")}</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className={profileTabTriggerClass}>
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/80 text-current transition-colors group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground">
+                <Settings className="h-6 w-6" aria-hidden />
+              </span>
+              <span>{t("إعدادات", "Settings")}</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Profile Tab */}
@@ -580,33 +607,40 @@ const ProfilePage = () => {
           <TabsContent value="settings">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between gap-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Settings className="h-5 w-5 text-primary" />
-                    {t("الإعدادات", "Settings")}
-                  </CardTitle>
-                  <div className="flex flex-wrap items-center justify-end gap-3 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setShowPasswordForm((v) => !v)}
-                      className="flex items-center gap-2 text-sm text-primary hover:opacity-80 transition-opacity"
-                    >
-                      <KeyRound className="h-4 w-4" />
-                      <span>{t("تعديل كلمة المرور", "Change password")}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      className="flex items-center gap-2 text-sm text-destructive hover:opacity-80 transition-opacity"
-                      aria-label={t("تسجيل الخروج", "Sign out")}
-                    >
-                      <LogOut className="h-4 w-4" />
-                      <span>{t("تسجيل الخروج", "Sign out")}</span>
-                    </button>
-                  </div>
-                </div>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-primary" />
+                  {t("الإعدادات", "Settings")}
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordForm((v) => !v)}
+                    className="flex w-full items-center gap-3 rounded-xl border bg-card px-4 py-3.5 text-start transition-colors hover:bg-muted/50"
+                  >
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <KeyRound className="h-5 w-5" />
+                    </span>
+                    <span className="flex-1 text-sm font-medium">
+                      {t("تعديل كلمة المرور", "Change password")}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 rounded-xl border border-destructive/20 bg-card px-4 py-3.5 text-start transition-colors hover:bg-destructive/5"
+                    aria-label={t("تسجيل الخروج", "Sign out")}
+                  >
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+                      <LogOut className="h-5 w-5" />
+                    </span>
+                    <span className="flex-1 text-sm font-medium text-destructive">
+                      {t("تسجيل الخروج", "Sign out")}
+                    </span>
+                  </button>
+                </div>
+
                 {showPasswordForm && (
                   <div className="rounded-xl border p-4 space-y-3">
                     <h3 className="font-bold text-sm">{t("تعديل كلمة المرور", "Change password")}</h3>
@@ -668,7 +702,6 @@ const ProfilePage = () => {
                     </div>
                   </div>
                 )}
-
               </CardContent>
             </Card>
           </TabsContent>
