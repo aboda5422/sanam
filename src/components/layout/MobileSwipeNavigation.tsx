@@ -29,6 +29,8 @@ function isIgnoredTarget(target: EventTarget | null): boolean {
         "select",
         "[contenteditable='true']",
         "[data-no-swipe]",
+        ".leaflet-container",
+        ".leaflet-pane",
         "[role='dialog']",
         "[data-state='open']",
         ".overflow-x-auto",

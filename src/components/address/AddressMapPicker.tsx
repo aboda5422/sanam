@@ -108,7 +108,17 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
     reverseTimerRef.current = setTimeout(async () => {
       const name = await reverseGeocodeOsm(la, ln);
       setAddressText(name || fallback);
-    }, 350);
+    }, 80);
+  }, []);
+
+  /** Resolve place name immediately (used by «موقعي» so user need not drag the pin). */
+  const reverseGeocodeNow = useCallback(async (la: number, ln: number) => {
+    const fallback = `موقع محدد: ${la.toFixed(5)}, ${ln.toFixed(5)}`;
+    if (reverseTimerRef.current) clearTimeout(reverseTimerRef.current);
+    const name = await reverseGeocodeOsm(la, ln);
+    const text = name || fallback;
+    setAddressText(text);
+    return text;
   }, []);
 
   useEffect(() => {
@@ -183,13 +193,21 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
     );
   }, [activeZones]);
 
-  const applyPosition = (latitude: number, longitude: number) => {
+  const applyPosition = async (latitude: number, longitude: number) => {
     setLat(latitude);
     setLng(longitude);
-    reverseGeocode(latitude, longitude);
-    osmHandleRef.current?.locateTo(latitude, longitude, 16);
-    saveLastLocation({ lat: latitude, lng: longitude, ts: Date.now() });
     setMapTouched(true);
+    // Move pin without re-firing onMove (avoids double reverse-geocode / race)
+    osmHandleRef.current?.setView(latitude, longitude, 16);
+    saveLastLocation({ lat: latitude, lng: longitude, ts: Date.now() });
+    const place = await reverseGeocodeNow(latitude, longitude);
+    saveLastLocation({
+      lat: latitude,
+      lng: longitude,
+      address: place,
+      ts: Date.now(),
+    });
+    return place;
   };
 
   const reportGeoError = (code: string, detail?: string) => {
@@ -233,16 +251,19 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
           }
           throw err;
         });
-        applyPosition(pos.coords.latitude, pos.coords.longitude);
-        toast.success("تم تحديد موقعك");
+        await applyPosition(pos.coords.latitude, pos.coords.longitude);
+        toast.success("تم تحديد موقعك وتعبئة العنوان");
       } else {
         if (!navigator.geolocation) { reportGeoError("no-geolocation"); return; }
         await new Promise<void>((resolve) => {
           navigator.geolocation.getCurrentPosition(
-            (pos) => {
-              applyPosition(pos.coords.latitude, pos.coords.longitude);
-              toast.success("تم تحديد موقعك");
-              resolve();
+            async (pos) => {
+              try {
+                await applyPosition(pos.coords.latitude, pos.coords.longitude);
+                toast.success("تم تحديد موقعك وتعبئة العنوان");
+              } finally {
+                resolve();
+              }
             },
             (err) => {
               const code =
@@ -436,8 +457,12 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
 
       {showMap && (
         <>
-          <div className="relative rounded-xl overflow-hidden border">
-            <div ref={mapElRef} className="w-full h-64 bg-muted flex items-center justify-center">
+          <div className="relative rounded-xl overflow-hidden border" data-no-swipe>
+            <div
+              ref={mapElRef}
+              className="w-full h-64 bg-muted flex items-center justify-center"
+              data-no-swipe
+            >
               {mapError ? (
                 <div className="px-4 text-center space-y-2">
                   <p className="text-sm text-destructive flex items-center justify-center gap-2">
@@ -460,18 +485,16 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
                 </div>
               ) : null}
             </div>
-            <p className="pointer-events-none absolute top-2 left-2 rounded-md bg-background/90 px-2 py-0.5 text-[10px] text-muted-foreground shadow-sm">
-              OpenStreetMap · مجاني
-            </p>
             <Button
+              type="button"
               variant="secondary"
               size="sm"
-              className="absolute bottom-3 left-3 shadow-md"
+              className="absolute bottom-3 left-3 z-[1000] shadow-md"
               onClick={getCurrentLocation}
-              disabled={locating}
+              disabled={locating || !mapLoaded}
             >
               <Navigation className={`h-4 w-4 ml-1 ${locating ? "animate-spin" : ""}`} />
-              موقعي الحالي
+              {locating ? "…" : "موقعي"}
             </Button>
           </div>
 

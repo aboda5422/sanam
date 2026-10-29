@@ -80,14 +80,13 @@ export function attachBaseLayers(map: any, opts?: { defaultSatellite?: boolean }
   if (!L || !map) return;
 
   const street = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+    attribution: "",
     maxZoom: 19,
   });
   const satellite = L.tileLayer(
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     {
-      attribution:
-        "Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics",
+      attribution: "",
       maxZoom: 19,
     },
   );
@@ -95,7 +94,7 @@ export function attachBaseLayers(map: any, opts?: { defaultSatellite?: boolean }
   const placeLabels = L.tileLayer(
     "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
     {
-      attribution: "Labels &copy; Esri",
+      attribution: "",
       maxZoom: 19,
       opacity: 0.95,
       pane: "overlayPane",
@@ -105,7 +104,7 @@ export function attachBaseLayers(map: any, opts?: { defaultSatellite?: boolean }
   const roadLabels = L.tileLayer(
     "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
     {
-      attribution: "Roads &copy; Esri",
+      attribution: "",
       maxZoom: 19,
       opacity: 0.9,
       pane: "overlayPane",
@@ -226,7 +225,10 @@ export function mountOsmPinMap(
     }
   }
 
-  const map = L.map(el, { zoomControl: true }).setView([opts.lat, opts.lng], opts.zoom ?? 14);
+  const map = L.map(el, { zoomControl: true, attributionControl: false }).setView(
+    [opts.lat, opts.lng],
+    opts.zoom ?? 14,
+  );
   attachBaseLayers(map);
 
   const marker = L.marker([opts.lat, opts.lng], { draggable: true }).addTo(map);
