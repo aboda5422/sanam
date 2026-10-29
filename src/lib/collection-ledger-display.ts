@@ -60,15 +60,38 @@ export function wholesaleSettlementType(input: {
   return "transfer";
 }
 
+/**
+ * إيراد معترف به في الحسابات والمبيعات:
+ * - كاش: بعد التسليم للعميل
+ * - إلكتروني/تحويل: بعد دفع فعلي (payment_status=paid) والتسليم
+ * لا يُحتسب طلب إلكتروني مسلَّم دون دفع (مثل اختيار online ثم التسليم بدون Moyasar).
+ */
+export function isSalesRecognizedOrder(o: {
+  status: string;
+  payment_method: string;
+  payment_status?: string | null;
+}): boolean {
+  if (o.status !== "delivered") return false;
+  const type = retailSettlementType(o.payment_method);
+  if (type === "electronic" || type === "transfer") {
+    return o.payment_status === "paid";
+  }
+  return true;
+}
+
 export function retailCollectionStatus(o: {
   status: string;
   payment_method: string;
+  payment_status?: string | null;
   collected_amount?: number | null;
   cash_settled_at?: string | null;
 }): CollectionStatusKey {
   if (o.status !== "delivered") return "awaiting_delivery";
   const type = retailSettlementType(o.payment_method);
-  if (type === "electronic" || type === "transfer") return "collected";
+  if (type === "electronic" || type === "transfer") {
+    if (o.payment_status !== "paid") return "awaiting_customer_pay";
+    return "collected";
+  }
   if (type === "cash") {
     if (Number(o.collected_amount || 0) <= 0) return "awaiting_customer_pay";
     return o.cash_settled_at ? "collected" : "not_collected";

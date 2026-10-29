@@ -20,8 +20,10 @@ const paymentStatusMap: Record<string, { label: string; className: string }> = {
 
 const methodLabel = (m: string) => {
   if (m === "cash") return "نقدي";
-  if (m === "moyasar" || m === "online") return "إلكتروني";
-  return m;
+  if (m === "moyasar" || m === "online" || m === "creditcard" || m === "stcpay" || m === "applepay") {
+    return "إلكتروني";
+  }
+  return m || "—";
 };
 
 const AdminPaymentsPage = () => {
@@ -32,12 +34,13 @@ const AdminPaymentsPage = () => {
   const [to, setTo] = useState(today);
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const { data: payments, isLoading } = useQuery({
+  const { data: payments, isLoading, isError, error } = useQuery({
     queryKey: ["admin-payments", from, to, statusFilter, scopedBranchIds],
     queryFn: async () => {
+      // Disambiguate: payments.order_id → orders (not orders.payment_id → payments)
       let q = supabase
         .from("payments")
-        .select("*, orders!inner(order_number, customer_name, customer_phone, branch_id)")
+        .select("*, orders!payments_order_id_fkey!inner(order_number, customer_name, customer_phone, branch_id)")
         .gte("created_at", `${from}T00:00:00`)
         .lte("created_at", `${to}T23:59:59`)
         .order("created_at", { ascending: false });
@@ -45,8 +48,8 @@ const AdminPaymentsPage = () => {
       if (scopedBranchIds && scopedBranchIds.length > 0) {
         q = q.in("orders.branch_id", scopedBranchIds);
       }
-      const { data, error } = await q;
-      if (error) throw error;
+      const { data, error: qError } = await q;
+      if (qError) throw qError;
       return data;
     },
   });
@@ -146,6 +149,10 @@ const AdminPaymentsPage = () => {
 
       {isLoading ? (
         <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+      ) : isError ? (
+        <div className="bg-card rounded-xl border p-8 text-center text-sm text-destructive">
+          تعذر تحميل المدفوعات{error instanceof Error ? `: ${error.message}` : ""}
+        </div>
       ) : (
         <div className="bg-card rounded-xl border overflow-hidden">
           <div className="overflow-x-auto">

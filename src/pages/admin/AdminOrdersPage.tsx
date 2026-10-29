@@ -44,13 +44,52 @@ const statusMap: Record<string, { label: string; color: string }> = {
   cancelled: { label: "ملغي", color: "bg-red-100 text-red-800" },
 };
 
-const paymentStatusMap: Record<string, { label: string; className: string }> = {
-  pending: { label: "معلّق", className: "bg-yellow-100 text-yellow-800 border-yellow-300" },
-  paid: { label: "مدفوع", className: "bg-green-100 text-green-800 border-green-300" },
-  failed: { label: "فاشل", className: "bg-red-100 text-red-800 border-red-300" },
-  refunded: { label: "مسترد", className: "bg-purple-100 text-purple-800 border-purple-300" },
-  cancelled: { label: "ملغي", className: "bg-gray-100 text-gray-800 border-gray-300" },
-};
+type PaymentBadge = { label: string; className: string };
+
+/** طلب صالح تشغيلياً: كاش (الدفع عند الاستلام)، أو إلكتروني مدفوع فعلاً. */
+function isHealthyPaymentOrder(o: { payment_method?: string | null; payment_status?: string | null; status?: string }) {
+  if (o.status === "cancelled") return false;
+  const method = (o.payment_method || "").toLowerCase();
+  if (method === "cash") return true;
+  return o.payment_status === "paid";
+}
+
+function isCashMethod(method?: string | null) {
+  return (method || "").toLowerCase() === "cash";
+}
+
+/** تسميات أوضح حسب طريقة الدفع + حالة الدفع. */
+function paymentBadgeForOrder(o: {
+  payment_method?: string | null;
+  payment_status?: string | null;
+}): PaymentBadge {
+  const cash = isCashMethod(o.payment_method);
+  switch (o.payment_status) {
+    case "paid":
+      return { label: "مدفوع", className: "bg-green-100 text-green-800 border-green-300" };
+    case "failed":
+      return { label: "فشل في الدفع", className: "bg-red-100 text-red-800 border-red-300" };
+    case "refunded":
+      return { label: "مسترد", className: "bg-purple-100 text-purple-800 border-purple-300" };
+    case "cancelled":
+      return { label: "ملغي", className: "bg-gray-100 text-gray-800 border-gray-300" };
+    case "pending":
+    default:
+      if (cash) {
+        return { label: "عند الاستلام", className: "bg-amber-100 text-amber-900 border-amber-300" };
+      }
+      return { label: "لم يكمل الدفع", className: "bg-orange-100 text-orange-900 border-orange-300" };
+  }
+}
+
+const paymentFilterOptions: { value: string; label: string }[] = [
+  { value: "healthy", label: "الطلبات السليمة" },
+  { value: "incomplete", label: "لم يكمل الدفع" },
+  { value: "failed", label: "فشل في الدفع" },
+  { value: "paid", label: "مدفوع" },
+  { value: "refunded", label: "مسترد" },
+  { value: "all", label: "كل المدفوعات" },
+];
 
 function orderDeliveryCoords(order: {
   delivery_lat?: number | null;
@@ -75,7 +114,8 @@ const AdminOrdersContent = () => {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [paymentFilter, setPaymentFilter] = useState("all");
+  /** افتراضي: السليمة فقط (كاش أو إلكتروني مدفوع) — الفاشلة/غير المكتملة عبر الفلتر */
+  const [paymentFilter, setPaymentFilter] = useState("healthy");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [cancelOrderId, setCancelOrderId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
@@ -257,7 +297,17 @@ const AdminOrdersContent = () => {
         : statusFilter === "open"
           ? OPEN_STATUSES.has(o.status)
           : o.status === statusFilter;
-    const matchPayment = paymentFilter === "all" || o.payment_status === paymentFilter;
+    const method = (o.payment_method || "").toLowerCase();
+    const matchPayment =
+      paymentFilter === "all"
+        ? true
+        : paymentFilter === "healthy"
+          ? isHealthyPaymentOrder(o)
+          : paymentFilter === "incomplete"
+            ? method !== "cash" && o.payment_status === "pending"
+            : paymentFilter === "failed"
+              ? o.payment_status === "failed"
+              : o.payment_status === paymentFilter;
     return matchSearch && matchStatus && matchPayment;
   });
 
@@ -277,10 +327,11 @@ const AdminOrdersContent = () => {
           </SelectContent>
         </Select>
         <Select value={paymentFilter} onValueChange={setPaymentFilter}>
-          <SelectTrigger className="w-[160px]"><SelectValue placeholder="حالة الدفع" /></SelectTrigger>
+          <SelectTrigger className="w-[180px]"><SelectValue placeholder="حالة الدفع" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">كل المدفوعات</SelectItem>
-            {Object.entries(paymentStatusMap).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
+            {paymentFilterOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Badge variant="outline">{filtered?.length ?? 0} طلب</Badge>
@@ -337,10 +388,15 @@ const AdminOrdersContent = () => {
                       </Select>
                     </td>
                     <td className="p-3 text-center">
-                      <Badge variant="outline" className={`text-[10px] ${paymentStatusMap[o.payment_status]?.className || ""}`}>
-                        {paymentStatusMap[o.payment_status]?.label || o.payment_status}
-                      </Badge>
-                      <p className="text-[10px] text-muted-foreground mt-1">{o.payment_method === "cash" ? "نقدي" : "إلكتروني"}</p>
+                      {(() => {
+                        const pay = paymentBadgeForOrder(o);
+                        return (
+                          <Badge variant="outline" className={`text-[10px] ${pay.className}`}>
+                            {pay.label}
+                          </Badge>
+                        );
+                      })()}
+                      <p className="text-[10px] text-muted-foreground mt-1">{isCashMethod(o.payment_method) ? "نقدي" : "إلكتروني"}</p>
                     </td>
                     <td className="p-3 text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString("ar-SA")}</td>
                     <td className="p-3 text-center">
@@ -410,7 +466,12 @@ const AdminOrdersContent = () => {
                     );
                   })()}
                 </div>
-                <div><span className="text-muted-foreground">الدفع:</span> {selectedOrder.payment_method}</div>
+                <div>
+                  <span className="text-muted-foreground">الدفع:</span>{" "}
+                  {isCashMethod(selectedOrder.payment_method) ? "نقدي" : "إلكتروني"}
+                  {" · "}
+                  {paymentBadgeForOrder(selectedOrder).label}
+                </div>
               </div>
               {selectedOrder.notes && (
                 <div className="p-2 bg-muted rounded text-xs">

@@ -24,6 +24,7 @@ import {
   COLLECTION_STATUS_LABEL,
   SETTLEMENT_TYPE_BADGE,
   SETTLEMENT_TYPE_LABEL,
+  isSalesRecognizedOrder,
   retailCollectionStatus,
   retailSettlementType,
   type CollectionStatusKey,
@@ -68,6 +69,7 @@ type SalesOrder = {
   delivery_fee: number;
   status: string;
   payment_method: string;
+  payment_status: string;
   created_at: string;
   collected_amount: number | null;
   cash_settled_at?: string | null;
@@ -122,24 +124,25 @@ const AdminSalesPage = () => {
   const [collectionStatusFilter, setCollectionStatusFilter] =
     useState<CollectionStatusFilter>("all");
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["admin-sales-orders", scopedBranchIds],
     queryFn: async () => {
+      // Do not select coupon_* here: those columns are not on the linked remote yet
+      // and a missing column makes PostgREST fail the whole query → all KPIs read as 0.
       let q = supabase
         .from("orders")
-        .select("id, order_number, total, subtotal, delivery_fee, status, payment_method, created_at, collected_amount, cash_settled_at, customer_name, customer_phone, driver_id, coupon_discount_amount, coupon_delivery_waived, coupon_code, drivers(full_name)")
+        .select("id, order_number, total, subtotal, delivery_fee, status, payment_method, payment_status, created_at, collected_amount, cash_settled_at, customer_name, customer_phone, driver_id, drivers(full_name)")
         .order("created_at", { ascending: false });
       q = applyBranchFilter(q, scopedBranchIds);
-      const [{ data: rows, error }, payoutsRes] = await Promise.all([
+      const [{ data: rows, error: ordersError }, payoutsRes] = await Promise.all([
         q,
         supabase
           .from("driver_salary_payouts")
           .select("id, driver_id, amount, period_note, created_at, drivers(full_name)")
           .order("created_at", { ascending: false }),
       ]);
-      if (error) throw error;
+      if (ordersError) throw ordersError;
       if (payoutsRes.error) throw payoutsRes.error;
-      // Coupon columns may precede regenerated supabase types
       const orders = (rows || []) as unknown as SalesOrder[];
       const ids = orders.map((o) => o.id);
       const driverIds = [...new Set(orders.map((o) => o.driver_id).filter((id): id is string => !!id))];
@@ -234,8 +237,10 @@ const AdminSalesPage = () => {
     const blocks: { at: number; lines: LedgerLine[] }[] = [];
     for (const order of filteredOrders) {
       const driverName = (order.drivers as { full_name?: string | null } | null)?.full_name || "—";
-      const lines: LedgerLine[] = [
-        {
+      const lines: LedgerLine[] = [];
+      // إيراد فقط للطلبات المعترف بها (كاش مسلّم، أو إلكتروني مدفوع + مسلّم)
+      if (isSalesRecognizedOrder(order)) {
+        lines.push({
           key: `rev-${order.id}`,
           kind: "revenue",
           order,
@@ -243,8 +248,8 @@ const AdminSalesPage = () => {
           amount: Number(order.total),
           at: order.created_at,
           label: "إيراد الطلب",
-        },
-      ];
+        });
+      }
       const expense = wageExpenses.get(order.id);
       if (expense && expense.amount > 0) {
         lines.push({
@@ -257,7 +262,7 @@ const AdminSalesPage = () => {
           label: expense.label,
         });
       }
-      blocks.push({ at: new Date(order.created_at).getTime(), lines });
+      if (lines.length) blocks.push({ at: new Date(order.created_at).getTime(), lines });
     }
     for (const payout of salaryInView) {
       const note = payout.period_note?.trim();
@@ -280,35 +285,35 @@ const AdminSalesPage = () => {
   }, [filteredOrders, wageExpenses, salaryInView]);
 
   const stats = useMemo(() => {
-    const delivered = filteredOrders.filter((o) => o.status === "delivered");
-    const totalRevenue = delivered.reduce((s, o) => s + Number(o.total), 0);
-    const totalDeliveryFees = delivered.reduce((s, o) => s + Number(o.delivery_fee), 0);
-    const driverCashPending = delivered
+    const recognized = filteredOrders.filter((o) => isSalesRecognizedOrder(o));
+    const totalRevenue = recognized.reduce((s, o) => s + Number(o.total), 0);
+    const totalDeliveryFees = recognized.reduce((s, o) => s + Number(o.delivery_fee), 0);
+    const driverCashPending = recognized
       .filter((o) => isCashHeldByDriver(o))
       .reduce((s, o) => s + Math.max(0, Number(o.collected_amount || o.total) - (wages.get(o.id) || 0)), 0);
-    const driverCashCollected = delivered
+    const driverCashCollected = recognized
       .filter((o) => isCashRemitted(o))
       .reduce((s, o) => s + Math.max(0, Number(o.collected_amount || o.total) - (wageExpenses.get(o.id)?.amount || 0)), 0);
-    const electronicTotal = delivered
+    const electronicTotal = recognized
       .filter((o) => retailSettlementType(o.payment_method) === "electronic")
       .reduce((s, o) => s + Number(o.total), 0);
-    const totalCouponDiscount = delivered.reduce(
+    const totalCouponDiscount = recognized.reduce(
       (s, o) => s + Number((o as any).coupon_discount_amount || 0) + Number((o as any).coupon_delivery_waived || 0),
       0,
     );
     let driverDeliveryShare = 0;
     let appDeliveryShare = 0;
-    for (const order of delivered) {
+    for (const order of recognized) {
       const fee = Math.max(0, Number(order.delivery_fee) || 0);
       const wage = Math.min(fee, wages.get(order.id) || 0);
       driverDeliveryShare += wage;
       appDeliveryShare += fee - wage;
     }
     const salaryDisbursed = salaryInView.reduce((s, payout) => s + Number(payout.amount || 0), 0);
-    const wageDisbursed = delivered.reduce((s, o) => s + (wageExpenses.get(o.id)?.amount || 0), 0);
+    const wageDisbursed = recognized.reduce((s, o) => s + (wageExpenses.get(o.id)?.amount || 0), 0);
     const disbursed = wageDisbursed + salaryDisbursed;
     const transferOrders = filteredOrders.filter((o) => retailSettlementType(o.payment_method) === "transfer").length;
-    const transferTotal = delivered
+    const transferTotal = recognized
       .filter((o) => retailSettlementType(o.payment_method) === "transfer")
       .reduce((s, o) => s + Number(o.total), 0);
     const cashOrderCount = filteredOrders.filter((o) => retailSettlementType(o.payment_method) === "cash").length;
@@ -333,7 +338,7 @@ const AdminSalesPage = () => {
       electronicTotal,
       transferTotal,
       totalOrders: filteredOrders.length,
-      deliveredCount: delivered.length,
+      deliveredCount: recognized.length,
       totalCouponDiscount,
     };
   }, [filteredOrders, wageExpenses, wages, salaryInView]);
@@ -372,7 +377,23 @@ const AdminSalesPage = () => {
     toast.success("تم تنزيل ملف إكسل للحسابات");
   };
 
-  if (isLoading) return <AdminLayout title="الحسابات والمبيعات"><div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div></AdminLayout>;
+  if (isLoading) {
+    return (
+      <AdminLayout title="الحسابات والمبيعات">
+        <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+      </AdminLayout>
+    );
+  }
+
+  if (isError) {
+    return (
+      <AdminLayout title="الحسابات والمبيعات">
+        <div className="rounded-xl border bg-card p-8 text-center text-sm text-destructive">
+          تعذر تحميل الحسابات{error instanceof Error ? `: ${error.message}` : ""}
+        </div>
+      </AdminLayout>
+    );
+  }
 
   const relatedPeriod = dateFilter === "today" || dateFilter === "week" ? dateFilter : "all";
   const collectionLinks = {
@@ -477,7 +498,7 @@ const AdminSalesPage = () => {
 
   const orderCards = [
     { title: "إجمالي الطلبات", value: String(stats.totalOrders), hint: "كل الطلبات في الفترة", icon: ShoppingCart, color: "text-primary" },
-    { title: "الطلبات المكتملة", value: String(stats.deliveredCount), hint: "سُلّمت ودخلت في الإيراد", icon: ShoppingCart, color: "text-green-600" },
+    { title: "الطلبات المكتملة", value: String(stats.deliveredCount), hint: "كاش مسلّم، أو إلكتروني مدفوع ومسلّم", icon: ShoppingCart, color: "text-green-600" },
     {
       title: "نوع الطلبات",
       value: `${stats.cashOrderCount} / ${stats.electronicOrderCount}`,

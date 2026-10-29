@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import DriverLayout from "@/components/driver/DriverLayout";
+import { orderPaymentAllowsDriverWork } from "@/lib/driver-fulfillment";
 
 const statusFlow: Record<string, { next: string; label: string }> = {
   assigned: { next: "preparing", label: "بدء التجهيز" },
@@ -130,6 +131,15 @@ const DriverOrderDetailPage = () => {
 
   const updateStatus = async () => {
     if (!order || !statusFlow[order.status]) return;
+
+    if (!orderPaymentAllowsDriverWork(order)) {
+      toast({
+        title: "الدفع غير مكتمل",
+        description: "لا يمكن متابعة طلب إلكتروني قبل إتمام الدفع من العميل",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const nextStatus = statusFlow[order.status].next;
 

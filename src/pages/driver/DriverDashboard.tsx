@@ -82,6 +82,7 @@ const DriverDashboard = () => {
           .select("*", { count: "exact", head: true })
           .eq("status", "pending")
           .is("driver_id", null)
+          .or("payment_method.eq.cash,payment_status.eq.paid")
           .in("branch_id", branchIds);
         pendingCount = count || 0;
       }

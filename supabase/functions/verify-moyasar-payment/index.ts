@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { upsertMoyasarPayment } from "../_shared/upsert-moyasar-payment.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -32,18 +33,17 @@ serve(async (req) => {
     }
 
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
-    const orderId = verified.metadata?.order_id;
     const newStatus = verified.status === "paid" ? "paid"
-      : verified.status === "failed" ? "failed" : "pending";
+      : verified.status === "failed" ? "failed"
+      : verified.status === "refunded" ? "refunded" : "pending";
 
-    await supabase.from("payments").update({
-      status: newStatus,
-      raw_response: verified,
-    }).eq("moyasar_payment_id", payment_id);
+    const { paymentId, orderId } = await upsertMoyasarPayment(supabase, verified, newStatus);
 
     if (orderId) {
-      const updates: any = { payment_status: newStatus };
-      if (newStatus === "paid") updates.status = "preparing";
+      // Keep fulfillment status (pending/ready/…) — do not jump to preparing.
+      // With preparer off, drivers only claim `pending`; setting preparing hid paid orders.
+      const updates: Record<string, unknown> = { payment_status: newStatus };
+      if (paymentId) updates.payment_id = paymentId;
       if (newStatus === "failed") {
         await supabase.rpc("restore_order_stock", { p_order_id: orderId });
       }

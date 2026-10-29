@@ -13,6 +13,7 @@ import { fetchDriverBranchIds } from "@/lib/branch-scope";
 import DriverLayout from "@/components/driver/DriverLayout";
 import { DEFAULT_PREPARER_FEATURES, type PreparerFeatures, prepProgress } from "@/lib/preparer";
 import { RETURN_STATUS_LABELS, type OrderReturnStatus } from "@/lib/order-returns";
+import { orderPaymentAllowsDriverWork } from "@/lib/driver-fulfillment";
 
 type OrdersTab = "available" | "mine" | "returns";
 
@@ -117,6 +118,7 @@ const DriverOrdersPage = () => {
           .select("*, order_items(quantity, prepared_qty)")
           .eq("status", "ready")
           .is("driver_id", null)
+          .or("payment_method.eq.cash,payment_status.eq.paid")
           .in("branch_id", branchIds)
           .order("created_at", { ascending: false }),
         supabase
@@ -124,6 +126,7 @@ const DriverOrdersPage = () => {
           .select("*, order_items(quantity, prepared_qty)")
           .eq("status", "preparing")
           .is("driver_id", null)
+          .or("payment_method.eq.cash,payment_status.eq.paid")
           .in("branch_id", branchIds)
           .order("created_at", { ascending: false }),
       ]);
@@ -135,18 +138,22 @@ const DriverOrdersPage = () => {
         .select("*")
         .eq("status", "pending")
         .is("driver_id", null)
+        .or("payment_method.eq.cash,payment_status.eq.paid")
         .in("branch_id", branchIds)
         .order("created_at", { ascending: false });
       setAvailableOrders(pending || []);
       setPreparingSilent([]);
     }
 
-    const { data: mine } = await supabase
+    // Only statuses that exist on public.order_status — invalid enum values
+    // (e.g. awaiting_price_approval) make PostgREST reject the whole query → empty «طلباتي».
+    const { data: mine, error: mineErr } = await supabase
       .from("orders")
       .select("*")
       .eq("driver_id", driverId)
-      .in("status", ["assigned", "preparing", "awaiting_price_approval", "price_approved", "on_the_way"])
+      .in("status", ["assigned", "preparing", "ready", "on_the_way"])
       .order("created_at", { ascending: false });
+    if (mineErr) console.error("driver my-orders", mineErr);
 
     setMyOrders(mine || []);
 
@@ -239,6 +246,22 @@ const DriverOrdersPage = () => {
     if (acceptingId) return;
     setAcceptingId(orderId);
 
+    const { data: target } = await supabase
+      .from("orders")
+      .select("id, payment_method, payment_status, status")
+      .eq("id", orderId)
+      .maybeSingle();
+    if (!target || !orderPaymentAllowsDriverWork(target)) {
+      setAcceptingId(null);
+      toast({
+        title: "الطلب غير جاهز للقبول",
+        description: "طلبات الدفع الإلكتروني تظهر للمندوب فقط بعد إتمام الدفع",
+        variant: "destructive",
+      });
+      fetchOrders();
+      return;
+    }
+
     const expectedStatus = preparerOn ? "ready" : "pending";
     const { data, error } = await supabase
       .from("orders")
@@ -310,8 +333,6 @@ const DriverOrdersPage = () => {
     pending: "جديد",
     assigned: "معيّن",
     preparing: "جاري التجهيز",
-    awaiting_price_approval: "بانتظار موافقة السعر",
-    price_approved: "السعر معتمد",
     ready: "جاهز للاستلام",
     on_the_way: "في الطريق",
     price_revision: "رفض السعر — مراجعة",
@@ -321,8 +342,6 @@ const DriverOrdersPage = () => {
     pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
     assigned: "bg-blue-100 text-blue-800 border-blue-200",
     preparing: "bg-orange-100 text-orange-800 border-orange-200",
-    awaiting_price_approval: "bg-amber-100 text-amber-900 border-amber-200",
-    price_approved: "bg-emerald-100 text-emerald-800 border-emerald-200",
     ready: "bg-teal-100 text-teal-800 border-teal-200",
     on_the_way: "bg-indigo-100 text-indigo-800 border-indigo-200",
     price_revision: "bg-red-100 text-red-800 border-red-200",
