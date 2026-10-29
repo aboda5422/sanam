@@ -29,13 +29,13 @@ function tabFromParam(raw: string | null): CollectionTab {
 }
 
 const AdminCollectionsHubPage = () => {
-  const { role } = useAdminAuth();
+  const { role, navPaths } = useAdminAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = tabFromParam(searchParams.get("tab"));
 
-  const canRetailDrivers = canViewDriverCashCollectionTab(role, "retail");
-  const canCashierCash = canViewCashierCashCollectionTab(role);
-  const canRegistry = canViewCollectionRegistryTab(role);
+  const canRetailDrivers = canViewDriverCashCollectionTab(role, "retail", navPaths);
+  const canCashierCash = canViewCashierCashCollectionTab(role, navPaths);
+  const canRegistry = canViewCollectionRegistryTab(role, navPaths);
 
   const visibleTabs = useMemo(() => {
     const tabs: {

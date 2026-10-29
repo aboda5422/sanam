@@ -457,7 +457,10 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
 
       {showMap && (
         <>
-          <div className="relative rounded-xl overflow-hidden border" data-no-swipe>
+          <div
+            className="relative z-0 isolate overflow-hidden rounded-xl border"
+            data-no-swipe
+          >
             <div
               ref={mapElRef}
               className="w-full h-64 bg-muted flex items-center justify-center"
@@ -489,7 +492,7 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
               type="button"
               variant="secondary"
               size="sm"
-              className="absolute bottom-3 left-3 z-[1000] shadow-md"
+              className="absolute bottom-3 left-3 z-10 shadow-md"
               onClick={getCurrentLocation}
               disabled={locating || !mapLoaded}
             >

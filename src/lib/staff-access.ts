@@ -48,7 +48,7 @@ export const PANEL_ROLE_BADGE: Record<AdminPanelRole, string> = {
   support: "شكاوى",
 };
 
-const ALL_ADMIN_PATHS = [
+export const ALL_ADMIN_PATHS = [
   "/admin",
   "/admin/orders",
   "/admin/products",
@@ -89,14 +89,33 @@ export function isPanelRole(role: string | null | undefined): role is AdminPanel
   return !!role && (PANEL_ROLES as string[]).includes(role);
 }
 
-export function allowedAdminPaths(role: AdminPanelRole | null): string[] {
+/**
+ * Resolve allowed admin paths.
+ * - site_admin → everything
+ * - explicit navPaths (custom staff) → those paths (+ /admin)
+ * - otherwise → legacy role map (branch managers / old staff)
+ */
+export function allowedAdminPaths(
+  role: AdminPanelRole | null,
+  navPaths?: string[] | null,
+): string[] {
+  if (role === "site_admin") return ALL_ADMIN_PATHS;
+  if (navPaths && navPaths.length > 0) {
+    const set = new Set(navPaths.map((p) => p.replace(/\/+$/, "") || "/admin"));
+    set.add("/admin");
+    return [...set];
+  }
   if (!role) return ["/admin"];
   return ROLE_PATHS[role] || ["/admin"];
 }
 
-export function canAccessAdminPath(role: AdminPanelRole | null, pathname: string): boolean {
+export function canAccessAdminPath(
+  role: AdminPanelRole | null,
+  pathname: string,
+  navPaths?: string[] | null,
+): boolean {
   const path = pathname.replace(/\/+$/, "") || "/";
-  const allowed = allowedAdminPaths(role);
+  const allowed = allowedAdminPaths(role, navPaths);
   return allowed.some((p) => (p === "/admin" ? path === "/admin" : path.startsWith(p)));
 }
 
@@ -146,27 +165,37 @@ export function canCollectPosCashAtHub(role: AdminPanelRole | null): boolean {
   return role === "site_admin" || role === "accountant";
 }
 
-export function canAccessCollectionsHub(role: AdminPanelRole | null): boolean {
+export function canAccessCollectionsHub(
+  role: AdminPanelRole | null,
+  navPaths?: string[] | null,
+): boolean {
   if (!role) return false;
-  return canAccessAdminPath(role, "/admin/collections");
+  return canAccessAdminPath(role, "/admin/collections", navPaths);
 }
 
 export function canViewDriverCashCollectionTab(
   role: AdminPanelRole | null,
   channel?: "wholesale" | "retail",
+  navPaths?: string[] | null,
 ): boolean {
-  if (!canAccessCollectionsHub(role)) return false;
+  if (!canAccessCollectionsHub(role, navPaths)) return false;
   if (channel === "wholesale") return false;
   if (hasFullCollectionHubTabs(role)) return true;
   return canSettleDriverCashAtHub(role, channel ?? "retail");
 }
 
-export function canViewCashierCashCollectionTab(role: AdminPanelRole | null): boolean {
-  return canAccessCollectionsHub(role);
+export function canViewCashierCashCollectionTab(
+  role: AdminPanelRole | null,
+  navPaths?: string[] | null,
+): boolean {
+  return canAccessCollectionsHub(role, navPaths);
 }
 
-export function canViewCollectionRegistryTab(role: AdminPanelRole | null): boolean {
-  return canAccessCollectionsHub(role);
+export function canViewCollectionRegistryTab(
+  role: AdminPanelRole | null,
+  navPaths?: string[] | null,
+): boolean {
+  return canAccessCollectionsHub(role, navPaths);
 }
 
 export function canViewWholesaleSalesCollection(_role: AdminPanelRole | null): boolean {

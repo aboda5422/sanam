@@ -70,9 +70,9 @@ async function resolveProfileName(userId: string | null | undefined) {
 }
 
 export function CollectionRegistryTab() {
-  const { role, userId } = useAdminAuth();
-  const canRetailDrivers = canViewDriverCashCollectionTab(role, "retail");
-  const canCashier = canViewCashierCashCollectionTab(role);
+  const { role, userId, navPaths } = useAdminAuth();
+  const canRetailDrivers = canViewDriverCashCollectionTab(role, "retail", navPaths);
+  const canCashier = canViewCashierCashCollectionTab(role, navPaths);
 
   const [period, setPeriod] = useState<DatePeriod>(DEFAULT_WHOLESALE_PERIOD);
   const [customFrom, setCustomFrom] = useState("");

@@ -18,6 +18,8 @@ type AdminAuthContextValue = {
   loading: boolean;
   userId: string | null;
   role: AdminPanelRole | null;
+  /** Explicit sidebar paths from admin_nav_permissions (null = use role defaults). */
+  navPaths: string[] | null;
   isSuperAdmin: boolean;
   isSiteWide: boolean;
   branchIds: string[];
@@ -39,6 +41,7 @@ function AdminAuthProviderInner({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [role, setRole] = useState<AdminPanelRole | null>(null);
+  const [navPaths, setNavPaths] = useState<string[] | null>(null);
   const [branchIds, setBranchIds] = useState<string[]>([]);
   const [branches, setBranches] = useState<AdminBranch[]>([]);
   const [filterBranchId, setFilterBranchId] = useState<string | null>(null);
@@ -70,6 +73,15 @@ function AdminAuthProviderInner({ children }: { children: ReactNode }) {
         }
 
         setRole(panelRole);
+
+        const { data: navRows } = await supabase
+          .from("admin_nav_permissions" as any)
+          .select("path")
+          .eq("user_id", uid);
+        const paths = ((navRows || []) as { path: string }[])
+          .map((r) => r.path)
+          .filter(Boolean);
+        setNavPaths(panelRole === "site_admin" ? null : paths.length ? paths : null);
 
         const { data: allBranches } = await supabase
           .from("branches")
@@ -111,7 +123,14 @@ function AdminAuthProviderInner({ children }: { children: ReactNode }) {
   }, [navigate]);
 
   const isSuperAdmin = role === "site_admin";
-  const isSiteWide = isSuperAdmin || ((role === "accountant" || role === "inventory" || role === "support") && branchIds.length === 0);
+  /** Site-wide staff: no branch rows. Branch managers keep assigned branches. */
+  const isSiteWide =
+    isSuperAdmin ||
+    (branchIds.length === 0 &&
+      (role === "accountant" ||
+        role === "inventory" ||
+        role === "support" ||
+        (role === "store_admin" && navPaths !== null)));
 
   const scopedBranchIds = useMemo(() => {
     if (isSiteWide) {
@@ -127,6 +146,7 @@ function AdminAuthProviderInner({ children }: { children: ReactNode }) {
     loading,
     userId,
     role,
+    navPaths,
     isSuperAdmin,
     isSiteWide,
     branchIds,

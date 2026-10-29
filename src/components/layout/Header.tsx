@@ -243,7 +243,21 @@ const Header = () => {
                             to={`/category/${cat.id}`}
                             className="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-muted transition-colors text-sm"
                           >
-                            <span className="text-lg">{cat.icon}</span>
+                            {cat.image ? (
+                              <img
+                                src={cat.image}
+                                alt=""
+                                width={36}
+                                height={36}
+                                loading="lazy"
+                                decoding="async"
+                                className="h-9 w-9 shrink-0 rounded-lg object-cover bg-muted"
+                              />
+                            ) : (
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-base">
+                                {cat.icon || "🛒"}
+                              </span>
+                            )}
                             <span>{lang === "ar" ? cat.name : cat.nameEn}</span>
                           </Link>
                         ))}

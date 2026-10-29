@@ -1,25 +1,13 @@
-import {
-  LayoutDashboard,
-  Package,
-  ShoppingCart,
-  Truck,
-  Wallet,
-  MessageSquare,
-  Settings,
-  LogOut,
-  FolderTree,
-  Store,
-  BarChart3,
-  Users,
-  Megaphone,
-  Timer,
-  MonitorSmartphone,
-  Star,
-} from "lucide-react";
+import { LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { allowedAdminPaths } from "@/lib/staff-access";
+import {
+  ADMIN_NAV_GROUP_LABELS,
+  ADMIN_NAV_ITEMS,
+  type AdminNavGroup,
+} from "@/lib/admin-nav";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import logoFull from "@/assets/logo-full-light.png";
 import {
@@ -34,86 +22,76 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
-const mainItems = [
-  { title: "لوحة التحكم", url: "/admin", icon: LayoutDashboard },
-  { title: "الطلبات", url: "/admin/orders", icon: ShoppingCart },
-  { title: "المنتجات", url: "/admin/products", icon: Package },
-  { title: "الأقسام", url: "/admin/categories", icon: FolderTree },
-  { title: "الفروع", url: "/admin/branches", icon: Store },
-];
-
-const operationItems = [
-  { title: "إدارة العملاء", url: "/admin/customers", icon: Users },
-  { title: "إدارة المناديب", url: "/admin/drivers", icon: Truck },
-  { title: "إعدادات التوصيل", url: "/admin/delivery", icon: Timer },
-  { title: "الشكاوى", url: "/admin/complaints", icon: MessageSquare },
-  { title: "تقييمات منخفضة", url: "/admin/ratings", icon: Star },
-];
-
-const settingsItems = [
-  { title: "نظام الكاشير", url: "/admin/pos", icon: MonitorSmartphone },
-  { title: "الحسابات والمبيعات", url: "/admin/sales", icon: BarChart3 },
-  { title: "التحصيل", url: "/admin/collections", icon: Wallet },
-  { title: "سجل المدفوعات", url: "/admin/payments", icon: Wallet },
-  { title: "الشعارات والإعلانات", url: "/admin/announcements", icon: Megaphone },
-  { title: "الإعدادات", url: "/admin/settings", icon: Settings },
-];
+const GROUPS: AdminNavGroup[] = ["main", "operations", "system"];
 
 export function AdminSidebar() {
   const { state, isMobile, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const navigate = useNavigate();
-  const { role } = useAdminAuth();
+  const { role, navPaths } = useAdminAuth();
 
   const isActive = (path: string) =>
     path === "/admin"
       ? location.pathname === "/admin"
       : location.pathname.startsWith(path);
 
-  const allowed = new Set(allowedAdminPaths(role));
-  const filterItems = (items: typeof mainItems) => items.filter((item) => allowed.has(item.url));
+  const allowed = new Set(allowedAdminPaths(role, navPaths));
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/admin/login");
   };
 
-  const renderGroup = (
-    label: string,
-    items: typeof mainItems
-  ) => {
+  const renderGroup = (group: AdminNavGroup) => {
+    const items = ADMIN_NAV_ITEMS.filter((i) => i.group === group);
     if (items.length === 0) return null;
     return (
-    <SidebarGroup>
-      <SidebarGroupLabel>{label}</SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.url}>
-              <SidebarMenuButton
-                asChild
-                isActive={isActive(item.url)}
-              >
-                <NavLink
-                  to={item.url}
-                  end={item.url === "/admin"}
-                  className="hover:bg-muted/50"
-                  activeClassName="bg-primary/10 text-primary font-medium"
-                  onClick={() => {
-                    if (isMobile) setOpenMobile(false);
-                  }}
-                >
-                  <item.icon className="ml-2 h-4 w-4" />
-                  {!collapsed && <span>{item.title}</span>}
-                </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
+      <SidebarGroup key={group}>
+        <SidebarGroupLabel>{ADMIN_NAV_GROUP_LABELS[group]}</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {items.map((item) => {
+              const canOpen = allowed.has(item.path);
+              return (
+                <SidebarMenuItem key={item.path}>
+                  {canOpen ? (
+                    <SidebarMenuButton asChild isActive={isActive(item.path)}>
+                      <NavLink
+                        to={item.path}
+                        end={item.path === "/admin"}
+                        className="hover:bg-muted/50"
+                        activeClassName="bg-primary/10 text-primary font-medium"
+                        onClick={() => {
+                          if (isMobile) setOpenMobile(false);
+                        }}
+                      >
+                        <item.icon className="ml-2 h-4 w-4" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  ) : (
+                    <SidebarMenuButton
+                      disabled
+                      aria-disabled
+                      className={cn(
+                        "pointer-events-none cursor-not-allowed opacity-40",
+                        "text-muted-foreground",
+                      )}
+                      title="ليست ضمن صلاحياتك"
+                    >
+                      <item.icon className="ml-2 h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </SidebarMenuButton>
+                  )}
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
     );
   };
 
@@ -134,9 +112,7 @@ export function AdminSidebar() {
               </p>
             </div>
           )}
-          {renderGroup("الرئيسية", filterItems(mainItems))}
-          {renderGroup("العمليات", filterItems(operationItems))}
-          {renderGroup("النظام", filterItems(settingsItems))}
+          {GROUPS.map((g) => renderGroup(g))}
         </div>
       </SidebarContent>
       <SidebarFooter>

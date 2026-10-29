@@ -267,48 +267,49 @@ const ProfilePage = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4" dir={lang === "ar" ? "rtl" : "ltr"}>
-                <div>
-                  <Label className="text-start block">{t("البريد الإلكتروني", "Email")}</Label>
-                  <div className="mt-1 flex items-center gap-2 rounded-md bg-muted p-2.5 text-sm text-muted-foreground">
-                    <Mail className="h-4 w-4 shrink-0" />
-                    <span dir="ltr" className="min-w-0 flex-1 text-start">
-                      {user?.email}
-                    </span>
-                  </div>
-                </div>
-
                 {editingProfile ? (
                   <>
-                    <div>
-                      <Label className="text-start block">{t("الاسم الكامل", "Full Name")}</Label>
-                      <Input
-                        value={form.full_name}
-                        onChange={(e) => setForm((f) => ({ ...f, full_name: e.target.value }))}
-                        className="mt-1 text-start"
-                        dir={lang === "ar" ? "rtl" : "ltr"}
-                      />
+                    <div className="rounded-xl border bg-muted/30 px-3 py-2.5">
+                      <p className="text-xs text-muted-foreground">{t("البريد الإلكتروني", "Email")}</p>
+                      <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                        <Mail className="h-4 w-4 shrink-0" />
+                        <span dir="ltr" className="min-w-0 flex-1 truncate text-start">
+                          {user?.email}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <Label className="text-start block">{t("رقم الجوال", "Phone")}</Label>
-                      <Input
-                        value={form.phone}
-                        onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                        placeholder="05xxxxxxxx"
-                        dir="ltr"
-                        className={`mt-1 ${lang === "ar" ? "text-right" : "text-left"}`}
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-start block">{t("المدينة", "City")}</Label>
-                      <select
-                        dir={lang === "ar" ? "rtl" : "ltr"}
-                        value={form.city === "Makkah" || form.city === "مكة المكرمة" ? "مكة المكرمة" : form.city === "Riyadh" || form.city === "الرياض" ? "الرياض" : form.city}
-                        onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-                        className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-start"
-                      >
-                        <option value="مكة المكرمة">{t("مكة المكرمة", "Makkah")}</option>
-                        <option value="الرياض">{t("الرياض", "Riyadh")}</option>
-                      </select>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div>
+                        <Label className="text-start block">{t("الاسم الكامل", "Full Name")}</Label>
+                        <Input
+                          value={form.full_name}
+                          onChange={(e) => setForm((f) => ({ ...f, full_name: e.target.value }))}
+                          className="mt-1 text-start"
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-start block">{t("رقم الجوال", "Phone")}</Label>
+                        <Input
+                          value={form.phone}
+                          onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                          placeholder="05xxxxxxxx"
+                          dir="ltr"
+                          className={`mt-1 ${lang === "ar" ? "text-right" : "text-left"}`}
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <Label className="text-start block">{t("المدينة", "City")}</Label>
+                        <select
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          value={form.city === "Makkah" || form.city === "مكة المكرمة" ? "مكة المكرمة" : form.city === "Riyadh" || form.city === "الرياض" ? "الرياض" : form.city}
+                          onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+                          className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-start"
+                        >
+                          <option value="مكة المكرمة">{t("مكة المكرمة", "Makkah")}</option>
+                          <option value="الرياض">{t("الرياض", "Riyadh")}</option>
+                        </select>
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <Button onClick={handleSave} disabled={saving} className="flex-1 gap-2">
@@ -345,8 +346,15 @@ const ProfilePage = () => {
                     </div>
                   </>
                 ) : (
-                  <>
+                  <div className="overflow-hidden rounded-xl border divide-y">
                     {[
+                      {
+                        key: "email",
+                        label: t("البريد الإلكتروني", "Email"),
+                        value: user?.email || "",
+                        ltr: true,
+                        icon: Mail,
+                      },
                       { key: "full_name", label: t("الاسم الكامل", "Full Name"), value: form.full_name },
                       { key: "phone", label: t("رقم الجوال", "Phone"), value: form.phone, ltr: true },
                       {
@@ -359,25 +367,36 @@ const ProfilePage = () => {
                               ? t("مكة المكرمة", "Makkah")
                               : form.city,
                       },
-                    ].map((row) => (
-                      <div key={row.key} className="min-w-0 text-start">
-                        <p className="text-xs text-muted-foreground">{row.label}</p>
-                        <p className="mt-0.5 text-sm font-medium">
-                          {row.value?.trim() ? (
-                            row.ltr ? (
-                              <span dir="ltr" className="inline-block">
-                                {row.value}
+                    ].map((row) => {
+                      const Icon = "icon" in row ? row.icon : null;
+                      const display = row.value?.trim()
+                        ? row.value
+                        : t("غير محدد", "Not set");
+                      const empty = !row.value?.trim();
+                      return (
+                        <div
+                          key={row.key}
+                          className="flex items-center justify-between gap-3 px-3.5 py-3"
+                        >
+                          <p className="shrink-0 text-xs text-muted-foreground">{row.label}</p>
+                          <p
+                            className={`min-w-0 text-sm font-medium ${
+                              empty ? "text-muted-foreground" : "text-foreground"
+                            } ${lang === "ar" ? "text-left" : "text-right"}`}
+                          >
+                            {row.ltr ? (
+                              <span dir="ltr" className="inline-flex max-w-full items-center gap-1.5 truncate">
+                                {Icon ? <Icon className="h-3.5 w-3.5 shrink-0 opacity-60" /> : null}
+                                {display}
                               </span>
                             ) : (
-                              row.value
-                            )
-                          ) : (
-                            t("غير محدد", "Not set")
-                          )}
-                        </p>
-                      </div>
-                    ))}
-                  </>
+                              display
+                            )}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </CardContent>
             </Card>

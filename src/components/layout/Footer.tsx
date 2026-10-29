@@ -7,6 +7,7 @@ import logoFull from "@/assets/logo-full.png";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useBranch } from "@/contexts/BranchContext";
 import { BRAND } from "@/lib/brand";
+import { useStoreInfo } from "@/hooks/useStoreInfo";
 import {
   Dialog,
   DialogContent,
@@ -35,8 +36,11 @@ const Footer = () => {
   const navigate = useNavigate();
   const { data: dbCategories } = useCategories();
   const { data: categorySections = [] } = useCategorySections();
+  const { info: storeInfo } = useStoreInfo();
   const mainSections = categorySections.slice(0, 5);
   const whatsappNumber = BRAND.whatsapp;
+  const crNumber = (storeInfo.cr_number || BRAND.crNumber).trim();
+  const vatNumber = (storeInfo.vat_number || "").trim();
   const [staffOpen, setStaffOpen] = useState(false);
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -187,7 +191,7 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Government compliance placeholders — update when Sanam CR/VAT are provided */}
+        {/* Government compliance — CR / VAT from store settings */}
         <div className="flex flex-wrap items-center justify-center gap-6 mb-6 py-4 border-t border-background/10">
           <div className="flex items-center gap-3">
             <div className="bg-background/10 rounded-lg p-2 flex items-center justify-center">
@@ -197,7 +201,7 @@ const Footer = () => {
             </div>
             <div className="text-right">
               <p className="text-xs text-background/60">السجل التجاري</p>
-              <p className="text-sm font-bold" dir="ltr">—</p>
+              <p className="text-sm font-bold" dir="ltr">{crNumber || "—"}</p>
             </div>
           </div>
 
@@ -210,7 +214,7 @@ const Footer = () => {
           <div className="flex items-center gap-3">
             <div className="text-left">
               <p className="text-xs text-background/60">الرقم الضريبي</p>
-              <p className="text-sm font-bold" dir="ltr">—</p>
+              <p className="text-sm font-bold" dir="ltr">{vatNumber || "—"}</p>
             </div>
           </div>
         </div>
@@ -249,11 +253,9 @@ const Footer = () => {
             </a>
           </div>
 
-          {/* Copyright / legal */}
+          {/* Copyright / legal — CR shown in the dedicated slot above */}
           <p className="text-[11px] text-background/40 text-center md:text-right leading-relaxed">
-            © {new Date().getFullYear()} {BRAND.legalNameAr}
-            <span className="mx-1.5 opacity-50">|</span>
-            {t("س.ت", "CR")} {BRAND.crNumber}
+            © {new Date().getFullYear()} {storeInfo.company_name || BRAND.legalNameAr}
           </p>
         </div>
 

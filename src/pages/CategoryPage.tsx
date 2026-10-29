@@ -185,7 +185,7 @@ const CategoryPage = () => {
             <button
               type="button"
               onClick={() => scrollStrip(sectionScrollRef, "right")}
-              className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background/90 backdrop-blur rounded-full shadow flex items-center justify-center hover:bg-muted md:right-2"
+              className="absolute right-1 top-1/2 -translate-y-1/2 z-10 hidden h-7 w-7 items-center justify-center rounded-full bg-background/90 shadow backdrop-blur hover:bg-muted md:right-2 md:flex"
               aria-label={t("تمرير يمين", "Scroll right")}
             >
               <ChevronRight className="h-4 w-4" />
@@ -193,7 +193,7 @@ const CategoryPage = () => {
             <button
               type="button"
               onClick={() => scrollStrip(sectionScrollRef, "left")}
-              className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background/90 backdrop-blur rounded-full shadow flex items-center justify-center hover:bg-muted md:left-2"
+              className="absolute left-1 top-1/2 -translate-y-1/2 z-10 hidden h-7 w-7 items-center justify-center rounded-full bg-background/90 shadow backdrop-blur hover:bg-muted md:left-2 md:flex"
               aria-label={t("تمرير يسار", "Scroll left")}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -201,7 +201,7 @@ const CategoryPage = () => {
             <div
               ref={sectionScrollRef}
               data-no-swipe
-              className="flex gap-2 overflow-x-auto scrollbar-hide py-2.5 px-8"
+              className="flex gap-2 overflow-x-auto scrollbar-hide py-2.5 px-1 md:px-8"
               style={{ scrollbarWidth: "none" }}
             >
               {sectionOptions.map((section) => {
@@ -234,7 +234,7 @@ const CategoryPage = () => {
               <button
                 type="button"
                 onClick={() => scrollStrip(subScrollRef, "right")}
-                className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background/90 backdrop-blur rounded-full shadow flex items-center justify-center hover:bg-muted md:right-2"
+                className="absolute right-1 top-1/2 -translate-y-1/2 z-10 hidden h-7 w-7 items-center justify-center rounded-full bg-background/90 shadow backdrop-blur hover:bg-muted md:right-2 md:flex"
                 aria-label={t("تمرير يمين", "Scroll right")}
               >
                 <ChevronRight className="h-4 w-4" />
@@ -242,7 +242,7 @@ const CategoryPage = () => {
               <button
                 type="button"
                 onClick={() => scrollStrip(subScrollRef, "left")}
-                className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background/90 backdrop-blur rounded-full shadow flex items-center justify-center hover:bg-muted md:left-2"
+                className="absolute left-1 top-1/2 -translate-y-1/2 z-10 hidden h-7 w-7 items-center justify-center rounded-full bg-background/90 shadow backdrop-blur hover:bg-muted md:left-2 md:flex"
                 aria-label={t("تمرير يسار", "Scroll left")}
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -250,7 +250,7 @@ const CategoryPage = () => {
               <div
                 ref={subScrollRef}
                 data-no-swipe
-                className="flex gap-1.5 overflow-x-auto scrollbar-hide py-2 px-8"
+                className="flex gap-1.5 overflow-x-auto scrollbar-hide py-2 px-1 md:px-8"
                 style={{ scrollbarWidth: "none" }}
               >
                 {subCategories.map((cat) => {

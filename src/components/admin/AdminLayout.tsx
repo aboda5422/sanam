@@ -25,16 +25,25 @@ const AdminShellContext = createContext<AdminShellContextValue | null>(null);
 const AdminShell = ({ children, title }: AdminLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { loading, isSuperAdmin, isSiteWide, role, branches, filterBranchId, setFilterBranchId, scopedBranchIds } =
-    useAdminAuth();
+  const {
+    loading,
+    isSuperAdmin,
+    isSiteWide,
+    role,
+    navPaths,
+    branches,
+    filterBranchId,
+    setFilterBranchId,
+    scopedBranchIds,
+  } = useAdminAuth();
   useAdminNotifications();
 
   useEffect(() => {
     if (loading || !role) return;
-    if (!canAccessAdminPath(role, location.pathname)) {
-      navigate(allowedAdminPaths(role)[0] || "/admin", { replace: true });
+    if (!canAccessAdminPath(role, location.pathname, navPaths)) {
+      navigate(allowedAdminPaths(role, navPaths)[0] || "/admin", { replace: true });
     }
-  }, [loading, role, location.pathname, navigate]);
+  }, [loading, role, navPaths, location.pathname, navigate]);
 
   if (loading) {
     return (
