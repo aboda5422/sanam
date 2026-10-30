@@ -128,6 +128,63 @@ async function nominatimSearch(query: string): Promise<GeoHit | null> {
   return null;
 }
 
+async function googleGeocode(query: string, apiKey: string): Promise<GeoHit | null> {
+  const url =
+    "https://maps.googleapis.com/maps/api/geocode/json" +
+    `?address=${encodeURIComponent(query)}` +
+    `&region=sa&components=country:SA&language=ar&key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (data.status !== "OK" || !data.results?.[0]) return null;
+  const r = data.results[0];
+  const lat = Number(r.geometry?.location?.lat);
+  const lng = Number(r.geometry?.location?.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || !inSaudi(lat, lng)) return null;
+  return {
+    lat,
+    lng,
+    formatted: r.formatted_address || undefined,
+    provider: "google",
+  };
+}
+
+/** Places API (New) — works when legacy Geocoding is not activated. */
+async function googlePlacesSearch(query: string, apiKey: string): Promise<GeoHit | null> {
+  const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": apiKey,
+      "X-Goog-FieldMask": "places.location,places.formattedAddress,places.displayName",
+    },
+    body: JSON.stringify({
+      textQuery: query,
+      maxResultCount: 3,
+      regionCode: "SA",
+      languageCode: "ar",
+    }),
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  const places = Array.isArray(data?.places) ? data.places : [];
+  for (const p of places) {
+    const lat = Number(p?.location?.latitude);
+    const lng = Number(p?.location?.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || !inSaudi(lat, lng)) continue;
+    return {
+      lat,
+      lng,
+      formatted:
+        p.formattedAddress ||
+        p.displayName?.text ||
+        undefined,
+      provider: "google-places",
+    };
+  }
+  return null;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -151,7 +208,26 @@ Deno.serve(async (req) => {
       if (splHit) return json({ hit: splHit, status: "OK", provider: "spl" });
     }
 
-    // 2) Free Nominatim fallback (rarely knows SPL short codes)
+    // 2) Google Places (New) + Geocoding — Places often works when Geocoding isn't activated
+    const googleKey = Deno.env.get("GOOGLE_MAPS_API_KEY") || "";
+    if (googleKey.trim()) {
+      const googleQueries = [
+        code,
+        `${code} Saudi Arabia`,
+        `${code} السعودية`,
+        `العنوان الوطني ${code}`,
+        `National Address ${code}`,
+        `short address ${code}`,
+      ];
+      for (const q of googleQueries) {
+        const placesHit = await googlePlacesSearch(q, googleKey.trim());
+        if (placesHit) return json({ hit: placesHit, status: "OK", provider: "google-places" });
+        const geoHit = await googleGeocode(q, googleKey.trim());
+        if (geoHit) return json({ hit: geoHit, status: "OK", provider: "google" });
+      }
+    }
+
+    // 3) Free Nominatim fallback (rarely knows SPL short codes)
     const nominatimQueries = [`${code} Saudi Arabia`, `العنوان الوطني ${code}`, code];
     for (let i = 0; i < nominatimQueries.length; i++) {
       if (i > 0) await new Promise((r) => setTimeout(r, 1100));
@@ -162,9 +238,15 @@ Deno.serve(async (req) => {
     return json({
       hit: null,
       status: "ZERO_RESULTS",
-      provider: splKey.trim() ? "spl+nominatim" : "nominatim",
+      provider: [
+        splKey.trim() ? "spl" : null,
+        googleKey.trim() ? "google" : null,
+        "nominatim",
+      ]
+        .filter(Boolean)
+        .join("+"),
       note:
-        "رمز العنوان الوطني يحتاج مفتاح اشتراك من api.address.gov.sa. بدون المفتاح يمكن حفظ الرمز وتحريك الدبوس يدوياً على الخريطة.",
+        "رمز العنوان الوطني يحتاج مفتاح اشتراك من api.address.gov.sa لأفضل دقة. بدون المفتاح يمكن حفظ الرمز وتحريك الدبوس يدوياً على الخريطة.",
       needs_spl_key: !splKey.trim(),
     });
   } catch (e) {

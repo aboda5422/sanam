@@ -5,13 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Capacitor } from "@capacitor/core";
-import { geocodeNationalAddress } from "@/lib/google-maps";
-import {
-  loadLeaflet,
-  mountOsmPinMap,
-  reverseGeocodeOsm,
-  type OsmMapHandle,
-} from "@/lib/osm-map";
+import { loadGoogleMaps, geocodeNationalAddress } from "@/lib/google-maps";
 import {
   inferCityFromNationalAddress,
   isValidNationalAddress,
@@ -78,7 +72,7 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
   const [locating, setLocating] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const mapElRef = useRef<HTMLDivElement>(null);
-  const osmHandleRef = useRef<OsmMapHandle | null>(null);
+  const zoneOverlaysRef = useRef<any[]>([]);
   const reverseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingFocus = useRef<{
     lat: number;
@@ -106,19 +100,37 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
     const fallback = `موقع محدد: ${la.toFixed(5)}, ${ln.toFixed(5)}`;
     if (reverseTimerRef.current) clearTimeout(reverseTimerRef.current);
     reverseTimerRef.current = setTimeout(async () => {
-      const name = await reverseGeocodeOsm(la, ln);
-      setAddressText(name || fallback);
+      if (!window.google?.maps?.Geocoder) {
+        setAddressText(fallback);
+        return;
+      }
+      try {
+        const geocoder = new window.google.maps.Geocoder();
+        const result = await geocoder.geocode({ location: { lat: la, lng: ln } });
+        setAddressText(result.results?.[0]?.formatted_address || fallback);
+      } catch {
+        setAddressText(fallback);
+      }
     }, 80);
   }, []);
 
-  /** Resolve place name immediately (used by «موقعي» so user need not drag the pin). */
   const reverseGeocodeNow = useCallback(async (la: number, ln: number) => {
     const fallback = `موقع محدد: ${la.toFixed(5)}, ${ln.toFixed(5)}`;
     if (reverseTimerRef.current) clearTimeout(reverseTimerRef.current);
-    const name = await reverseGeocodeOsm(la, ln);
-    const text = name || fallback;
-    setAddressText(text);
-    return text;
+    if (!window.google?.maps?.Geocoder) {
+      setAddressText(fallback);
+      return fallback;
+    }
+    try {
+      const geocoder = new window.google.maps.Geocoder();
+      const result = await geocoder.geocode({ location: { lat: la, lng: ln } });
+      const text = result.results?.[0]?.formatted_address || fallback;
+      setAddressText(text);
+      return text;
+    } catch {
+      setAddressText(fallback);
+      return fallback;
+    }
   }, []);
 
   useEffect(() => {
@@ -127,10 +139,10 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
     setMapLoaded(false);
     setMapError(null);
     (async () => {
-      const ok = await loadLeaflet();
+      const ok = await loadGoogleMaps();
       if (cancelled) return;
-      if (!ok) {
-        setMapError("تعذر تحميل الخريطة المفتوحة. تحقق من الاتصال ثم أعد المحاولة.");
+      if (!ok || !window.google?.maps) {
+        setMapError("تعذر تحميل خرائط جوجل. تحقق من الاتصال ثم أعد المحاولة.");
         return;
       }
       setMapLoaded(true);
@@ -141,64 +153,112 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
   }, [showMap, mapRetry]);
 
   useEffect(() => {
-    if (!showMap || !mapLoaded || !mapElRef.current) return;
+    if (!showMap || !mapLoaded || !window.google?.maps || !mapElRef.current) return;
 
-    const handle = mountOsmPinMap(mapElRef.current, {
-      lat,
-      lng,
+    const mapEl = mapElRef.current;
+    mapEl.innerHTML = "";
+
+    const map = new window.google.maps.Map(mapEl, {
+      center: { lat, lng },
       zoom: 15,
-      onMove: (la, ln) => {
-        setLat(la);
-        setLng(ln);
-        setMapTouched(true);
-        reverseGeocode(la, ln);
+      disableDefaultUI: true,
+      zoomControl: true,
+      mapTypeControl: true,
+      mapTypeControlOptions: {
+        style: window.google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+        position: window.google.maps.ControlPosition.TOP_LEFT,
       },
-      zones: activeZones.map((z) => ({
-        polygon: z.polygon,
-        color: z.color || undefined,
-      })),
+      gestureHandling: "greedy",
+      mapTypeId: "roadmap",
     });
-    osmHandleRef.current = handle;
+
+    const marker = new window.google.maps.Marker({
+      position: { lat, lng },
+      map,
+      draggable: true,
+    });
+
+    (mapEl as any).__map = map;
+    (mapEl as any).__marker = marker;
+
+    map.addListener("click", (e: any) => {
+      const pos = e.latLng;
+      marker.setPosition(pos);
+      setLat(pos.lat());
+      setLng(pos.lng());
+      setMapTouched(true);
+      reverseGeocode(pos.lat(), pos.lng());
+    });
+
+    marker.addListener("dragend", () => {
+      const pos = marker.getPosition();
+      if (!pos) return;
+      setLat(pos.lat());
+      setLng(pos.lng());
+      setMapTouched(true);
+      reverseGeocode(pos.lat(), pos.lng());
+    });
 
     const pending = pendingFocus.current;
-    if (pending && handle) {
+    if (pending) {
       pendingFocus.current = null;
+      map.setCenter({ lat: pending.lat, lng: pending.lng });
+      map.setZoom(pending.zoom ?? (pending.confirmPin ? 16 : 13));
+      marker.setPosition({ lat: pending.lat, lng: pending.lng });
       setLat(pending.lat);
       setLng(pending.lng);
-      if (pending.confirmPin) {
-        handle.locateTo(pending.lat, pending.lng, pending.zoom ?? 16);
-        setMapTouched(true);
-        if (pending.formatted) setAddressText(pending.formatted);
-        else reverseGeocode(pending.lat, pending.lng);
-      } else {
-        handle.setView(pending.lat, pending.lng, pending.zoom ?? 12);
-        if (pending.formatted) setAddressText(pending.formatted);
-      }
+      if (pending.confirmPin) setMapTouched(true);
+      if (pending.formatted) setAddressText(pending.formatted);
+      else if (pending.confirmPin) reverseGeocode(pending.lat, pending.lng);
     }
 
     return () => {
-      handle?.destroy();
-      osmHandleRef.current = null;
+      zoneOverlaysRef.current.forEach((p) => p.setMap(null));
+      zoneOverlaysRef.current = [];
+      (mapEl as any).__map = null;
+      (mapEl as any).__marker = null;
     };
     // Mount once per map session; zones updated below
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showMap, mapLoaded]);
 
   useEffect(() => {
-    osmHandleRef.current?.setZones(
-      activeZones.map((z) => ({
-        polygon: z.polygon,
-        color: z.color || undefined,
-      })),
-    );
-  }, [activeZones]);
+    if (!showMap || !mapLoaded || !window.google?.maps || !mapElRef.current) return;
+    const map = (mapElRef.current as any).__map;
+    if (!map) return;
+
+    zoneOverlaysRef.current.forEach((p) => p.setMap(null));
+    zoneOverlaysRef.current = [];
+
+    activeZones.forEach((zone) => {
+      const poly = new window.google.maps.Polygon({
+        paths: zone.polygon,
+        fillColor: zone.color || "#16a34a",
+        fillOpacity: 0.12,
+        strokeColor: zone.color || "#16a34a",
+        strokeOpacity: 0.7,
+        strokeWeight: 2,
+        clickable: false,
+        map,
+      });
+      zoneOverlaysRef.current.push(poly);
+    });
+  }, [activeZones, mapLoaded, showMap]);
 
   const applyPosition = async (latitude: number, longitude: number) => {
     setLat(latitude);
     setLng(longitude);
     setMapTouched(true);
-    // Move pin without re-firing onMove (avoids double reverse-geocode / race)
-    osmHandleRef.current?.setView(latitude, longitude, 16);
+    const mapEl = mapElRef.current;
+    const map = mapEl && (mapEl as any).__map;
+    const marker = mapEl && (mapEl as any).__marker;
+    if (map) {
+      map.setCenter({ lat: latitude, lng: longitude });
+      map.setZoom(16);
+    }
+    if (marker) {
+      marker.setPosition({ lat: latitude, lng: longitude });
+    }
     saveLastLocation({ lat: latitude, lng: longitude, ts: Date.now() });
     const place = await reverseGeocodeNow(latitude, longitude);
     saveLastLocation({
@@ -241,7 +301,6 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
             return;
           }
         }
-        const t0 = Date.now();
         const pos: any = await Promise.race([
           Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }),
           new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 16000)),
@@ -296,6 +355,7 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
       return;
     }
     setLookingUp(true);
+    await loadGoogleMaps();
     const geo = await geocodeNationalAddress(code);
     const city = inferCityFromNationalAddress(code);
     setLookingUp(false);
@@ -484,7 +544,7 @@ const AddressMapPicker = ({ onAddressSelected, initialLat, initialLng }: Address
               ) : !mapLoaded ? (
                 <div className="text-muted-foreground text-sm flex items-center gap-2">
                   <MapPin className="h-5 w-5 animate-pulse" />
-                  جاري تحميل الخريطة المفتوحة...
+                  جاري تحميل خرائط جوجل...
                 </div>
               ) : null}
             </div>

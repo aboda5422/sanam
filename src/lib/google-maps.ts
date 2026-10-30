@@ -244,6 +244,44 @@ async function geocodeRest(query: string): Promise<GeoHit | null> {
   }
 }
 
+/** Places API (New) REST — works when legacy Geocoding / JS Places are unavailable. */
+async function placesSearchRest(query: string): Promise<GeoHit | null> {
+  const key = await getMapsKey();
+  if (!key) return null;
+  try {
+    const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": key,
+        "X-Goog-FieldMask": "places.location,places.formattedAddress,places.displayName",
+      },
+      body: JSON.stringify({
+        textQuery: query,
+        maxResultCount: 3,
+        regionCode: "SA",
+        languageCode: "ar",
+      }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const places = Array.isArray(data?.places) ? data.places : [];
+    for (const p of places) {
+      const lat = Number(p?.location?.latitude);
+      const lng = Number(p?.location?.longitude);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      return {
+        lat,
+        lng,
+        formatted: p.formattedAddress || p.displayName?.text || undefined,
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 async function geocodeViaFunction(code: string): Promise<(GeoHit & { provider?: string }) | null> {
   try {
     const { data, error } = await supabase.functions.invoke("geocode-national", {
@@ -274,10 +312,13 @@ export async function geocodeNationalAddress(
     q,
     `${q} السعودية`,
     `${q} Saudi Arabia`,
+    `National Address ${q}`,
     `short address ${q}`,
     `العنوان الوطني ${q}`,
   ];
   for (const query of queries) {
+    const places = await placesSearchRest(query);
+    if (places && isCredibleNationalHit(places, q)) return places;
     const rest = await geocodeRest(query);
     if (rest && isCredibleNationalHit(rest, q)) return rest;
   }
