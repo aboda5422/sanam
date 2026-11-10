@@ -44,7 +44,7 @@ export function toLegacyProduct(p: Product) {
     nameEn: p.name_en || "",
     price: p.price,
     oldPrice: p.original_price ?? undefined,
-    image: p.image || "/placeholder.png",
+    image: p.image || "/placeholder.webp",
     categoryId: p.category_id || "",
     unit: p.unit,
     description: p.description || "",

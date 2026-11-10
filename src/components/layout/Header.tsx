@@ -381,7 +381,7 @@ const Header = () => {
                     onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
                   >
                     <img
-                      src={p.image || "/placeholder.png"}
+                      src={p.image || "/placeholder.webp"}
                       alt={p.name}
                       width={56}
                       height={56}

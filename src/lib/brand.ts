@@ -23,8 +23,8 @@ export const BRAND = {
   whatsapp: "966502291213",
   locationsAr: "مكة المكرمة والرياض",
   locationsEn: "Makkah & Riyadh",
-  /** Fallback when a category/product image is missing — Sanam mark (mobile header icon) */
-  placeholderImage: "/placeholder.png",
+  /** Fallback when a category/product image is missing — crisp Sanam mark (WebP) */
+  placeholderImage: "/placeholder.webp",
   /** Sampled from official full logo */
   colors: {
     orange: "#EC8824",

@@ -18,7 +18,7 @@ export function optimizeImageUrl(
   url: string | null | undefined,
   preset: ImageSizePreset = "card",
 ): string {
-  if (!url) return "/placeholder.png";
+  if (!url) return "/placeholder.webp";
   if (url.startsWith("/") || url.startsWith("data:") || url.startsWith("blob:")) return url;
 
   const width = PRESET_WIDTH[preset];

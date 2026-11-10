@@ -22,6 +22,11 @@ const ProductCard = ({ product, priority = false }: ProductCardProps) => {
     : 0;
   const displayName = lang === "en" && product.name_en ? product.name_en : product.name;
   const sar = t("ر.س", "SAR");
+  const isPlaceholder =
+    !product.image ||
+    product.image.includes("placeholder.") ||
+    product.image.endsWith("/logo-mark.png") ||
+    product.image.endsWith("/logo-mark.webp");
 
   return (
     <div
@@ -29,14 +34,20 @@ const ProductCard = ({ product, priority = false }: ProductCardProps) => {
       style={{ contentVisibility: "auto", containIntrinsicSize: "0 280px" }}
     >
       <Link to={`/product/${product.id}`} className="block">
-        <div className="relative aspect-square overflow-hidden bg-white p-3">
+        <div
+          className={`relative aspect-square overflow-hidden bg-white ${
+            isPlaceholder ? "p-8 sm:p-10" : "p-3"
+          }`}
+        >
           <SmartImage
-            src={product.image}
+            src={product.image || "/placeholder.webp"}
             preset="card"
             alt={displayName}
-            width={200}
-            height={200}
-            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+            width={isPlaceholder ? 160 : 200}
+            height={isPlaceholder ? 160 : 200}
+            className={`w-full h-full object-contain ${
+              isPlaceholder ? "" : "group-hover:scale-105 transition-transform duration-300"
+            }`}
             loading={priority ? "eager" : "lazy"}
             decoding="async"
             fetchPriority={priority ? "high" : "low"}

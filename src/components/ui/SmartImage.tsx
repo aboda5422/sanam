@@ -25,7 +25,7 @@ function resolveSrc(src: string | null | undefined, preset: ImageSizePreset, fal
 export function SmartImage({
   src,
   preset = "card",
-  fallbackSrc = "/placeholder.png",
+  fallbackSrc = "/placeholder.webp",
   onError,
   ...rest
 }: SmartImageProps) {

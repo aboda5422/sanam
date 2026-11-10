@@ -60,7 +60,7 @@ const ProductPage = () => {
         (u, i, arr): u is string => !!u && arr.indexOf(u) === i
       )
     : [];
-  const mainImage = activeImage || gallery[0] || "/placeholder.png";
+  const mainImage = activeImage || gallery[0] || "/placeholder.webp";
 
   const displayName = product
     ? lang === "en" && product.name_en

@@ -44,5 +44,8 @@
 /placeholder.png
   Cache-Control: public, max-age=2592000
 
+/placeholder.webp
+  Cache-Control: public, max-age=2592000
+
 /index.html
   Cache-Control: public, max-age=0, must-revalidate

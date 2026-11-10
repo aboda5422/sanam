@@ -21,7 +21,7 @@ const CategoryTile = ({
   priority?: boolean;
 }) => {
   const isPlaceholder =
-    !image || image === "/placeholder.png" || image.endsWith("placeholder.png");
+    !image || image.includes("placeholder.");
 
   return (
     <Link to={to} className="group block">
@@ -73,7 +73,7 @@ const HomeSections = () => {
         slug: c.slug,
         name: c.name,
         nameEn: c.name_en || c.name,
-        image: c.image || "/placeholder.png",
+        image: c.image || "/placeholder.webp",
         section: c.section || "",
       }));
     }
@@ -82,7 +82,7 @@ const HomeSections = () => {
       slug: c.id,
       name: c.name,
       nameEn: c.nameEn,
-      image: c.image || "/placeholder.png",
+      image: c.image || "/placeholder.webp",
       section: c.section,
     }));
   }, [dbCategories]);
@@ -126,7 +126,7 @@ const HomeSections = () => {
                   key={cat.id}
                   to={`/category/${cat.slug}`}
                   name={lang === "ar" ? cat.name : cat.nameEn}
-                  image={cat.image || section.image || "/placeholder.png"}
+                  image={cat.image || section.image || "/placeholder.webp"}
                   captionBelow={captionBelow}
                   priority={sectionIndex === 0 && catIndex < 6}
                 />
