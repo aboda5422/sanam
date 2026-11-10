@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { staffEmailFromUsername } from "@/lib/admin-username";
-import logoFull from "@/assets/logo-full-light.png";
+import logoFull from "@/assets/logo-full-light.webp";
 
 const REMEMBER_KEY = "sanam:driver-login-remember";
 

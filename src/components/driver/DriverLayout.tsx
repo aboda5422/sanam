@@ -4,7 +4,7 @@ import { ArrowRight, MapPin, Loader2 } from "lucide-react";
 import DriverBottomNav from "./DriverBottomNav";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { supabase } from "@/integrations/supabase/client";
-import logoFull from "@/assets/logo-full-light.png";
+import logoFull from "@/assets/logo-full-light.webp";
 import { BRAND } from "@/lib/brand";
 import { Badge } from "@/components/ui/badge";
 

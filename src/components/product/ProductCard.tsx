@@ -1,7 +1,9 @@
 ﻿import { Plus, Minus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { Product } from "@/types/product";
 import { toLegacyProduct } from "@/types/product";
+import { SmartImage } from "@/components/ui/SmartImage";
 import { Link } from "react-router-dom";
 
 interface ProductCardProps {
@@ -12,11 +14,14 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, priority = false }: ProductCardProps) => {
   const { items, addItem, updateQuantity } = useCart();
+  const { t, lang } = useLanguage();
   const cartItem = items.find((i) => i.product.id === product.id);
   const legacyProduct = toLegacyProduct(product);
   const discount = product.original_price
     ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
     : 0;
+  const displayName = lang === "en" && product.name_en ? product.name_en : product.name;
+  const sar = t("ر.س", "SAR");
 
   return (
     <div
@@ -25,31 +30,31 @@ const ProductCard = ({ product, priority = false }: ProductCardProps) => {
     >
       <Link to={`/product/${product.id}`} className="block">
         <div className="relative aspect-square overflow-hidden bg-white p-3">
-          <img
-            src={product.image || "/placeholder.png"}
-            alt={product.name}
+          <SmartImage
+            src={product.image}
+            preset="card"
+            alt={displayName}
             width={200}
             height={200}
             className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
             loading={priority ? "eager" : "lazy"}
             decoding="async"
             fetchPriority={priority ? "high" : "low"}
-            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/placeholder.png"; }}
           />
           {discount > 0 && (
-            <span className="absolute top-2 right-2 bg-destructive text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+            <span className="absolute top-2 end-2 bg-destructive text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
               {discount}%-
             </span>
           )}
           {product.is_featured && (
-            <span className="absolute top-2 left-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded max-w-[7rem] truncate">
-              {product.extra_label || "الأكثر مبيعاً"}
+            <span className="absolute top-2 start-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded max-w-[7rem] truncate">
+              {product.extra_label || t("الأكثر مبيعاً", "Bestseller")}
             </span>
           )}
         </div>
       </Link>
 
-      <div className="absolute bottom-[68px] left-2 z-10">
+      <div className="absolute bottom-[68px] start-2 z-10">
         {cartItem ? (
           <div className="flex items-center gap-0.5 bg-primary rounded-full shadow-md">
             <button
@@ -79,14 +84,16 @@ const ProductCard = ({ product, priority = false }: ProductCardProps) => {
       <div className="px-2 pb-3 pt-1">
         <div className="flex items-baseline gap-1 mb-0.5">
           <span className="font-heading font-bold text-foreground text-base">{product.price.toFixed(2)}</span>
-          <span className="text-xs text-muted-foreground">ر.س</span>
+          <span className="text-xs text-muted-foreground">{sar}</span>
         </div>
         {product.original_price && (
-          <span className="text-xs text-muted-foreground line-through block">{product.original_price.toFixed(2)} ر.س</span>
+          <span className="text-xs text-muted-foreground line-through block">
+            {product.original_price.toFixed(2)} {sar}
+          </span>
         )}
         <Link to={`/product/${product.id}`}>
           <h3 className="text-sm text-foreground mt-1 line-clamp-2 leading-relaxed hover:text-primary transition-colors">
-            {product.name}
+            {displayName}
           </h3>
         </Link>
         {(product.brand || product.size_label) && (

@@ -3,7 +3,8 @@ import { useRef, useState } from "react";
 import { Phone, MapPin, MessageCircle, MessageSquare, Truck, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useCategories, useCategorySections } from "@/hooks/useCategories";
-import logoFull from "@/assets/logo-full.png";
+import { categories as staticCategories } from "@/data/store-data";
+import logoFull from "@/assets/logo-full.webp";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useBranch } from "@/contexts/BranchContext";
 import { BRAND } from "@/lib/brand";
@@ -65,6 +66,11 @@ const Footer = () => {
               <img
                 src={logoFull}
                 alt={BRAND.fullNameAr}
+                width={320}
+                height={56}
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
                 className="h-12 md:h-14 w-auto max-w-[260px] md:max-w-[320px] object-contain cursor-pointer select-none"
                 onMouseDown={startPress}
                 onMouseUp={cancelPress}
@@ -93,7 +99,7 @@ const Footer = () => {
                   <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                 </svg>
                 <div className="text-right">
-                  <p className="text-[10px] text-background/60">حمّل من</p>
+                  <p className="text-[10px] text-background/60">{t("حمّل من", "Get it on")}</p>
                   <p className="text-xs font-medium">App Store</p>
                 </div>
               </button>
@@ -106,7 +112,7 @@ const Footer = () => {
                   <path d="M3.609 1.814 13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893 2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199 2.302 2.302-2.302 2.302L15.396 12l2.302-2.492zM5.864 2.658l10.937 6.333L14.5 11.292 5.864 2.658z"/>
                 </svg>
                 <div className="text-right">
-                  <p className="text-[10px] text-background/60">حمّل من</p>
+                  <p className="text-[10px] text-background/60">{t("حمّل من", "Get it on")}</p>
                   <p className="text-xs font-medium">Google Play</p>
                 </div>
               </button>
@@ -114,21 +120,41 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Category sections */}
+        {/* Category sections — static fallback when branch not selected (SEO crawl paths) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 mb-8 pb-8 border-b border-background/10">
           {mainSections.map((section) => {
-            const sectionCats = (dbCategories || []).filter((c) => c.section === section.id).slice(0, 6);
+            const fromDb = (dbCategories || [])
+              .filter((c) => c.section === section.id)
+              .slice(0, 6)
+              .map((c) => ({
+                key: c.id,
+                slug: c.slug,
+                name: c.name,
+                nameEn: c.name_en || c.name,
+              }));
+            const sectionCats =
+              fromDb.length > 0
+                ? fromDb
+                : staticCategories
+                    .filter((c) => c.section === section.id)
+                    .slice(0, 6)
+                    .map((c) => ({
+                      key: c.id,
+                      slug: c.id,
+                      name: c.name,
+                      nameEn: c.nameEn,
+                    }));
             return (
               <div key={section.id}>
                 <h4 className="font-heading font-semibold text-sm mb-3">{t(section.title, section.titleEn)}</h4>
                 <div className="space-y-1.5">
                   {sectionCats.map((cat) => (
                     <Link
-                      key={cat.id}
+                      key={cat.key}
                       to={`/category/${cat.slug}`}
                       className="block text-xs text-background/60 hover:text-primary transition-colors"
                     >
-                      {t(cat.name, cat.name_en || cat.name)}
+                      {t(cat.name, cat.nameEn)}
                     </Link>
                   ))}
                 </div>
@@ -200,20 +226,29 @@ const Footer = () => {
               </svg>
             </div>
             <div className="text-right">
-              <p className="text-xs text-background/60">السجل التجاري</p>
+              <p className="text-xs text-background/60">{t("السجل التجاري", "Commercial Registration")}</p>
               <p className="text-sm font-bold" dir="ltr">{crNumber || "—"}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="bg-background/10 rounded-lg p-2 flex items-center justify-center">
-              <span className="text-xs font-bold text-primary leading-tight text-center">ضريبة<br/>القيمة<br/>المضافة<br/><span className="text-[10px]">VAT</span></span>
+              <span className="text-xs font-bold text-primary leading-tight text-center">
+                {lang === "en" ? (
+                  <>VAT</>
+                ) : (
+                  <>
+                    ضريبة<br />القيمة<br />المضافة<br />
+                    <span className="text-[10px]">VAT</span>
+                  </>
+                )}
+              </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="text-left">
-              <p className="text-xs text-background/60">الرقم الضريبي</p>
+            <div className="text-start">
+              <p className="text-xs text-background/60">{t("الرقم الضريبي", "VAT number")}</p>
               <p className="text-sm font-bold" dir="ltr">{vatNumber || "—"}</p>
             </div>
           </div>
@@ -277,9 +312,9 @@ const Footer = () => {
       <Dialog open={staffOpen} onOpenChange={setStaffOpen}>
         <DialogContent className="sm:max-w-sm" dir="rtl">
           <DialogHeader>
-            <DialogTitle className="text-center">دخول الموظفين</DialogTitle>
+            <DialogTitle className="text-center">{t("دخول الموظفين", "Staff access")}</DialogTitle>
             <DialogDescription className="text-center">
-              اختر نوع الحساب لتسجيل الدخول
+              {t("اختر نوع الحساب لتسجيل الدخول", "Choose an account type to sign in")}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-3 mt-2">
@@ -293,8 +328,8 @@ const Footer = () => {
             >
               <Truck className="h-5 w-5 text-primary" />
               <div className="text-right">
-                <div className="font-semibold">واجهة المندوب</div>
-                <div className="text-xs text-muted-foreground">دخول مندوب التوصيل</div>
+                <div className="font-semibold">{t("واجهة المندوب", "Driver app")}</div>
+                <div className="text-xs text-muted-foreground">{t("دخول مندوب التوصيل", "Delivery driver login")}</div>
               </div>
             </Button>
             <Button
@@ -307,8 +342,8 @@ const Footer = () => {
             >
               <ShieldCheck className="h-5 w-5 text-primary" />
               <div className="text-right">
-                <div className="font-semibold">لوحة التحكم</div>
-                <div className="text-xs text-muted-foreground">دخول الإدارة والمشرفين</div>
+                <div className="font-semibold">{t("لوحة التحكم", "Admin panel")}</div>
+                <div className="text-xs text-muted-foreground">{t("دخول الإدارة والمشرفين", "Admin & supervisor login")}</div>
               </div>
             </Button>
           </div>

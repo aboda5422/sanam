@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
 
 type Lang = "ar" | "en";
 
@@ -14,6 +14,11 @@ const LanguageContext = createContext<LanguageContextType>({
   t: (ar) => ar,
 });
 
+function applyDocumentLang(next: Lang) {
+  document.documentElement.dir = next === "ar" ? "rtl" : "ltr";
+  document.documentElement.lang = next;
+}
+
 export const useLanguage = () => useContext(LanguageContext);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
@@ -22,12 +27,15 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return (saved === "en" ? "en" : "ar") as Lang;
   });
 
+  useEffect(() => {
+    applyDocumentLang(lang);
+  }, [lang]);
+
   const toggleLang = useCallback(() => {
     setLang((prev) => {
       const next = prev === "ar" ? "en" : "ar";
       localStorage.setItem("app-lang", next);
-      document.documentElement.dir = next === "ar" ? "rtl" : "ltr";
-      document.documentElement.lang = next;
+      applyDocumentLang(next);
       return next;
     });
   }, []);

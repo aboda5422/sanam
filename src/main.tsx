@@ -2,14 +2,12 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { Capacitor } from "@capacitor/core";
-import { initFirebase } from "@/lib/firebase";
-import { initGoogleAnalytics } from "@/lib/analytics";
+import { scheduleGoogleAnalytics } from "@/lib/analytics";
+import { registerServiceWorker } from "@/lib/register-sw";
 
-// Google Analytics 4 (public measurement id)
-initGoogleAnalytics();
-
-// Firebase config (apiKey) loaded securely from Supabase secrets
-void initFirebase();
+// Defer GA until after first paint / idle — do not block storefront boot.
+scheduleGoogleAnalytics();
+registerServiceWorker();
 
 // Native-only initialization (status bar, splash hide, keyboard handling)
 if (Capacitor.isNativePlatform()) {

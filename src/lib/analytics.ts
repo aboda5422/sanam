@@ -36,8 +36,25 @@ export function initGoogleAnalytics(): void {
   initialized = true;
 }
 
+/** Schedule GA after first paint so it never competes with LCP. */
+export function scheduleGoogleAnalytics(): void {
+  if (typeof window === "undefined") return;
+  const run = () => initGoogleAnalytics();
+  const ric = (window as Window & {
+    requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+  }).requestIdleCallback;
+  if (typeof ric === "function") {
+    ric(run, { timeout: 4500 });
+    return;
+  }
+  const start = () => setTimeout(run, 1800);
+  if (document.readyState === "complete") start();
+  else window.addEventListener("load", start, { once: true });
+}
+
 export function trackPageView(path: string, title?: string): void {
-  if (!initialized || !window.gtag) return;
+  if (!initialized) initGoogleAnalytics();
+  if (!window.gtag) return;
   window.gtag("event", "page_view", {
     page_path: path,
     page_title: title || document.title,
@@ -49,6 +66,7 @@ export function trackEvent(
   name: string,
   params?: Record<string, string | number | boolean | undefined>
 ): void {
-  if (!initialized || !window.gtag) return;
+  if (!initialized) initGoogleAnalytics();
+  if (!window.gtag) return;
   window.gtag("event", name, params);
 }

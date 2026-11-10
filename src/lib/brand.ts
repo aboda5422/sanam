@@ -16,6 +16,8 @@ export const BRAND = {
   descriptionEn:
     "At Sanam we believe every visit should be a special experience — fresh essentials at competitive prices with exceptional service.",
   siteUrl: "https://sanam.sa",
+  /** Customer storefront (SEO canonical / OG / sitemap) */
+  storeUrl: "https://store.sanam.sa",
   phoneDisplay: "0502291213",
   phoneTel: "0502291213",
   whatsapp: "966502291213",

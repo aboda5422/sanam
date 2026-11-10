@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logoFullLight from "@/assets/logo-full-light.png";
+import logoFullLight from "@/assets/logo-full-light.webp";
 
 type Props = {
   children: React.ReactNode;

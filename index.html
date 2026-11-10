@@ -2,36 +2,76 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>سنام سوبر ماركت | Sanam Supermarket</title>
     <meta name="description" content="سنام ... حيث الجودة تلتقي بالثقة! تشكيلة واسعة من المنتجات الطازجة والضرورية بأسعار تنافسية في مكة المكرمة والرياض.">
     <meta name="author" content="سنام سوبر ماركت" />
-    <link rel="icon" type="image/png" href="/favicon.png?v=3" />
-    <link rel="apple-touch-icon" href="/favicon.png?v=3" />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://store.sanam.sa/" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4" />
+    <link rel="icon" type="image/png" href="/favicon.png?v=4" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=4" />
 
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="سنام سوبر ماركت" />
+    <meta property="og:locale" content="ar_SA" />
+    <meta property="og:url" content="https://store.sanam.sa/" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Non-blocking fonts: print media swap + preload -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+      />
+    </noscript>
 
-  <meta property="og:image" content="https://sanam.xbarawa.com/sanam-logo.png">
-  <meta name="twitter:image" content="https://sanam.xbarawa.com/sanam-logo.png">
-  <meta name="twitter:card" content="summary_large_image">
-  
-  
-  
-  
-  <meta property="og:title" content="سنام سوبر ماركت | Sanam Supermarket">
-  <meta name="twitter:title" content="سنام سوبر ماركت | Sanam Supermarket">
-  <meta property="og:description" content="سنام ... حيث الجودة تلتقي بالثقة! منتجات طازجة وخدمة استثنائية في مكة والرياض.">
-  <meta name="twitter:description" content="سنام ... حيث الجودة تلتقي بالثقة! منتجات طازجة وخدمة استثنائية في مكة والرياض.">
-</head>
+    <meta property="og:image" content="https://store.sanam.sa/sanam-logo.webp">
+    <meta name="twitter:image" content="https://store.sanam.sa/sanam-logo.webp">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <meta property="og:title" content="سنام سوبر ماركت | Sanam Supermarket">
+    <meta name="twitter:title" content="سنام سوبر ماركت | Sanam Supermarket">
+    <meta property="og:description" content="سنام ... حيث الجودة تلتقي بالثقة! منتجات طازجة وخدمة استثنائية في مكة والرياض.">
+    <meta name="twitter:description" content="سنام ... حيث الجودة تلتقي بالثقة! منتجات طازجة وخدمة استثنائية في مكة والرياض.">
+
+    <style>
+      html, body { margin: 0; background: #fff; color: #1f2430; }
+      #boot-shell {
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 1.25rem;
+        font-family: "IBM Plex Sans Arabic", system-ui, sans-serif;
+      }
+      #boot-shell img { height: 40px; width: auto; }
+      #boot-shell p { margin: 0.75rem 0 0; font-size: 0.95rem; opacity: 0.55; }
+    </style>
+  </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="boot-shell" aria-hidden="true">
+        <img src="/sanam-mark.png" alt="سنام" width="120" height="40" fetchpriority="high" />
+        <p>جاري التحميل…</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

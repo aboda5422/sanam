@@ -9,7 +9,7 @@ import {
   type AdminNavGroup,
 } from "@/lib/admin-nav";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import logoFull from "@/assets/logo-full-light.png";
+import logoFull from "@/assets/logo-full-light.webp";
 import {
   Sidebar,
   SidebarContent,

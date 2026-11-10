@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ProductCard from "@/components/product/ProductCard";
+import SeoHead from "@/components/seo/SeoHead";
 import { useCategoryProductsInfinite } from "@/hooks/useProducts";
 import { useCategories, useCategorySections } from "@/hooks/useCategories";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,6 +13,13 @@ import { Button } from "@/components/ui/button";
 import { categories as staticCategories } from "@/data/store-data";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  breadcrumbJsonLd,
+  categoryTitle,
+  collectionPageJsonLd,
+  truncateMeta,
+} from "@/lib/seo";
 
 /** Sanam-only categories in Supabase but not always in the static Ninja list */
 const EXTRA_BY_SECTION: Record<string, string[]> = {
@@ -30,13 +39,33 @@ const CategoryPage = () => {
 
   const staticCat = staticCategories.find((c) => c.id === id);
 
-  const dbCategory = dbCategories?.find(
+  const branchCategory = dbCategories?.find(
     (c) =>
       c.slug === id ||
       c.id === id ||
       c.name === staticCat?.name ||
       c.slug === staticCat?.id
   );
+
+  // SEO / deep-link: resolve category by slug before a branch is chosen.
+  const { data: publicCategory } = useQuery({
+    queryKey: ["category-by-slug-seo", id],
+    enabled: !!id && !branchCategory && !staticCat,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, name, name_en, image, slug, section, is_active, sort_order, branch_id")
+        .eq("slug", id!)
+        .eq("is_active", true)
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const dbCategory = branchCategory || (publicCategory as typeof branchCategory) || undefined;
 
   const {
     data: productPages,
@@ -146,14 +175,38 @@ const CategoryPage = () => {
     if (targetSlug) navigate(`/category/${targetSlug}`);
   };
 
+  const categoryPath = `/category/${id || ""}`;
+  const categoryDesc = categoryName
+    ? truncateMeta(`تسوّق ${categoryName} من سنام سوبر ماركت — منتجات طازجة وتوصيل في مكة والرياض.`)
+    : undefined;
+  const categorySeoLd = categoryName
+    ? [
+        collectionPageJsonLd({
+          name: categoryName,
+          description: categoryDesc,
+          path: categoryPath,
+        }),
+        breadcrumbJsonLd([
+          { name: "الرئيسية", path: "/" },
+          { name: categoryName, path: categoryPath },
+        ]),
+      ]
+    : undefined;
+
   if (!staticCat && !dbCategory && dbCategories) {
     return (
       <div className="min-h-screen flex flex-col">
+        <SeoHead
+          title="القسم غير موجود | سنام سوبر ماركت"
+          description="هذا القسم غير متوفر حالياً."
+          path={categoryPath}
+          noIndex
+        />
         <Header />
         <main className="flex-1 container py-12 text-center">
-          <h2 className="font-heading text-xl font-bold mb-2">
+          <h1 className="font-heading text-xl font-bold mb-2">
             {t("القسم غير موجود", "Category not found")}
-          </h2>
+          </h1>
           <p className="text-muted-foreground text-sm">
             {t("الرجاء اختيار قسم آخر", "Please choose another category")}
           </p>
@@ -165,11 +218,18 @@ const CategoryPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SeoHead
+        title={categoryName ? categoryTitle(categoryName) : undefined}
+        description={categoryDesc}
+        path={categoryPath}
+        image={dbCategory?.image || staticCat?.image}
+        jsonLd={categorySeoLd}
+      />
       <Header />
       <main className="flex-1">
         <div className="container pt-6 pb-3">
           <div className="flex items-center justify-between gap-3 mb-1">
-            <h1 className="font-heading font-bold text-2xl text-right flex-1">{categoryName}</h1>
+            <h1 className="font-heading font-bold text-2xl text-start flex-1">{categoryName}</h1>
             <Link
               to="/categories"
               className="shrink-0 text-xs text-muted-foreground hover:text-primary whitespace-nowrap"

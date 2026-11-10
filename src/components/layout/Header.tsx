@@ -13,8 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { categorySections, categories } from "@/data/store-data";
-import logoMark from "@/assets/logo-mark.png";
-import logoFullLight from "@/assets/logo-full-light.png";
+import logoMark from "@/assets/logo-mark.webp";
+import logoFullLight from "@/assets/logo-full-light.webp";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BRAND } from "@/lib/brand";
 import { useBranch } from "@/contexts/BranchContext";
@@ -24,6 +24,7 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [displayName, setDisplayName] = useState("");
+  const [guestNumber, setGuestNumber] = useState<number | null>(null);
   const [defaultAddress, setDefaultAddress] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,6 +35,10 @@ const Header = () => {
   const navigate = useNavigate();
   const { lang, toggleLang, t } = useLanguage();
   const { selectedBranch, openPicker } = useBranch();
+  const accountLabel =
+    guestNumber != null
+      ? t(`ضيف #${guestNumber}`, `Guest #${guestNumber}`)
+      : displayName;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -46,6 +51,7 @@ const Header = () => {
       setUser(sessionUser);
       if (!sessionUser) {
         setDisplayName("");
+        setGuestNumber(null);
         setDefaultAddress(null);
         return;
       }
@@ -56,8 +62,10 @@ const Header = () => {
         .eq("user_id", sessionUser.id)
         .maybeSingle();
       if (profile?.is_guest && profile.guest_number) {
-        setDisplayName(`ضيف #${profile.guest_number}`);
+        setGuestNumber(Number(profile.guest_number));
+        setDisplayName("");
       } else {
+        setGuestNumber(null);
         setDisplayName(profile?.full_name || sessionUser.user_metadata?.full_name || "");
       }
     };
@@ -164,6 +172,9 @@ const Header = () => {
                   <img
                     src={logoFullLight}
                     alt={BRAND.fullNameAr}
+                    width={220}
+                    height={44}
+                    decoding="async"
                     className="h-11 w-auto max-w-full object-contain mx-auto"
                   />
                 </SheetTitle>
@@ -176,7 +187,7 @@ const Header = () => {
                       className="flex items-center gap-2"
                     >
                       <User className="h-5 w-5 text-primary" />
-                      <span className="font-medium text-sm">{displayName || t("حسابي", "My Account")}</span>
+                      <span className="font-medium text-sm">{accountLabel || t("حسابي", "My Account")}</span>
                     </Link>
                     <button
                       onClick={handleLogout}
@@ -275,11 +286,19 @@ const Header = () => {
           <img
             src={logoMark}
             alt={BRAND.fullNameAr}
+            width={44}
+            height={44}
+            decoding="async"
+            fetchPriority="high"
             className="h-11 w-auto md:hidden"
           />
           <img
             src={logoFullLight}
             alt={BRAND.fullNameAr}
+            width={280}
+            height={48}
+            decoding="async"
+            fetchPriority="high"
             className="hidden md:block h-12 w-auto max-w-[280px] object-contain"
           />
         </Link>
@@ -411,7 +430,7 @@ const Header = () => {
                   >
                     <User className="h-5 w-5" />
                     <span className="hidden sm:inline max-w-[120px] truncate">
-                      {displayName || t("حسابي", "Account")}
+                      {accountLabel || t("حسابي", "Account")}
                     </span>
                   </button>
                 </DropdownMenuTrigger>

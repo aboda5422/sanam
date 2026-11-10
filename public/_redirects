@@ -1,4 +1,9 @@
 # Apple Pay domain verification must not be rewritten to the SPA
 /.well-known/apple-developer-merchantid-domain-association  /.well-known/apple-developer-merchantid-domain-association  200
 /.well-known/*    /.well-known/:splat    200
+
+# Real XML sitemap (static file in publish dir) — keep ahead of SPA fallback
+/sitemap.xml    /sitemap.xml    200
+/robots.txt     /robots.txt     200
+
 /*    /index.html   200

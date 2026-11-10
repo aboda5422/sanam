@@ -1,86 +1,103 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { BranchProvider } from "@/contexts/BranchContext";
-import { AdminAuthProvider } from "@/hooks/useAdminAuth";
-import { AdminAuthedShell } from "@/components/admin/AdminLayout";
 import BranchPickerDialog from "@/components/branch/BranchPickerDialog";
 import Index from "./pages/Index";
 import CategoryPage from "./pages/CategoryPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
-import CheckoutPage from "./pages/CheckoutPage";
-import AuthPage from "./pages/AuthPage";
-import ProfilePage from "./pages/ProfilePage";
-import CustomerOrdersPage from "./pages/CustomerOrdersPage";
-import OrderTrackingPage from "./pages/OrderTrackingPage";
 import NotFound from "./pages/NotFound";
-import CustomerComplaintsPage from "./pages/CustomerComplaintsPage";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
-import TermsPage from "./pages/TermsPage";
-import PaymentPage from "./pages/PaymentPage";
-import PaymentResultPage from "./pages/PaymentResultPage";
-import UnsubscribePage from "./pages/UnsubscribePage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
 import RouteTracker from "./components/RouteTracker";
 import ScrollToTop from "./components/ScrollToTop";
 import MobileBottomNav from "./components/layout/MobileBottomNav";
 import MobileSwipeNavigation from "./components/layout/MobileSwipeNavigation";
 import { CustomerOrderAlertsListener } from "./hooks/useCustomerOrderAlerts";
+import { persistQueryClient, restoreQueryClient } from "@/lib/query-persist";
 
-// Admin pages
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminProductsPage from "./pages/admin/AdminProductsPage";
-import AdminCategoriesPage from "./pages/admin/AdminCategoriesPage";
-import AdminComplaintsPage from "./pages/admin/AdminComplaintsPage";
-import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
-import AdminDriversPage from "./pages/admin/AdminDriversPage";
-import AdminBranchesPage from "./pages/admin/AdminBranchesPage";
-import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
-import AdminDeliverySettingsPage from "./pages/admin/AdminDeliverySettingsPage";
-import AdminSalesPage from "./pages/admin/AdminSalesPage";
-import AdminLoginPage from "./pages/admin/AdminLoginPage";
-import AdminCustomersPage from "./pages/admin/AdminCustomersPage";
-import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
-import AdminPaymentsPage from "./pages/admin/AdminPaymentsPage";
-import AdminHomePage from "./pages/admin/AdminHomePage";
-import AdminEmailLogsPage from "./pages/admin/AdminEmailLogsPage";
-import AdminPosPage from "./pages/admin/AdminPosPage";
-import AdminCollectionsHubPage from "./pages/admin/AdminCollectionsHubPage";
-import AdminRatingsPage from "./pages/admin/AdminRatingsPage";
-// Driver pages
-import DriverLoginPage from "./pages/driver/DriverLoginPage";
-import DriverDashboard from "./pages/driver/DriverDashboard";
-import DriverOrdersPage from "./pages/driver/DriverOrdersPage";
-import DriverOrderDetailPage from "./pages/driver/DriverOrderDetailPage";
-import DriverHistoryPage from "./pages/driver/DriverHistoryPage";
-import DriverEarningsPage from "./pages/driver/DriverEarningsPage";
-import DriverProfilePage from "./pages/driver/DriverProfilePage";
-// Cashier / POS
-import CashierLoginPage from "./pages/cashier/CashierLoginPage";
-import CashierLayout from "./pages/cashier/CashierLayout";
-import CashierSellPage from "./pages/cashier/CashierSellPage";
-import CashierShiftPage from "./pages/cashier/CashierShiftPage";
-import PreparerLoginPage from "./pages/preparer/PreparerLoginPage";
-import PreparerLayout from "./pages/preparer/PreparerLayout";
-import PreparerOrdersPage from "./pages/preparer/PreparerOrdersPage";
-import PreparerOrderDetailPage from "./pages/preparer/PreparerOrderDetailPage";
+// Secondary customer routes — split so home/catalog JS stays lean.
+const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
+const AuthPage = lazy(() => import("./pages/AuthPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const CustomerOrdersPage = lazy(() => import("./pages/CustomerOrdersPage"));
+const OrderTrackingPage = lazy(() => import("./pages/OrderTrackingPage"));
+const CustomerComplaintsPage = lazy(() => import("./pages/CustomerComplaintsPage"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
+const PaymentPage = lazy(() => import("./pages/PaymentPage"));
+const PaymentResultPage = lazy(() => import("./pages/PaymentResultPage"));
+const UnsubscribePage = lazy(() => import("./pages/UnsubscribePage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 
-const queryClient = new QueryClient();
+// Staff panels — code-split so storefront visitors do not download them.
+const AdminAuthedLayout = lazy(() => import("./routes/AdminAuthedLayout"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminProductsPage = lazy(() => import("./pages/admin/AdminProductsPage"));
+const AdminCategoriesPage = lazy(() => import("./pages/admin/AdminCategoriesPage"));
+const AdminComplaintsPage = lazy(() => import("./pages/admin/AdminComplaintsPage"));
+const AdminOrdersPage = lazy(() => import("./pages/admin/AdminOrdersPage"));
+const AdminDriversPage = lazy(() => import("./pages/admin/AdminDriversPage"));
+const AdminBranchesPage = lazy(() => import("./pages/admin/AdminBranchesPage"));
+const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage"));
+const AdminDeliverySettingsPage = lazy(() => import("./pages/admin/AdminDeliverySettingsPage"));
+const AdminSalesPage = lazy(() => import("./pages/admin/AdminSalesPage"));
+const AdminLoginPage = lazy(() => import("./pages/admin/AdminLoginPage"));
+const AdminCustomersPage = lazy(() => import("./pages/admin/AdminCustomersPage"));
+const AdminAnnouncementsPage = lazy(() => import("./pages/admin/AdminAnnouncementsPage"));
+const AdminPaymentsPage = lazy(() => import("./pages/admin/AdminPaymentsPage"));
+const AdminHomePage = lazy(() => import("./pages/admin/AdminHomePage"));
+const AdminEmailLogsPage = lazy(() => import("./pages/admin/AdminEmailLogsPage"));
+const AdminPosPage = lazy(() => import("./pages/admin/AdminPosPage"));
+const AdminCollectionsHubPage = lazy(() => import("./pages/admin/AdminCollectionsHubPage"));
+const AdminRatingsPage = lazy(() => import("./pages/admin/AdminRatingsPage"));
 
-const AdminAuthedLayout = () => (
-  <AdminAuthProvider>
-    <AdminAuthedShell>
-      <Outlet />
-    </AdminAuthedShell>
-  </AdminAuthProvider>
-);
+const DriverLoginPage = lazy(() => import("./pages/driver/DriverLoginPage"));
+const DriverDashboard = lazy(() => import("./pages/driver/DriverDashboard"));
+const DriverOrdersPage = lazy(() => import("./pages/driver/DriverOrdersPage"));
+const DriverOrderDetailPage = lazy(() => import("./pages/driver/DriverOrderDetailPage"));
+const DriverHistoryPage = lazy(() => import("./pages/driver/DriverHistoryPage"));
+const DriverEarningsPage = lazy(() => import("./pages/driver/DriverEarningsPage"));
+const DriverProfilePage = lazy(() => import("./pages/driver/DriverProfilePage"));
+
+const CashierLoginPage = lazy(() => import("./pages/cashier/CashierLoginPage"));
+const CashierLayout = lazy(() => import("./pages/cashier/CashierLayout"));
+const CashierSellPage = lazy(() => import("./pages/cashier/CashierSellPage"));
+const CashierShiftPage = lazy(() => import("./pages/cashier/CashierShiftPage"));
+
+const PreparerLoginPage = lazy(() => import("./pages/preparer/PreparerLoginPage"));
+const PreparerLayout = lazy(() => import("./pages/preparer/PreparerLayout"));
+const PreparerOrdersPage = lazy(() => import("./pages/preparer/PreparerOrdersPage"));
+const PreparerOrderDetailPage = lazy(() => import("./pages/preparer/PreparerOrderDetailPage"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      gcTime: 30 * 24 * 60 * 60 * 1000, // keep client cache up to 30 days
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+restoreQueryClient(queryClient);
+persistQueryClient(queryClient);
+
+function RouteFallback() {
+  return (
+    <div className="min-h-[40vh] flex items-center justify-center" role="status" aria-label="جاري التحميل">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -95,13 +112,16 @@ const App = () => (
           <RouteTracker />
           <CustomerOrderAlertsListener />
           <BranchPickerDialog />
+          <Suspense fallback={<RouteFallback />}>
           <Routes>
-            {/* Customer Routes */}
+            {/* Critical storefront paths — eager for first paint */}
             <Route path="/" element={<Index />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/category/:id" element={<CategoryPage />} />
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/cart" element={<CartPage />} />
+
+            {/* Secondary customer routes — lazy */}
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -166,6 +186,7 @@ const App = () => (
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
           <MobileBottomNav />
           <MobileSwipeNavigation />
           </CartProvider>

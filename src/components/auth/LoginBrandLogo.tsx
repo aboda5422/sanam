@@ -1,5 +1,5 @@
-import logoFullLight from "@/assets/logo-full-light.png";
-import logoFullOnDark from "@/assets/logo-full.png";
+import logoFullLight from "@/assets/logo-full-light.webp";
+import logoFullOnDark from "@/assets/logo-full.webp";
 import { BRAND } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 

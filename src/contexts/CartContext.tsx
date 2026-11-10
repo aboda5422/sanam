@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
-import { Product } from "@/data/store-data";
+import type { Product } from "@/data/store-data";
 import { supabase } from "@/integrations/supabase/client";
 import { getSessionId } from "@/hooks/usePageTracking";
 import { useBranch } from "@/contexts/BranchContext";

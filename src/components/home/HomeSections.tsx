@@ -2,18 +2,23 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCategories, useCategorySections } from "@/hooks/useCategories";
+import { categories as staticCategories } from "@/data/store-data";
+import { SmartImage } from "@/components/ui/SmartImage";
 
 const CategoryTile = ({
   to,
   name,
   image,
-  forceCaptionOverlay,
+  captionBelow,
+  priority = false,
 }: {
   to: string;
   name: string;
   image: string;
-  /** When true (English UI), cover baked-in Arabic title on the tile image */
-  forceCaptionOverlay?: boolean;
+  /** English UI: label under the tile so it does not clash with Arabic baked into the art */
+  captionBelow?: boolean;
+  /** First viewport tiles should load eagerly for LCP */
+  priority?: boolean;
 }) => {
   const isPlaceholder =
     !image || image === "/placeholder.png" || image.endsWith("placeholder.png");
@@ -21,30 +26,33 @@ const CategoryTile = ({
   return (
     <Link to={to} className="group block">
       <div className="aspect-square rounded-2xl overflow-hidden bg-[#f8f8f9] border border-black/[0.03] hover:shadow-sm transition-all duration-300 relative">
-        {forceCaptionOverlay ? (
-          <p className="absolute top-0 inset-x-0 z-10 px-1.5 pt-2 pb-1.5 text-center text-[11px] sm:text-xs font-bold text-foreground leading-tight line-clamp-2 bg-gradient-to-b from-[#f8f8f9] via-[#f8f8f9]/95 to-transparent pointer-events-none">
-            {name}
-          </p>
-        ) : null}
-        <img
+        <SmartImage
           src={image}
+          preset="thumb"
           alt={name}
           width={160}
           height={160}
           className={`w-full h-full transition-transform duration-500 group-hover:scale-[1.03] ${
-            isPlaceholder ? "object-contain p-6" : "object-cover"
+            isPlaceholder
+              ? "object-contain p-6"
+              : captionBelow
+                ? "object-cover object-bottom"
+                : "object-cover"
           }`}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
           decoding="async"
-          fetchPriority="low"
+          fetchPriority={priority ? "high" : "low"}
           onError={(e) => {
-            e.currentTarget.onerror = null;
-            e.currentTarget.src = "/placeholder.png";
             e.currentTarget.classList.add("object-contain", "p-6");
-            e.currentTarget.classList.remove("object-cover");
+            e.currentTarget.classList.remove("object-cover", "object-bottom");
           }}
         />
       </div>
+      {captionBelow ? (
+        <p className="mt-1.5 px-0.5 text-center text-[11px] sm:text-xs font-semibold text-foreground leading-tight line-clamp-2">
+          {name}
+        </p>
+      ) : null}
     </Link>
   );
 };
@@ -53,16 +61,38 @@ const HomeSections = () => {
   const { lang } = useLanguage();
   const { data: dbCategories } = useCategories();
   const { data: categorySections = [] } = useCategorySections();
-  const forceCaptionOverlay = lang === "en";
+  const captionBelow = lang === "en";
   const [shownSections, setShownSections] = useState(2);
   const moreRef = useRef<HTMLDivElement>(null);
+
+  // Before branch selection, fall back to static catalog so crawlers still see internal links.
+  const displayCategories = useMemo(() => {
+    if (dbCategories?.length) {
+      return dbCategories.map((c) => ({
+        id: c.id,
+        slug: c.slug,
+        name: c.name,
+        nameEn: c.name_en || c.name,
+        image: c.image || "/placeholder.png",
+        section: c.section || "",
+      }));
+    }
+    return staticCategories.map((c) => ({
+      id: c.id,
+      slug: c.id,
+      name: c.name,
+      nameEn: c.nameEn,
+      image: c.image || "/placeholder.png",
+      section: c.section,
+    }));
+  }, [dbCategories]);
 
   const populated = useMemo(
     () =>
       categorySections.filter((section) =>
-        (dbCategories || []).some((c) => c.section === section.id),
+        displayCategories.some((c) => c.section === section.id),
       ),
-    [categorySections, dbCategories],
+    [categorySections, displayCategories],
   );
 
   useEffect(() => {
@@ -82,22 +112,23 @@ const HomeSections = () => {
 
   return (
     <div className="space-y-10">
-      {populated.slice(0, shownSections).map((section) => {
-        const sectionCats = (dbCategories || []).filter((c) => c.section === section.id);
+      {populated.slice(0, shownSections).map((section, sectionIndex) => {
+        const sectionCats = displayCategories.filter((c) => c.section === section.id);
 
         return (
           <section key={section.id}>
-            <h2 className="font-heading font-bold text-2xl md:text-3xl text-right mb-5">
+            <h2 className="font-heading font-bold text-2xl md:text-3xl text-start mb-5">
               {lang === "ar" ? section.title : section.titleEn}
             </h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-              {sectionCats.map((cat) => (
+              {sectionCats.map((cat, catIndex) => (
                 <CategoryTile
                   key={cat.id}
                   to={`/category/${cat.slug}`}
-                  name={lang === "ar" ? cat.name : cat.name_en || cat.name}
+                  name={lang === "ar" ? cat.name : cat.nameEn}
                   image={cat.image || section.image || "/placeholder.png"}
-                  forceCaptionOverlay={forceCaptionOverlay}
+                  captionBelow={captionBelow}
+                  priority={sectionIndex === 0 && catIndex < 6}
                 />
               ))}
             </div>
