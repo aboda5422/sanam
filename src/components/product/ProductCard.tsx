@@ -33,63 +33,69 @@ const ProductCard = ({ product, priority = false }: ProductCardProps) => {
       className="bg-card rounded-xl overflow-hidden group relative"
       style={{ contentVisibility: "auto", containIntrinsicSize: "0 280px" }}
     >
-      <Link to={`/product/${product.id}`} className="block">
-        <div
-          className={`relative aspect-square overflow-hidden bg-white ${
-            isPlaceholder ? "p-8 sm:p-10" : "p-3"
-          }`}
-        >
-          <SmartImage
-            src={product.image || "/placeholder.webp"}
-            preset="card"
-            alt={displayName}
-            width={isPlaceholder ? 160 : 200}
-            height={isPlaceholder ? 160 : 200}
-            className={`w-full h-full object-contain ${
-              isPlaceholder ? "" : "group-hover:scale-105 transition-transform duration-300"
+      <div className="relative">
+        <Link to={`/product/${product.id}`} className="block">
+          <div
+            className={`relative aspect-square overflow-hidden bg-white ${
+              isPlaceholder ? "p-8 sm:p-10" : "p-3"
             }`}
-            loading={priority ? "eager" : "lazy"}
-            decoding="async"
-            fetchPriority={priority ? "high" : "low"}
-          />
-          {discount > 0 && (
-            <span className="absolute top-2 end-2 bg-destructive text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
-              {discount}%-
-            </span>
-          )}
-          {product.is_featured && (
-            <span className="absolute top-2 start-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded max-w-[7rem] truncate">
-              {product.extra_label || t("الأكثر مبيعاً", "Bestseller")}
-            </span>
+          >
+            <SmartImage
+              src={product.image || "/placeholder.webp"}
+              preset="card"
+              alt={displayName}
+              width={isPlaceholder ? 160 : 200}
+              height={isPlaceholder ? 160 : 200}
+              className={`w-full h-full object-contain ${
+                isPlaceholder ? "" : "group-hover:scale-105 transition-transform duration-300"
+              }`}
+              loading={priority ? "eager" : "lazy"}
+              decoding="async"
+              fetchPriority={priority ? "high" : "low"}
+            />
+            {discount > 0 && (
+              <span className="absolute top-2 end-2 bg-destructive text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                {discount}%-
+              </span>
+            )}
+            {product.is_featured && (
+              <span className="absolute top-2 start-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded max-w-[7rem] truncate">
+                {product.extra_label || t("الأكثر مبيعاً", "Bestseller")}
+              </span>
+            )}
+          </div>
+        </Link>
+
+        {/* Anchored to image corner so it never covers the price */}
+        <div className="absolute bottom-2 start-2 z-10">
+          {cartItem ? (
+            <div className="flex items-center gap-0.5 bg-primary rounded-full shadow-md">
+              <button
+                type="button"
+                className="w-7 h-7 flex items-center justify-center text-primary-foreground rounded-full hover:bg-primary-dark transition-colors"
+                onClick={() => updateQuantity(product.id, cartItem.quantity - 1)}
+              >
+                <Minus className="h-3 w-3" />
+              </button>
+              <span className="text-primary-foreground text-xs font-bold w-4 text-center">{cartItem.quantity}</span>
+              <button
+                type="button"
+                className="w-7 h-7 flex items-center justify-center text-primary-foreground rounded-full hover:bg-primary-dark transition-colors"
+                onClick={() => updateQuantity(product.id, cartItem.quantity + 1)}
+              >
+                <Plus className="h-3 w-3" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="w-7 h-7 flex items-center justify-center bg-white border border-border text-foreground rounded-full shadow-sm hover:bg-muted transition-colors"
+              onClick={() => addItem(legacyProduct)}
+            >
+              <Plus className="h-3.5 w-3.5" />
+            </button>
           )}
         </div>
-      </Link>
-
-      <div className="absolute bottom-[68px] start-2 z-10">
-        {cartItem ? (
-          <div className="flex items-center gap-0.5 bg-primary rounded-full shadow-md">
-            <button
-              className="w-7 h-7 flex items-center justify-center text-primary-foreground rounded-full hover:bg-primary-dark transition-colors"
-              onClick={(e) => { e.preventDefault(); updateQuantity(product.id, cartItem.quantity - 1); }}
-            >
-              <Minus className="h-3 w-3" />
-            </button>
-            <span className="text-primary-foreground text-xs font-bold w-4 text-center">{cartItem.quantity}</span>
-            <button
-              className="w-7 h-7 flex items-center justify-center text-primary-foreground rounded-full hover:bg-primary-dark transition-colors"
-              onClick={(e) => { e.preventDefault(); updateQuantity(product.id, cartItem.quantity + 1); }}
-            >
-              <Plus className="h-3 w-3" />
-            </button>
-          </div>
-        ) : (
-          <button
-            className="w-7 h-7 flex items-center justify-center bg-white border border-border text-foreground rounded-full shadow-sm hover:bg-muted transition-colors"
-            onClick={(e) => { e.preventDefault(); addItem(legacyProduct); }}
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </button>
-        )}
       </div>
 
       <div className="px-2 pb-3 pt-1">
