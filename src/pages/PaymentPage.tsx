@@ -128,7 +128,7 @@ const PaymentPage = () => {
         </p>
       )}
       <p className="text-xs text-muted-foreground mb-6">
-        Apple Pay: افتحي الرابط من تطبيق <strong>Safari</strong> (مو Chrome). إذا فتحت ورقة الدفع ثم نزلت وحدها خلال ثوانٍ فالمتصفح أو تسجيل النطاق عند Moyasar لم يُكمِل التحقق — أعيدي المحاولة من Safari، أو تأكدي أن النطاق store.sanam.sa حالته Registered.
+        بانتظار التحقق من ميسر
       </p>
       {loading && (
         <div className="flex items-center justify-center py-16">

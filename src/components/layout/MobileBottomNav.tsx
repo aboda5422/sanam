@@ -106,7 +106,7 @@ const MobileBottomNav = () => {
               className="-mt-4 relative group touch-manipulation"
             >
               <span
-                className="absolute inset-[-4px] rounded-full bg-primary/30 blur-md animate-pulse transition-all duration-300 group-hover:inset-[-8px] group-hover:bg-primary/50 group-hover:blur-lg group-active:bg-primary/45"
+                className="absolute inset-[-4px] rounded-full bg-primary/0 blur-md transition-all duration-300 group-hover:inset-[-8px] group-hover:bg-primary/45 group-hover:blur-lg group-active:bg-primary/35"
                 aria-hidden
               />
               <span className="relative flex items-center justify-center w-[38px] h-[38px] rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-background transition-all duration-300 ease-out group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-primary/45 group-active:scale-95">
@@ -121,7 +121,7 @@ const MobileBottomNav = () => {
 
       <QuickOrderSheet open={quickOrderOpen} onOpenChange={setQuickOrderOpen} />
 
-      {/* Desktop: floating Smart Search — bottom-left, very soft pulse */}
+      {/* Desktop: floating Smart Search — bottom-left */}
       <button
         type="button"
         onClick={() => setQuickOrderOpen(true)}
@@ -133,7 +133,7 @@ const MobileBottomNav = () => {
         )}
       >
         <span
-          className="absolute inset-[-6px] rounded-full bg-primary/25 blur-md animate-soft-glow transition-all duration-300 group-hover:inset-[-10px] group-hover:bg-primary/45"
+          className="absolute inset-[-6px] rounded-full bg-primary/0 blur-md transition-all duration-300 group-hover:inset-[-10px] group-hover:bg-primary/40"
           aria-hidden
         />
         <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/75 text-primary-foreground shadow-lg shadow-primary/25 ring-2 ring-background transition-all duration-300 ease-out group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-primary/40 group-active:scale-95">
