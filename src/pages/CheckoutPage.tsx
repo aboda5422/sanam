@@ -42,7 +42,6 @@ import {
   immediateDeliveryClosedMessage,
   formatAddressLabel,
   notifyAddressesChanged,
-  NATIONAL_ADDRESS_LOOKUP_ENABLED,
   type CustomerAddressPayload,
 } from "@/lib/branch";
 import { applyCustomerDiscount } from "@/lib/customer-discount";
@@ -59,6 +58,16 @@ const deliveryTimes = [
   "6:00 - 8:00 مساءً",
   "8:00 - 10:00 مساءً",
 ];
+
+const SAUDI_MOBILE_RE = /^05\d{8}$/;
+
+function normalizeSaudiMobile(input: string): string {
+  return String(input || "").replace(/\D/g, "").slice(0, 10);
+}
+
+function isValidSaudiMobile(input: string): boolean {
+  return SAUDI_MOBILE_RE.test(normalizeSaudiMobile(input));
+}
 
 const CheckoutPage = () => {
   const { items, totalPrice, clearCart, markCheckoutReached, markConverted } = useCart();
@@ -546,7 +555,7 @@ const CheckoutPage = () => {
       .insert({
         user_id: user.id,
         customer_name: name,
-        customer_phone: phone,
+        customer_phone: normalizeSaudiMobile(phone),
         delivery_address: selectedAddress?.address || (hasNational ? `العنوان الوطني: ${national}` : ""),
         delivery_lat: hasCoords ? selectedAddress!.lat : null,
         delivery_lng: hasCoords ? selectedAddress!.lng : null,
@@ -640,10 +649,23 @@ const CheckoutPage = () => {
     const hasNational = isValidNationalAddress(national);
     const hasCoords = selectedAddress ? addressHasCoords(selectedAddress) : false;
 
-    if (!phone || !selectedTime) {
-      toast({ title: "يرجى تعبئة الجوال ووقت التوصيل", variant: "destructive" });
+    if (!selectedTime) {
+      toast({ title: "يرجى اختيار وقت التوصيل", variant: "destructive" });
       return;
     }
+
+    const normalizedPhone = normalizeSaudiMobile(phone);
+    if (!isValidSaudiMobile(normalizedPhone)) {
+      setPhone(normalizedPhone);
+      setEditingPhone(true);
+      toast({
+        title: "رقم الجوال غير صحيح",
+        description: "يجب أن يكون 10 أرقام ويبدأ بـ 05",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (normalizedPhone !== phone) setPhone(normalizedPhone);
 
     if (!isGuest && !name) {
       toast({ title: "يرجى تعبئة الاسم", variant: "destructive" });
@@ -684,24 +706,36 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (isGuest && user && phone.trim()) {
-      await supabase.from("profiles").update({ phone: phone.trim() }).eq("user_id", user.id);
+    if (isGuest && user && isValidSaudiMobile(phone)) {
+      await supabase.from("profiles").update({ phone: normalizeSaudiMobile(phone) }).eq("user_id", user.id);
     }
 
     await placeOrder();
   };
 
   const savePhoneAsDefault = async (): Promise<boolean> => {
-    if (!user || !phone.trim()) return false;
+    if (!user) return false;
+    const normalizedPhone = normalizeSaudiMobile(phone);
+    if (!isValidSaudiMobile(normalizedPhone)) {
+      setPhone(normalizedPhone);
+      setEditingPhone(true);
+      toast({
+        title: "رقم الجوال غير صحيح",
+        description: "يجب أن يكون 10 أرقام ويبدأ بـ 05",
+        variant: "destructive",
+      });
+      return false;
+    }
     const { error } = await supabase
       .from("profiles")
-      .update({ phone: phone.trim() })
+      .update({ phone: normalizedPhone })
       .eq("user_id", user.id);
     if (error) {
       toast({ title: "تعذر حفظ الرقم", description: error.message, variant: "destructive" });
       return false;
     }
-    setSavedPhone(phone.trim());
+    setPhone(normalizedPhone);
+    setSavedPhone(normalizedPhone);
     setEditingPhone(false);
     toast({ title: "تم اعتماد الرقم كافتراضي" });
     return true;
@@ -795,15 +829,23 @@ const CheckoutPage = () => {
                     <div className="space-y-1.5">
                       <Input
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => setPhone(normalizeSaudiMobile(e.target.value))}
                         placeholder="05XXXXXXXX"
+                        inputMode="numeric"
+                        autoComplete="tel-national"
+                        maxLength={10}
+                        required
+                        aria-invalid={phone.length > 0 && !isValidSaudiMobile(phone)}
                         dir="ltr"
                         className="text-right"
                       />
+                      <p className={`text-xs ${phone.length > 0 && !isValidSaudiMobile(phone) ? "text-destructive" : "text-muted-foreground"}`}>
+                        إلزامي: 10 أرقام ويبدأ بـ 05
+                      </p>
                       {savedPhone && (
                         <button
                           type="button"
-                          onClick={() => { setPhone(savedPhone); setEditingPhone(false); }}
+                          onClick={() => { setPhone(normalizeSaudiMobile(savedPhone)); setEditingPhone(false); }}
                           className="text-xs text-primary hover:underline"
                         >
                           ↩ العودة للرقم المسجل ({savedPhone})
@@ -815,8 +857,8 @@ const CheckoutPage = () => {
               </div>
             </div>
 
-            {/* Branch + national address */}
-            <div className="bg-card rounded-xl border p-6 space-y-4">
+            {/* Branch */}
+            <div className="bg-card rounded-xl border p-6">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm text-muted-foreground">الفرع</p>
@@ -827,23 +869,6 @@ const CheckoutPage = () => {
                   تغيير الفرع
                 </Button>
               </div>
-              {NATIONAL_ADDRESS_LOOKUP_ENABLED && (
-              <div>
-                <Label htmlFor="national-address">العنوان الوطني المختصر</Label>
-                <Input
-                  id="national-address"
-                  value={nationalAddress}
-                  onChange={(e) => setNationalAddress(e.target.value.toUpperCase())}
-                  placeholder="ANCAW32154"
-                  dir="ltr"
-                  className="mt-1.5 font-mono tracking-wider"
-                  maxLength={12}
-                />
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  اختياري إذا حددت الموقع على الخريطة، ومطلوب إذا لم تحدد الخريطة. مثال: ANCAW32154
-                </p>
-              </div>
-              )}
             </div>
 
             {/* Address selection */}

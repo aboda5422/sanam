@@ -48,6 +48,24 @@ serve(async (req) => {
     }
     console.log("Moyasar webhook:", body.type || body.id);
 
+    // Moyasar dashboard "Verify Webhook" sends this event with a 6-digit code.
+    const eventType = typeof body.type === "string" ? body.type : "";
+    const verificationPayload =
+      body.data && typeof body.data === "object"
+        ? (body.data as Record<string, unknown>)
+        : body;
+    const verificationCode = verificationPayload.verification_code;
+    if (
+      eventType === "webhook_verification" ||
+      (typeof verificationCode === "string" && verificationCode.length > 0)
+    ) {
+      console.log("MOYASAR_WEBHOOK_VERIFICATION_CODE:", verificationCode);
+      return new Response(
+        JSON.stringify({ success: true, verification_received: true }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const paymentData = body.data || body;
     const moyasarId = paymentData.id;
     if (!moyasarId) {

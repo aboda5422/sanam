@@ -1,1 +1,4 @@
+# Apple Pay domain verification must not be rewritten to the SPA
+/.well-known/apple-developer-merchantid-domain-association  /.well-known/apple-developer-merchantid-domain-association  200
+/.well-known/*    /.well-known/:splat    200
 /*    /index.html   200
