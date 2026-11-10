@@ -9,14 +9,16 @@ Deno.serve(async (req) => {
   }
 
   const apiKey = Deno.env.get("FIREBASE_API_KEY") || Deno.env.get("VITE_FIREBASE_API_KEY");
+  // Soft-disable: missing secret must not 500 the storefront; client treats null as "skip Firebase".
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: "Firebase API key not configured" }), {
-      status: 500,
+    return new Response(JSON.stringify({ configured: false }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
   const config = {
+    configured: true,
     apiKey,
     authDomain: Deno.env.get("FIREBASE_AUTH_DOMAIN") || "sanamapp-4cfc0.firebaseapp.com",
     projectId: Deno.env.get("FIREBASE_PROJECT_ID") || "sanamapp-4cfc0",
