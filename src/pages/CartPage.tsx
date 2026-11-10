@@ -1,21 +1,24 @@
 import { Link } from "react-router-dom";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Package } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useBranch } from "@/contexts/BranchContext";
 import { splitInclusiveVat } from "@/lib/vat";
+import { useCustomerOrderAlerts } from "@/hooks/useCustomerOrderAlerts";
 
 const CartPage = () => {
   const { items, updateQuantity, removeItem, clearCart, totalPrice } = useCart();
   const { selectedBranch } = useBranch();
+  const { hasActiveOrder, activeOrders, primaryAlertOrderId } = useCustomerOrderAlerts();
   const freeFrom = selectedBranch?.free_delivery_threshold ?? 100;
   const baseFee = selectedBranch?.delivery_fee ?? 10;
   const delivery = totalPrice >= freeFrom ? 0 : baseFee;
   const { exclusive: netSubtotal, vat: vatAmount } = splitInclusiveVat(totalPrice);
 
   if (items.length === 0) {
+    const trackHref = primaryAlertOrderId ? `/order/${primaryAlertOrderId}` : "/orders";
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -23,9 +26,20 @@ const CartPage = () => {
           <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
           <h2 className="font-heading text-2xl font-bold mb-2">السلة فارغة</h2>
           <p className="text-muted-foreground mb-6">أضف منتجات من المتجر لبدء التسوق</p>
-          <Link to="/">
-            <Button>تصفح المنتجات</Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <Link to="/">
+              <Button>تصفح المنتجات</Button>
+            </Link>
+            {hasActiveOrder && (
+              <Link to={trackHref}>
+                <Button variant="outline" className="gap-2">
+                  <Package className="h-4 w-4" />
+                  تتبع طلبك
+                  {activeOrders[0] ? ` #${activeOrders[0].order_number}` : ""}
+                </Button>
+              </Link>
+            )}
+          </div>
         </main>
         <div className="hidden md:block">
           <Footer />

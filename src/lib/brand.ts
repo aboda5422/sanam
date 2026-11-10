@@ -35,3 +35,8 @@ export const BRAND = {
     x: "https://x.com/SanamSaudi",
   },
 } as const;
+
+/** Browser storage keys — cart survives refresh/logout until checkout clears it */
+export const STORAGE_KEYS = {
+  cart: "sanam:cart",
+} as const;

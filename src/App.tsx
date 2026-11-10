@@ -17,6 +17,7 @@ import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
+import CustomerOrdersPage from "./pages/CustomerOrdersPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
 import NotFound from "./pages/NotFound";
 import CustomerComplaintsPage from "./pages/CustomerComplaintsPage";
@@ -106,6 +107,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/orders" element={<CustomerOrdersPage />} />
             <Route path="/order/:id" element={<OrderTrackingPage />} />
             <Route path="/complaints" element={<CustomerComplaintsPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />

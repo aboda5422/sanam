@@ -4,11 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { getSessionId } from "@/hooks/usePageTracking";
 import { useBranch } from "@/contexts/BranchContext";
 import { remapCartItemsToBranch, summarizeCartRemapNotices } from "@/lib/remap-cart";
+import { STORAGE_KEYS } from "@/lib/brand";
 import { toast } from "sonner";
 
 export interface CartItem {
   product: Product;
   quantity: number;
+}
+
+interface StoredCart {
+  branchId: string | null;
+  items: CartItem[];
 }
 
 interface CartContextType {
@@ -26,13 +32,72 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+function isValidCartItem(value: unknown): value is CartItem {
+  if (!value || typeof value !== "object") return false;
+  const item = value as CartItem;
+  const p = item.product;
+  return (
+    typeof item.quantity === "number" &&
+    item.quantity > 0 &&
+    !!p &&
+    typeof p === "object" &&
+    typeof p.id === "string" &&
+    typeof p.name === "string" &&
+    typeof p.price === "number"
+  );
+}
+
+function loadStoredCart(): StoredCart | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.cart);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredCart;
+    if (!parsed || !Array.isArray(parsed.items)) return null;
+    return {
+      branchId: typeof parsed.branchId === "string" ? parsed.branchId : null,
+      items: parsed.items.filter(isValidCartItem),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveStoredCart(branchId: string | null, items: CartItem[]) {
+  try {
+    if (items.length === 0) {
+      localStorage.removeItem(STORAGE_KEYS.cart);
+      return;
+    }
+    const payload: StoredCart = { branchId, items };
+    localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(payload));
+  } catch {
+    // quota / private mode — ignore
+  }
+}
+
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const initial = useRef<StoredCart | null | undefined>(undefined);
+  if (initial.current === undefined) {
+    initial.current = loadStoredCart();
+  }
+
+  const [items, setItems] = useState<CartItem[]>(() => initial.current?.items ?? []);
   const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { selectedBranch } = useBranch();
-  const branchIdRef = useRef<string | null>(null);
+  const branchIdRef = useRef<string | null>(initial.current?.branchId ?? null);
   const itemsRef = useRef<CartItem[]>(items);
+  const skipPersistOnce = useRef(true);
   itemsRef.current = items;
+
+  // Persist across navigation / refresh / logout / app reopen (until clearCart on order).
+  useEffect(() => {
+    if (skipPersistOnce.current) {
+      skipPersistOnce.current = false;
+      return;
+    }
+    const branchId = selectedBranch?.id ?? branchIdRef.current;
+    saveStoredCart(branchId, items);
+  }, [items, selectedBranch?.id]);
 
   // Transfer cart to the new branch (match by catalog); warn on missing / price / stock changes.
   useEffect(() => {
@@ -49,7 +114,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     branchIdRef.current = next;
     const snapshot = itemsRef.current;
-    if (snapshot.length === 0) return;
+    if (snapshot.length === 0) {
+      saveStoredCart(next, []);
+      return;
+    }
 
     let cancelled = false;
     (async () => {
@@ -57,6 +125,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const result = await remapCartItemsToBranch(snapshot, next);
         if (cancelled) return;
         setItems(result.items);
+        saveStoredCart(next, result.items);
         const lines = summarizeCartRemapNotices(result.notices);
         if (lines.length) {
           toast.warning("تنبيه بعد تغيير الفرع", {
@@ -70,6 +139,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (cancelled) return;
         console.error("[cart-remap]", e);
         setItems([]);
+        saveStoredCart(next, []);
         toast.error("تعذر نقل السلة إلى الفرع الجديد؛ تم تفريغها");
       }
     })();
@@ -105,7 +175,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const clearCart = useCallback(() => setItems([]), []);
+  const clearCart = useCallback(() => {
+    setItems([]);
+    saveStoredCart(branchIdRef.current, []);
+  }, []);
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
   const uniqueItems = items.length;

@@ -5,15 +5,17 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import QuickOrderSheet from "@/components/quick-order/QuickOrderSheet";
 import CartNavLink from "@/components/layout/CartNavLink";
+import { useCustomerOrderAlerts } from "@/hooks/useCustomerOrderAlerts";
 
 const MobileBottomNav = () => {
   const location = useLocation();
   const { t } = useLanguage();
   const [quickOrderOpen, setQuickOrderOpen] = useState(false);
+  const { activeOrderCount, hasUnreadStaffChat } = useCustomerOrderAlerts();
 
   const items = [
     { path: "/", icon: Home, label: t("الرئيسية", "Home"), match: "home" as const },
-    { path: "/profile?tab=orders", icon: Package, label: t("الطلبات", "Orders"), match: "orders" as const },
+    { path: "/orders", icon: Package, label: t("الطلبات", "Orders"), match: "orders" as const },
     { path: "/cart", match: "cart" as const, cart: true as const },
     { path: "/profile", icon: User, label: t("حسابي", "Account"), match: "account" as const },
   ];
@@ -28,16 +30,15 @@ const MobileBottomNav = () => {
   const rightItems = items.slice(2);
 
   const isItemActive = (match: (typeof items)[number]["match"]) => {
-    const tab = new URLSearchParams(location.search).get("tab");
     if (match === "home") return location.pathname === "/";
     if (match === "orders") {
-      return location.pathname.startsWith("/profile") && tab === "orders";
+      return location.pathname.startsWith("/orders") || location.pathname.startsWith("/order/");
     }
     if (match === "cart") {
-      return location.pathname.startsWith("/cart") || location.pathname.startsWith("/order/");
+      return location.pathname.startsWith("/cart");
     }
     if (match === "account") {
-      return location.pathname.startsWith("/profile") && tab !== "orders";
+      return location.pathname.startsWith("/profile");
     }
     return false;
   };
@@ -55,6 +56,7 @@ const MobileBottomNav = () => {
       );
     }
     const Icon = item.icon!;
+    const showOrdersBadge = item.match === "orders" && (hasUnreadStaffChat || activeOrderCount > 0);
     return (
       <Link
         key={item.path}
@@ -65,7 +67,17 @@ const MobileBottomNav = () => {
         )}
       >
         <div className="relative">
-          <Icon className={cn("h-6 w-6", isActive && "text-primary")} />
+          <Icon className={cn("h-6 w-6", isActive && "text-primary", hasUnreadStaffChat && item.match === "orders" && "text-rose-600")} />
+          {showOrdersBadge && (
+            <span
+              className={cn(
+                "absolute -top-1.5 -right-2 text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1",
+                hasUnreadStaffChat ? "bg-rose-600 animate-pulse" : "bg-amber-500",
+              )}
+            >
+              {hasUnreadStaffChat ? "!" : activeOrderCount > 9 ? "9+" : activeOrderCount}
+            </span>
+          )}
         </div>
         <span>{item.label}</span>
       </Link>

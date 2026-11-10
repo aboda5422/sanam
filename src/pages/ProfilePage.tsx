@@ -45,6 +45,12 @@ const ProfilePage = () => {
   const [saving, setSaving] = useState(false);
   const tabFromUrl = searchParams.get("tab");
   const activeTab = tabFromUrl && PROFILE_TABS.has(tabFromUrl) ? tabFromUrl : "profile";
+
+  // Active orders live on /orders (storefront), not under حسابي.
+  useEffect(() => {
+    if (tabFromUrl === "orders") navigate("/orders", { replace: true });
+  }, [tabFromUrl, navigate]);
+
   const [form, setForm] = useState({ full_name: "", phone: "", address: "", city: "مكة المكرمة" });
   const [editingProfile, setEditingProfile] = useState(false);
   const [cancelOrderId, setCancelOrderId] = useState<string | null>(null);

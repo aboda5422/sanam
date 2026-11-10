@@ -36,7 +36,7 @@ export default function CartNavLink({ variant = "header", className, label, acti
         : hasActiveOrder
           ? primaryAlertOrderId
             ? `/order/${primaryAlertOrderId}`
-            : "/profile?tab=orders"
+            : "/orders"
           : "/cart";
 
   const aria = hasUnreadStaffChat
