@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { MapPin, Clock, CheckCircle, CreditCard, Banknote, Loader2, Pencil, Lock, AlertTriangle, ArrowRight, ShoppingCart } from "lucide-react";
+import { MapPin, Clock, CalendarClock, CheckCircle, CreditCard, Banknote, Loader2, Pencil, Lock, AlertTriangle, ArrowRight, ShoppingCart } from "lucide-react";
 import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,13 +43,47 @@ import {
   notifyAddressesChanged,
   type CustomerAddressPayload,
 } from "@/lib/branch";
+import { STORAGE_KEYS } from "@/lib/brand";
 import { applyCustomerDiscount } from "@/lib/customer-discount";
 import { splitInclusiveVat } from "@/lib/vat";
 import { convertGuestAccount, isAnonymousUser, startGuestSession } from "@/lib/guest";
 import { translateError } from "@/lib/error-messages";
 
-const deliveryTimes = [
-  IMMEDIATE_DELIVERY_LABEL,
+type StoredCheckoutAddress = {
+  userId: string;
+  address: CustomerAddressPayload;
+};
+
+function loadStoredCheckoutAddress(userId: string): CustomerAddressPayload | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.checkoutAddress);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredCheckoutAddress;
+    if (!parsed || parsed.userId !== userId || !parsed.address?.address) return null;
+    return parsed.address;
+  } catch {
+    return null;
+  }
+}
+
+function saveStoredCheckoutAddress(userId: string, address: CustomerAddressPayload) {
+  try {
+    const payload: StoredCheckoutAddress = { userId, address };
+    localStorage.setItem(STORAGE_KEYS.checkoutAddress, JSON.stringify(payload));
+  } catch {
+    // ignore quota / private mode
+  }
+}
+
+function clearStoredCheckoutAddress() {
+  try {
+    localStorage.removeItem(STORAGE_KEYS.checkoutAddress);
+  } catch {
+    // ignore
+  }
+}
+
+const scheduledDeliveryTimes = [
   "10:00 - 12:00 صباحاً",
   "12:00 - 2:00 ظهراً",
   "2:00 - 4:00 عصراً",
@@ -100,7 +133,8 @@ const CheckoutPage = () => {
       .filter(Boolean);
     return { allowCash, notices };
   }, [items, dbCategories, categorySections]);
-  const [selectedTime, setSelectedTime] = useState("");
+  const [selectedTime, setSelectedTime] = useState(IMMEDIATE_DELIVERY_LABEL);
+  const [deliveryTimingMode, setDeliveryTimingMode] = useState<"now" | "later">("now");
   const [phone, setPhone] = useState("");
   const [savedPhone, setSavedPhone] = useState("");
   const [editingPhone, setEditingPhone] = useState(false);
@@ -111,7 +145,7 @@ const CheckoutPage = () => {
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<CustomerAddressPayload | null>(null);
   const [user, setUser] = useState<any>(null);
-  const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("cash");
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("online");
   const [processing, setProcessing] = useState(false);
   const [askDefaultPhone, setAskDefaultPhone] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
@@ -132,6 +166,26 @@ const CheckoutPage = () => {
       setPaymentMethod("online");
     }
   }, [cartSectionRules.allowCash, paymentMethod]);
+
+  const canDeliverNow = !!(
+    selectedBranch && isBranchOpenNow(selectedBranch.work_start, selectedBranch.work_end)
+  );
+
+  // Default to "الآن"; fall back to "لاحقاً" when the branch is closed.
+  useEffect(() => {
+    if (!selectedBranch) return;
+    if (canDeliverNow) {
+      if (deliveryTimingMode === "now" || selectedTime === IMMEDIATE_DELIVERY_LABEL || !selectedTime) {
+        setDeliveryTimingMode("now");
+        setSelectedTime(IMMEDIATE_DELIVERY_LABEL);
+      }
+      return;
+    }
+    setDeliveryTimingMode("later");
+    if (selectedTime === IMMEDIATE_DELIVERY_LABEL || !selectedTime) {
+      setSelectedTime("");
+    }
+  }, [selectedBranch?.id, selectedBranch?.work_start, selectedBranch?.work_end, canDeliverNow]);
 
   useEffect(() => {
     markCheckoutReached();
@@ -156,18 +210,36 @@ const CheckoutPage = () => {
         } else if (guest) {
           setName("ضيف");
         }
-        // Auto-select default delivery address
+        // Restore delivery address for this session/user (guests included).
         const { data: defaultAddr } = await supabase
           .from("user_addresses")
           .select("id, label, address, lat, lng, national_address")
           .eq("user_id", session.user.id)
           .eq("is_default", true)
           .maybeSingle();
-        if (defaultAddr) {
-          setSelectedAddress(defaultAddr as CustomerAddressPayload);
-          const na = (defaultAddr as any).national_address;
+        let restored = (defaultAddr as CustomerAddressPayload | null) || null;
+        if (!restored) {
+          const { data: latestAddr } = await supabase
+            .from("user_addresses")
+            .select("id, label, address, lat, lng, national_address")
+            .eq("user_id", session.user.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          restored = (latestAddr as CustomerAddressPayload | null) || null;
+        }
+        if (!restored) {
+          restored = loadStoredCheckoutAddress(session.user.id);
+        } else {
+          saveStoredCheckoutAddress(session.user.id, restored);
+        }
+        if (restored) {
+          setSelectedAddress(restored);
+          const na = restored.national_address;
           if (na) setNationalAddress(normalizeNationalAddress(na));
         }
+      } else {
+        clearStoredCheckoutAddress();
       }
       setSessionChecked(true);
     };
@@ -306,7 +378,6 @@ const CheckoutPage = () => {
           <p className="text-muted-foreground">يجب اختيار فرع قبل إتمام الطلب</p>
           <Button onClick={openPicker}>اختيار الفرع</Button>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -323,7 +394,6 @@ const CheckoutPage = () => {
         <main className="flex-1 flex items-center justify-center py-16">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </main>
-        <Footer />
       </div>
     );
   }
@@ -371,7 +441,6 @@ const CheckoutPage = () => {
             </button>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -477,7 +546,6 @@ const CheckoutPage = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <Footer />
       </div>
     );
   }
@@ -491,21 +559,34 @@ const CheckoutPage = () => {
     if (addr.national_address) setNationalAddress(addr.national_address);
     setShowMapPicker(false);
 
-    if (user && !addr.id && !isGuest) {
+    if (user) {
+      saveStoredCheckoutAddress(user.id, addr);
+    }
+
+    // Persist for guests and registered users so the next checkout in this session keeps the pin.
+    if (user && !addr.id) {
       const { count } = await supabase
         .from("user_addresses")
         .select("id", { count: "exact", head: true })
         .eq("user_id", user.id);
-      await supabase.from("user_addresses").insert({
-        user_id: user.id,
-        label: addr.label,
-        address: addr.address,
-        lat: addr.lat,
-        lng: addr.lng,
-        national_address: addr.national_address || null,
-        is_default: (count || 0) === 0,
-      });
-      notifyAddressesChanged();
+      const { data: inserted, error } = await supabase
+        .from("user_addresses")
+        .insert({
+          user_id: user.id,
+          label: addr.label,
+          address: addr.address,
+          lat: addr.lat,
+          lng: addr.lng,
+          national_address: addr.national_address || null,
+          is_default: (count || 0) === 0,
+        })
+        .select("id, label, address, lat, lng, national_address")
+        .maybeSingle();
+      if (!error && inserted) {
+        setSelectedAddress(inserted as CustomerAddressPayload);
+        saveStoredCheckoutAddress(user.id, inserted as CustomerAddressPayload);
+        notifyAddressesChanged();
+      }
     }
   };
 
@@ -515,6 +596,7 @@ const CheckoutPage = () => {
       return;
     }
     setSelectedAddress(addr);
+    if (user) saveStoredCheckoutAddress(user.id, addr);
     if (addr.national_address) setNationalAddress(normalizeNationalAddress(addr.national_address));
   };
 
@@ -649,8 +731,11 @@ const CheckoutPage = () => {
     const hasNational = isValidNationalAddress(national);
     const hasCoords = selectedAddress ? addressHasCoords(selectedAddress) : false;
 
-    if (!selectedTime) {
-      toast({ title: "يرجى اختيار وقت التوصيل", variant: "destructive" });
+    if (!selectedTime || (deliveryTimingMode === "later" && selectedTime === IMMEDIATE_DELIVERY_LABEL)) {
+      toast({
+        title: deliveryTimingMode === "later" ? "يرجى اختيار فترة التوصيل" : "يرجى اختيار وقت التوصيل",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -924,38 +1009,81 @@ const CheckoutPage = () => {
                 <Clock className="h-5 w-5 text-primary" />
                 وقت التوصيل
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {deliveryTimes.map((time) => (
-                  <button
-                    key={time}
-                    onClick={() => {
-                      if (
-                        time === IMMEDIATE_DELIVERY_LABEL &&
-                        selectedBranch &&
-                        !isBranchOpenNow(selectedBranch.work_start, selectedBranch.work_end)
-                      ) {
-                        toast({
-                          title: "خارج وقت الدوام",
-                          description: immediateDeliveryClosedMessage(
-                            selectedBranch.work_start,
-                            selectedBranch.work_end,
-                          ),
-                          variant: "destructive",
-                        });
-                        return;
-                      }
-                      setSelectedTime(time);
-                    }}
-                    className={`p-3 rounded-lg border text-sm font-medium transition-all ${
-                      selectedTime === time
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "hover:border-primary/30"
-                    }`}
-                  >
-                    {time}
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!canDeliverNow) {
+                      toast({
+                        title: "خارج وقت الدوام",
+                        description: immediateDeliveryClosedMessage(
+                          selectedBranch?.work_start,
+                          selectedBranch?.work_end,
+                        ),
+                        variant: "destructive",
+                      });
+                      setDeliveryTimingMode("later");
+                      if (selectedTime === IMMEDIATE_DELIVERY_LABEL) setSelectedTime("");
+                      return;
+                    }
+                    setDeliveryTimingMode("now");
+                    setSelectedTime(IMMEDIATE_DELIVERY_LABEL);
+                  }}
+                  className={`p-4 rounded-lg border-2 text-right transition-all flex items-center gap-3 ${
+                    deliveryTimingMode === "now" && selectedTime === IMMEDIATE_DELIVERY_LABEL
+                      ? "border-primary bg-primary/5"
+                      : canDeliverNow
+                        ? "hover:border-primary/30"
+                        : "opacity-60 hover:border-primary/30"
+                  }`}
+                >
+                  <Clock className="h-6 w-6 text-primary shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm">الآن</p>
+                    <p className="text-xs text-muted-foreground">في أقرب وقت</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeliveryTimingMode("later");
+                    if (selectedTime === IMMEDIATE_DELIVERY_LABEL) setSelectedTime("");
+                  }}
+                  className={`p-4 rounded-lg border-2 text-right transition-all flex items-center gap-3 ${
+                    deliveryTimingMode === "later"
+                      ? "border-primary bg-primary/5"
+                      : "hover:border-primary/30"
+                  }`}
+                >
+                  <CalendarClock className="h-6 w-6 text-primary shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm">لاحقاً</p>
+                    <p className="text-xs text-muted-foreground">اختر فترة التوصيل</p>
+                  </div>
+                </button>
               </div>
+
+              {deliveryTimingMode === "later" && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-xs text-muted-foreground">اختر فترة التوصيل المناسبة:</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {scheduledDeliveryTimes.map((time) => (
+                      <button
+                        key={time}
+                        type="button"
+                        onClick={() => setSelectedTime(time)}
+                        className={`p-3 rounded-lg border text-sm font-medium transition-all ${
+                          selectedTime === time
+                            ? "border-primary bg-primary/5 text-primary"
+                            : "hover:border-primary/30"
+                        }`}
+                      >
+                        {time}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Section notices */}
@@ -1097,7 +1225,6 @@ const CheckoutPage = () => {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

@@ -36,7 +36,8 @@ export const BRAND = {
   },
 } as const;
 
-/** Browser storage keys — cart survives refresh/logout until checkout clears it */
+/** Browser storage keys — cart/address survive refresh until session/account changes */
 export const STORAGE_KEYS = {
   cart: "sanam:cart",
+  checkoutAddress: "sanam:checkout_address",
 } as const;

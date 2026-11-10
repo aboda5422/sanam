@@ -100,13 +100,17 @@ const MobileBottomNav = () => {
           {/* Center Smart Search FAB */}
           <div className="flex-1 flex items-center justify-center">
             <button
+              type="button"
               onClick={() => setQuickOrderOpen(true)}
               aria-label={t("بحث ذكي", "Smart Search")}
-              className="-mt-4 relative group"
+              className="-mt-4 relative group touch-manipulation"
             >
-              <span className="absolute inset-0 rounded-full bg-primary/35 blur-md animate-pulse" aria-hidden />
-              <span className="relative flex items-center justify-center w-[38px] h-[38px] rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-background transition-transform group-active:scale-95">
-                <Sparkles className="h-[18px] w-[18px]" />
+              <span
+                className="absolute inset-[-4px] rounded-full bg-primary/30 blur-md animate-pulse transition-all duration-300 group-hover:inset-[-8px] group-hover:bg-primary/50 group-hover:blur-lg group-active:bg-primary/45"
+                aria-hidden
+              />
+              <span className="relative flex items-center justify-center w-[38px] h-[38px] rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-background transition-all duration-300 ease-out group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-primary/45 group-active:scale-95">
+                <Sparkles className="h-[18px] w-[18px] transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
               </span>
             </button>
           </div>
@@ -129,11 +133,11 @@ const MobileBottomNav = () => {
         )}
       >
         <span
-          className="absolute inset-[-6px] rounded-full bg-primary/25 blur-md animate-soft-glow"
+          className="absolute inset-[-6px] rounded-full bg-primary/25 blur-md animate-soft-glow transition-all duration-300 group-hover:inset-[-10px] group-hover:bg-primary/45"
           aria-hidden
         />
-        <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/75 text-primary-foreground shadow-lg shadow-primary/25 ring-2 ring-background transition-transform group-hover:scale-105 group-active:scale-95">
-          <Sparkles className="h-6 w-6" />
+        <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/75 text-primary-foreground shadow-lg shadow-primary/25 ring-2 ring-background transition-all duration-300 ease-out group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-primary/40 group-active:scale-95">
+          <Sparkles className="h-6 w-6 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
         </span>
       </button>
     </>

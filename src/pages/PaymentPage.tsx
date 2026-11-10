@@ -16,15 +16,19 @@ const PaymentPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const formRef = useRef<HTMLDivElement>(null);
+  const initOnceRef = useRef(false);
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState<any>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     const init = async () => {
-      if (!orderId) return;
+      if (!orderId || initOnceRef.current) return;
 
       const { data: ord, error } = await supabase
         .from("orders").select("*").eq("id", orderId).maybeSingle();
+      if (cancelled) return;
       if (error || !ord) {
         toast({ title: "الطلب غير موجود", variant: "destructive" });
         navigate("/");
@@ -33,9 +37,11 @@ const PaymentPage = () => {
       setOrder(ord);
 
       const { data: keyData } = await supabase.functions.invoke("get-moyasar-key");
+      if (cancelled) return;
       const publishableKey = keyData?.key;
       if (!publishableKey) {
         toast({ title: "خدمة الدفع غير مهيأة", variant: "destructive" });
+        setLoading(false);
         return;
       }
 
@@ -56,30 +62,60 @@ const PaymentPage = () => {
         document.body.appendChild(s);
       });
 
-      await loadScript();
-      setLoading(false);
+      try {
+        await loadScript();
+      } catch {
+        if (!cancelled) {
+          toast({ title: "تعذر تحميل نموذج الدفع", variant: "destructive" });
+          setLoading(false);
+        }
+        return;
+      }
+      if (cancelled) return;
 
-      setTimeout(() => {
-        if (!window.Moyasar || !formRef.current) return;
-        window.Moyasar.init({
-          element: formRef.current,
-          amount: Math.round(Number(ord.total) * 100),
-          currency: "SAR",
-          description: `طلب رقم ${ord.order_number}`,
-          publishable_api_key: publishableKey,
-          callback_url: `${window.location.origin}/payment-result`,
-          supported_networks: ["mada", "visa", "mastercard"],
-          methods: ["creditcard", "stcpay", "applepay"],
-          apple_pay: {
-            country: "SA",
-            label: "سنام سوبرماركت",
-            validate_merchant_url: "https://api.moyasar.com/v1/applepay/initiate",
-          },
-          metadata: { order_id: ord.id, user_id: ord.user_id },
-        });
-      }, 100);
+      // Wait until the form mount is painted (loader off) before Moyasar.init.
+      setLoading(false);
+      await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+      if (cancelled || !window.Moyasar || !formRef.current || initOnceRef.current) return;
+
+      initOnceRef.current = true;
+      window.Moyasar.init({
+        element: formRef.current,
+        amount: Math.round(Number(ord.total) * 100),
+        currency: "SAR",
+        description: `طلب رقم ${ord.order_number}`,
+        publishable_api_key: publishableKey,
+        callback_url: `${window.location.origin}/payment-result`,
+        language: "ar",
+        supported_networks: ["mada", "visa", "mastercard"],
+        methods: ["creditcard", "stcpay", "applepay"],
+        apple_pay: {
+          country: "SA",
+          label: "سنام سوبرماركت",
+          validate_merchant_url: "https://api.moyasar.com/v1/applepay/initiate",
+        },
+        metadata: { order_id: ord.id, user_id: ord.user_id },
+        on_failure: (err: unknown) => {
+          const message =
+            typeof err === "string"
+              ? err
+              : err && typeof err === "object" && "message" in err
+                ? String((err as { message?: unknown }).message || err)
+                : String(err || "فشل الدفع");
+          console.error("[moyasar]", err);
+          toast({
+            title: "تعذر إكمال الدفع",
+            description: message,
+            variant: "destructive",
+          });
+        },
+      });
     };
+
     init();
+    return () => {
+      cancelled = true;
+    };
   }, [orderId, navigate, toast]);
 
   return (
@@ -92,7 +128,7 @@ const PaymentPage = () => {
         </p>
       )}
       <p className="text-xs text-muted-foreground mb-6">
-        أبل باي يظهر على سفاري/آيفون فقط. سامسونج باي يحتاج تفعيل الخدمة من لوحة ميسر (رقم Service ID).
+        Apple Pay: افتحي الرابط من تطبيق <strong>Safari</strong> (مو Chrome). إذا فتحت ورقة الدفع ثم نزلت وحدها خلال ثوانٍ فالمتصفح أو تسجيل النطاق عند Moyasar لم يُكمِل التحقق — أعيدي المحاولة من Safari، أو تأكدي أن النطاق store.sanam.sa حالته Registered.
       </p>
       {loading && (
         <div className="flex items-center justify-center py-16">
